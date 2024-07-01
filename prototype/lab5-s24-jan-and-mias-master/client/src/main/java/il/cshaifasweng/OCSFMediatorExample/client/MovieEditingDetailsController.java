@@ -383,9 +383,7 @@ public class MovieEditingDetailsController {
     @Subscribe
     public void create_catlog_event(UpdateCatalogEvent E)
     {
-        Platform.runLater(()->{
-            search_movie_name_function();
-        });
+        search_movie_name_function();
     }
     @Subscribe
     public void change_Movie_ID(UpdateMovieIdBoxEvent event){
@@ -428,12 +426,13 @@ public class MovieEditingDetailsController {
     public void create_catalog(Message M)
     {
         Vbox_movies.getChildren().clear();
-        Vbox_movies.setPrefHeight(0);
+        Vbox_movies.setPrefHeight(50);
         List<Movie> movies = (List<Movie>)M.getObject();
         for (Movie movie : movies) {
-            Vbox_movies.setPrefHeight(Vbox_movies.getPrefHeight()+180);
+            Vbox_movies.setPrefHeight(Vbox_movies.getPrefHeight()+190);
             HBox hbox_movies = new HBox();
             hbox_movies.setSpacing(10);
+            hbox_movies.setPrefHeight(180);
             ImageView imageView = new ImageView();
             File file = movie.getImage_location();
             if(file != null) {
@@ -499,6 +498,8 @@ public class MovieEditingDetailsController {
                     director.setText("");
                     price.setText("");
                     description.setText("");
+                    File_uploaded = null;
+
                 }
             });
             vboxButtons.getChildren().add(remove_movie);

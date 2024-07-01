@@ -11,8 +11,3 @@ VALUES
 
 
 
-INSERT INTO screening (branch,date_time,room_number,theater_map,movie_id)
-VALUES
-('Haifa','2021/11/11 15:00',1,"0, 0, 0, 0, 0",1);
-
-
