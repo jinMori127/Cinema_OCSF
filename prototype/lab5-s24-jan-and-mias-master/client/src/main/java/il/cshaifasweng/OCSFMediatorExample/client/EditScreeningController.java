@@ -127,6 +127,7 @@ public class EditScreeningController {
         {
             ErrorMessage.setVisible(true);
             ErrorMessage.setText("select a screening");
+            return;
         }
         Message message = new Message(10,"#RemoveScreening");
         message.setObject(current_screening);
@@ -149,6 +150,7 @@ public class EditScreeningController {
 
     @FXML
     void search(ActionEvent event) {
+        ErrorMessage.setVisible(false);
         search_branch_function();
     }
 
@@ -159,6 +161,19 @@ public class EditScreeningController {
         {
             ErrorMessage.setVisible(true);
             ErrorMessage.setText("select a screening");
+            return;
+        }
+        if(date.getText().trim().isEmpty())
+        {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("enter a date");
+            return;
+        }
+        if(screening_time.getText().trim().isEmpty())
+        {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("enter a time");
+            return;
         }
 
         String dateC = date.getText();
@@ -168,7 +183,9 @@ public class EditScreeningController {
         try {
              real_date = formatter.parse(dateC+" "+timeC);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("date format: dd/MM/yyyy, time format: HH:mm");
+            return;
         }
         current_screening.setDate_time(real_date);
         Message message = new Message(10,"#UpdateScreening");
@@ -285,9 +302,9 @@ public class EditScreeningController {
     @Subscribe
     public void update_event(UpdateScreeningForMovieEvent event)
     {
-        Platform.runLater(()->{
-            search_branch_function();
-        });
+
+        search_branch_function();
+
     }
 
     @FXML
@@ -349,8 +366,9 @@ public class EditScreeningController {
     }
     @FXML
     void back_to_catalog(ActionEvent event) {
+        ErrorMessage.setVisible(false);
         Message message = new Message(0,"");
-
+        EventBus.getDefault().unregister(this);
         try {
             SimpleClient.getClient().sendToServer(message);
 
@@ -361,6 +379,7 @@ public class EditScreeningController {
 
     @FXML
     void get_row_column(KeyEvent event) {
+        ErrorMessage.setVisible(false);
         if (Branch.getValue() == null)
         {
             return;
@@ -377,6 +396,30 @@ public class EditScreeningController {
             column_number.setText("");
         }
 
+
+    }
+    @FXML
+    void change_branch(ActionEvent event) {
+        ErrorMessage.setVisible(false);
+        if (Branch.getValue() == null)
+        {
+            return;
+        }
+        if(room_number.getText() ==null||room_number.getText().isEmpty())
+        {
+            return;
+        }
+        List<String> key = Arrays.asList(Branch.getValue().toString(),room_number.getText().toString());
+        List<Integer> row_col= SimpleChatClient.get_rows_and_columns(key);
+        if(row_col != null) {
+            rows_number.setText(row_col.get(0).toString());
+            column_number.setText(row_col.get(1).toString());
+        }
+        else
+        {
+            rows_number.setText("");
+            column_number.setText("");
+        }
 
     }
 

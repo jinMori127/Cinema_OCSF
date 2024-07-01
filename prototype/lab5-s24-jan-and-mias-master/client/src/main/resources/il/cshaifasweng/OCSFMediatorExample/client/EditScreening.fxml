@@ -39,7 +39,7 @@
       <TextField fx:id="date" layoutX="55.0" layoutY="124.0" />
       <Text layoutX="91.0" layoutY="33.0" onMouseClicked="#select_screening" strokeType="OUTSIDE" strokeWidth="0.0" text="Room:" />
       <TextField fx:id="room_number" layoutX="130.0" layoutY="15.0" onKeyTyped="#get_row_column" prefHeight="26.0" prefWidth="42.0" />
-      <ComboBox fx:id="Branch" layoutX="62.0" layoutY="59.0" prefHeight="26.0" prefWidth="113.0" />
+      <ComboBox fx:id="Branch" layoutX="62.0" layoutY="59.0" onAction="#change_branch" prefHeight="26.0" prefWidth="113.0" />
       <Text layoutX="443.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Search branch" />
       <ComboBox fx:id="search_branch_combobox" layoutX="412.0" layoutY="28.0" onAction="#search" prefWidth="150.0" />
       <Text layoutX="378.0" layoutY="129.0" strokeType="OUTSIDE" strokeWidth="0.0" text="theater map:" />

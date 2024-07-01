@@ -404,6 +404,7 @@ public class MovieEditingDetailsController {
         {
             ErrorMessage.setVisible(true);
             ErrorMessage.setText("Price cannot be empty");
+            return;
         }
         try{
             Integer.parseInt(price.getText());
@@ -484,6 +485,7 @@ public class MovieEditingDetailsController {
                     ErrorMessage.setText("movie did not get deleted");
                     ErrorMessage.setVisible(true);
                     throw new RuntimeException(e);
+
                 }
                 if(Integer.toString(current_movie_id).equals(Movie_id.getText()))
                 {
@@ -540,6 +542,7 @@ public class MovieEditingDetailsController {
                 try {
                     go_to_screening_movie = movie;
                     SimpleClient.getClient().sendToServer(screening_message);
+                    EventBus.getDefault().unregister(this);
 
                 } catch (IOException e) {
                     ErrorMessage.setText("cant go to screening");
