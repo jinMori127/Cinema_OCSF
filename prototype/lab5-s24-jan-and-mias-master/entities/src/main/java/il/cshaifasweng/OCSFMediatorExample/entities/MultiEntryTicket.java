@@ -24,6 +24,7 @@ public class MultiEntryTicket implements Serializable{
         this.remain_tickets = remain_tickets;
     }
 
+    // get/set methods
     public int get_auto_number_multi_entry_ticket() {
         return auto_number_multi_entry_ticket;
     }

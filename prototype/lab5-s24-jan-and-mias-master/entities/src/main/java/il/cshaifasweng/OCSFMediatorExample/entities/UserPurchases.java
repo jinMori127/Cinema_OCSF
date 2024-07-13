@@ -24,6 +24,7 @@ public class UserPurchases implements Serializable{
     private String purchase_type;
     private String link;
 
+    // constructors
     public UserPurchases() {
 
     }
@@ -47,6 +48,7 @@ public class UserPurchases implements Serializable{
         this.link = link;
     }
 
+    // get/set methods
     public int get_auto_number_purchase() {
         return auto_number_purchase;
     }
