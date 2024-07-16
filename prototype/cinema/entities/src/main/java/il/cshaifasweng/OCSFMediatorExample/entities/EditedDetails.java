@@ -9,37 +9,44 @@ import java.util.List;
 import java.io.File;
 
 @Entity
-@Table(name = "EDs")
+@Table(name = "EditedDetails")
 public class EditedDetails implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int auto_number_edited_details;
 
-    @OneToMany(mappedBy = "new_price", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Movie> movie = new ArrayList<Movie>();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "movie_id", referencedColumnName = "auto_number_movie")
+    private Movie movie;
 
     private double changed_price;
 
+    // Constructors
     public EditedDetails() {}
 
-    public EditedDetails(int id, double changed_price) {
-        this.id = id;
+    public EditedDetails(int auto_number_edited_details,Movie movie, double changed_price) {
+        this.auto_number_edited_details = auto_number_edited_details;
+        this.movie = movie;
         this.changed_price = changed_price;
     }
 
-    public int getId() {
-        return id;
+    public int get_auto_number_edited_details() {
+        return auto_number_edited_details;
     }
 
-    public double getChanged_price() {
-        return changed_price;
-    }
-
-    public List<Movie> getMovie() {
+    public Movie get_movie() {
         return movie;
     }
 
-    public void setChanged_price(double changed_price) {
+    public void set_movie(Movie movie) {
+        this.movie = movie;
+    }
+
+    public double get_changed_price() {
+        return changed_price;
+    }
+
+    public void set_changed_price(double changed_price) {
         this.changed_price = changed_price;
     }
 }
