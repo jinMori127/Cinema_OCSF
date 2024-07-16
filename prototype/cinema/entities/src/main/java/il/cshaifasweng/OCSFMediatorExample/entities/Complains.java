@@ -17,9 +17,11 @@ public class Complains implements Serializable {
     private String complain_text;
     private String time_of_complain;
     private String respond;
-    private String status;
+    private bool respond_status;
     private String cinema_branch;
 
+
+    public Complains() {}
     // Constructor
     public Complains(IdUser id_user, String complain_text, String time_of_complain, String respond, String status, String cinema_branch) {
         this.id_user = id_user;
@@ -31,7 +33,6 @@ public class Complains implements Serializable {
     }
 
     // Default Constructor
-    public Complains() {}
 
     // getter and setter
 

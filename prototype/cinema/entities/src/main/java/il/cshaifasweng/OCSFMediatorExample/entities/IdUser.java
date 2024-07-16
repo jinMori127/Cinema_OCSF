@@ -9,7 +9,7 @@ import java.util.List;
 public class IdUser implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
+    private auto_number_id_users;
     private String user_id;
     private String name;
     private String phone_number;
