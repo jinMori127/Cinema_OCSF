@@ -89,7 +89,7 @@ public class UserPurchases implements Serializable{
     public void set_purchase_type(String purchase_type) {
         this.purchase_type = purchase_type;
     }
-    public String getLink() {
+    public String get_link() {
         return link;
     }
     public void set_link(String link) {
