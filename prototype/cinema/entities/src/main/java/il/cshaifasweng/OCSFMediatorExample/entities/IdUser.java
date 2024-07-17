@@ -9,7 +9,8 @@ import java.util.List;
 public class IdUser implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private auto_number_id_users;
+    private int auto_number_id_user;
+
     private String user_id;
     private String name;
     private String phone_number;
@@ -36,6 +37,9 @@ public class IdUser implements Serializable {
     }
 
     // getter and setter
+    public int getAuto_number_id_users() {
+        return auto_number_id_user;
+    }
 
 
     public String get_user_id() {
