@@ -23,15 +23,22 @@ public class SimpleClient extends AbstractClient {
 		if(message.getMessage().equals("Success, go to main page")){
 			System.out.println("here");
 			Current_Message = message;
-
 			Platform.runLater(() -> {
+				SimpleChatClient.setWindowTitle("masterPage");
+				try {
+					SimpleChatClient.setRoot("MasterPage");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+			/*Platform.runLater(() -> {
 				SimpleChatClient.setWindowTitle("editing_details");
 				try {
 					SimpleChatClient.setRoot("Movie_editing_details");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			});
+			});*/
         }
 		else if (message.getMessage().equals("#UpdateMovieList")){
 

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MasterPageCotroller">
+   <center>
+      <StackPane fx:id="content_area" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+   </center>
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu fx:id="catalog_menu" mnemonicParsing="false" onAction="#handle_action" text="HomePage">
+              <items>
+                  <MenuItem onAction="#handle_action" text="Home page" />
+              </items>
+          </Menu>
+            <Menu fx:id="user_action" mnemonicParsing="false" text="User Action">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Purchases" />
+                  <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Complains" />
+              </items>
+            </Menu>
+            <Menu fx:id="Sing_in" mnemonicParsing="false" text="Sign in">
+              <items>
+                  <MenuItem mnemonicParsing="false" onAction="#handle_action" text="id" />
+                  <MenuItem mnemonicParsing="false" onAction="#handle_action" text="worker" />
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Sign out">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Sing out" />
+              </items>
+            </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+</BorderPane>

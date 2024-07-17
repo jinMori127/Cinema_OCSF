@@ -6,9 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import com.mysql.cj.xdevapi.Client;
-import il.cshaifasweng.OCSFMediatorExample.entities.Message;
-import il.cshaifasweng.OCSFMediatorExample.entities.Screening;
-import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
+import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.ConnectionToClient;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
@@ -44,6 +42,15 @@ public class SimpleServer extends AbstractServer {
 		// Add ALL of your entities here. You can also try adding a whole package.
 		configuration.addAnnotatedClass(Movie.class);
 		configuration.addAnnotatedClass(Screening.class);
+		configuration.addAnnotatedClass(Complains.class);
+		configuration.addAnnotatedClass(EditedDetails.class);
+		configuration.addAnnotatedClass(IdUser.class);
+		configuration.addAnnotatedClass(MultiEntryTicket.class);
+		configuration.addAnnotatedClass(Reports.class);
+		configuration.addAnnotatedClass(UserPurchases.class);
+		configuration.addAnnotatedClass(Worker.class);
+
+
 
 
 		ServiceRegistry serviceRegistry = new
