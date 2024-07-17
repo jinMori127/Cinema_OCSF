@@ -17,7 +17,7 @@ public class Complains implements Serializable {
     private String complain_text;
     private String time_of_complain;
     private String respond;
-    private bool respond_status;
+    private boolean  respond_status;
     private String cinema_branch;
 
 
@@ -28,7 +28,7 @@ public class Complains implements Serializable {
         this.complain_text = complain_text;
         this.time_of_complain = time_of_complain;
         this.respond = respond;
-        this.status = status;
+        this.respond_status = respond_status;
         this.cinema_branch = cinema_branch;
     }
 
@@ -76,12 +76,12 @@ public class Complains implements Serializable {
         this.respond = respond;
     }
 
-    public String get_status() {
-        return status;
+    public boolean get_status() {
+        return respond_status;
     }
 
-    public void set_status(String status) {
-        this.status = status;
+    public void set_status(boolean respond_status) {
+        this.respond_status = respond_status;
     }
 
     public String get_cinema_branch() {
