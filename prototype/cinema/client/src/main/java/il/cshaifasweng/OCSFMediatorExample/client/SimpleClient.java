@@ -80,6 +80,13 @@ public class SimpleClient extends AbstractClient {
 		{
 			EventBus.getDefault().post(new ServerErrorEvent(message));
 		}
+
+		else if(message.getMessage().equals("#show_purchases_client"))
+		{
+			EventBus.getDefault().post(new ShowPurchasesBoxEvent(message));
+
+		}
+
 		else {
 			EventBus.getDefault().post(new MessageEvent(message));
 		}

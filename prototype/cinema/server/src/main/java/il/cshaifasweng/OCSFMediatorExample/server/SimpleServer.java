@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import javax.persistence.criteria.Join;
 
 import com.mysql.cj.xdevapi.Client;
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
@@ -265,6 +266,27 @@ public class SimpleServer extends AbstractServer {
 		}
 
 	}
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private List<UserPurchases> search_user_purchases(String id) throws Exception {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<UserPurchases> query = builder.createQuery(UserPurchases.class);
+		Root<UserPurchases> root = query.from(UserPurchases.class);
+		Join<UserPurchases, IdUser> userJoin = root.join("user_id");
+		Predicate idUserPredicate = builder.equal(userJoin.get("user_id"), id);
+		query.select(root).where(idUserPredicate);
+		List<UserPurchases> data = session.createQuery(query).getResultList();
+		session.getTransaction().commit();
+		session.close();
+		return data;
+
+	}
+
+
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		Message message = (Message) msg;
@@ -399,6 +421,23 @@ public class SimpleServer extends AbstractServer {
 				client.sendToClient(message);
 
 			}
+			//////////////////////////////////////////////////////////////////////////////////////////////
+
+			else if (message.getMessage().equals("#show_purchases"))
+			{
+
+				String id = (String) message.getObject();
+				List<UserPurchases> current_user = search_user_purchases(id);
+				message.setObject(current_user);
+				message.setMessage("#show_purchases_client");
+				client.sendToClient(message);
+
+
+			}
+
+
+
+
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} catch (Exception e) {
