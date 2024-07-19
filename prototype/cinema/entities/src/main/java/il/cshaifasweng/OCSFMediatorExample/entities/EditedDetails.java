@@ -30,23 +30,23 @@ public class EditedDetails implements Serializable {
         this.changed_price = changed_price;
     }
 
-    public int get_auto_number_edited_details() {
+    public int getAuto_number_edited_details() {
         return auto_number_edited_details;
     }
 
-    public Movie get_movie() {
+    public Movie getMovie() {
         return movie;
     }
 
-    public void set_movie(Movie movie) {
+    public void setMovie(Movie movie) {
         this.movie = movie;
     }
 
-    public double get_changed_price() {
+    public double getChanged_price() {
         return changed_price;
     }
 
-    public void set_changed_price(double changed_price) {
+    public void setChanged_price(double changed_price) {
         this.changed_price = changed_price;
     }
 }

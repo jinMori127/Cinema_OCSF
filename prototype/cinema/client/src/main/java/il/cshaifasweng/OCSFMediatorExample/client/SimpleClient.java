@@ -84,7 +84,6 @@ public class SimpleClient extends AbstractClient {
 		else if(message.getMessage().equals("#show_purchases_client"))
 		{
 			EventBus.getDefault().post(new ShowPurchasesBoxEvent(message));
-
 		}
 
 		else {

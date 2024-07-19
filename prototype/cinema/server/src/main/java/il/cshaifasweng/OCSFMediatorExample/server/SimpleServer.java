@@ -273,15 +273,14 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 		CriteriaBuilder builder = session.getCriteriaBuilder();
 		CriteriaQuery<UserPurchases> query = builder.createQuery(UserPurchases.class);
-		Root<UserPurchases> root = query.from(UserPurchases.class);
-		Join<UserPurchases, IdUser> userJoin = root.join("user_id");
-		Predicate idUserPredicate = builder.equal(userJoin.get("user_id"), id);
-		query.select(root).where(idUserPredicate);
+		query.from(UserPurchases.class);
 		List<UserPurchases> data = session.createQuery(query).getResultList();
 		session.getTransaction().commit();
 		session.close();
-		return data;
+//		data.removeIf(userPurchase -> !userPurchase.get_id_user().equals(id));
+		System.out.println(data.size());
 
+		return data;
 	}
 
 
@@ -425,11 +424,15 @@ public class SimpleServer extends AbstractServer {
 
 			else if (message.getMessage().equals("#show_purchases"))
 			{
+				System.out.println("hello salam ass2");
 
 				String id = (String) message.getObject();
-				List<UserPurchases> current_user = search_user_purchases(id);
-				message.setObject(current_user);
+
 				message.setMessage("#show_purchases_client");
+				System.out.println(message.getMessage());
+
+				message.setObject(search_user_purchases(id));
+
 				client.sendToClient(message);
 
 

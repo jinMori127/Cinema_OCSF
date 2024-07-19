@@ -46,8 +46,6 @@ import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.Current_Me
 import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.getClient;
 public class UserPurchasesController {
 
-
-
     @FXML
     private Button show_movies;
 
@@ -94,6 +92,8 @@ public class UserPurchasesController {
 
     public void create_user_purchases(Message message) {
         List<UserPurchases> user_list = (List<UserPurchases>) message.getObject();
+        System.out.println(user_list.size());
+
         seats_column.setCellValueFactory(new PropertyValueFactory<>("seats"));
         payment_type_column.setCellValueFactory(new PropertyValueFactory<>("payment_type"));
         payment_amount_column.setCellValueFactory(new PropertyValueFactory<>("payment_amount"));
@@ -106,13 +106,11 @@ public class UserPurchasesController {
 
 
     private String curr_id = "327876116";
-
     @FXML
     public void initialize() {
         EventBus.getDefault().register(this);
-        Message insert_message = new Message(20,"#show_purchaeses");
+        Message insert_message = new Message(20,"#show_purchases");
         insert_message.setObject(curr_id);
-
 
         try {
             SimpleClient.getClient().sendToServer(insert_message);
@@ -120,16 +118,5 @@ public class UserPurchasesController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
-
-
     }
-
-
-
-
-
-
-
 }

@@ -6,21 +6,22 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.UserPurchasesController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.UserPurchasesController">
    <children>
       <TableView fx:id="table_view" layoutX="1.0" layoutY="179.0" prefHeight="225.0" prefWidth="600.0">
         <columns>
-          <TableColumn prefWidth="75.0" text="C1" />
-          <TableColumn prefWidth="75.0" text="C2" />
+          <TableColumn fx:id="seats_column" prefWidth="75.0" text="seats" />
+          <TableColumn fx:id="payment_type_column" prefWidth="112.5" text="payment type" />
+            <TableColumn fx:id="payment_amount_column" prefWidth="110.0" text="Payment amount" />
+            <TableColumn fx:id="link_column" minWidth="2.5" prefWidth="46.5" text="link" />
+            <TableColumn fx:id="id_column" minWidth="7.5" prefWidth="59.5" text="id_user" />
         </columns>
       </TableView>
-      <Button fx:id="show_movies" layoutX="42.0" layoutY="17.0" mnemonicParsing="false" onAction="#show_movies_func" text="Show" />
-      <Button fx:id="delete_movie" layoutX="448.0" layoutY="69.0" mnemonicParsing="false" onAction="#deleteMovie" text="delete" textFill="#f50202">
+      <Button fx:id="delete_movie" layoutX="478.0" layoutY="146.0" mnemonicParsing="false" text="delete" textFill="#f50202">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Button>
-      <Button fx:id="select_movie" layoutX="277.0" layoutY="69.0" mnemonicParsing="false" onAction="#selectMovie" text="select" />
+      <Button fx:id="select_movie" layoutX="401.0" layoutY="146.0" mnemonicParsing="false" text="select" />
    </children>
 </AnchorPane>

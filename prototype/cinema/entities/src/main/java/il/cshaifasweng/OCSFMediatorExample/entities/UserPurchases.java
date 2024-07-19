@@ -53,46 +53,46 @@ public class UserPurchases implements Serializable{
         return auto_number_purchase;
     }
 
-    public String get_seats() {
+    public String getSeats() {
         return seats;
     }
-    public void set_seats(String seats) {
+    public void setSeats(String seats) {
         this.seats = seats;
     }
-    public String get_payment_type() {
+    public String getPayment_type() {
         return payment_type;
     }
-    public void set_payment_type(String payment_type) {
+    public void setPayment_type(String payment_type) {
         this.payment_type = payment_type;
     }
-    public double get_payment_amount() {
+    public double getPayment_amount() {
         return payment_amount;
     }
-    public void set_payment_amount(double payment_amount) {
+    public void setPayment_amount(double payment_amount) {
         this.payment_amount = payment_amount;
     }
-    public IdUser get_id_user(){
+    public IdUser getId_user(){
         return id_user;
     }
-    public void set_id_user(IdUser id_user){
+    public void setId_user(IdUser id_user){
         this.id_user = id_user;
     }
-    public Screening get_screening() {
+    public Screening getScreening() {
         return screening;
     }
-    public void set_screening(Screening screening){
+    public void setScreening(Screening screening){
         this.screening = screening;
     }
-    public String get_purchase_type() {
+    public String getPurchase_type() {
         return purchase_type;
     }
-    public void set_purchase_type(String purchase_type) {
+    public void setPurchase_type(String purchase_type) {
         this.purchase_type = purchase_type;
     }
-    public String get_link() {
+    public String getLink() {
         return link;
     }
-    public void set_link(String link) {
+    public void setLink(String link) {
         this.link = link;
     }
 }

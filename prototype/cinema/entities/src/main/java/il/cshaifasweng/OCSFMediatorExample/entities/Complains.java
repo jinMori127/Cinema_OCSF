@@ -32,63 +32,50 @@ public class Complains implements Serializable {
         this.cinema_branch = cinema_branch;
     }
 
-    // Default Constructor
-
     // getter and setter
-
-    public int get_auto_number_complains() {
+    public int getAuto_number_complains() {
         return auto_number_complains;
     }
 
-    public void set_auto_number_complains(int auto_number_complains) {
-        this.auto_number_complains = auto_number_complains;
-    }
-
-    public IdUser get_id_user() {
+    public IdUser getId_user() {
         return id_user;
     }
-
-    public void set_id_user(IdUser id_user) {
+    public void setId_user(IdUser id_user) {
         this.id_user = id_user;
     }
 
-    public String get_complain_text() {
+    public String getComplain_text() {
         return complain_text;
     }
-
-    public void set_complain_text(String complain_text) {
+    public void setComplain_text(String complain_text) {
         this.complain_text = complain_text;
     }
 
-    public String get_time_of_complain() {
+    public String getTime_of_complain() {
         return time_of_complain;
     }
-
-    public void set_time_of_complain(String time_of_complain) {
+    public void setTime_of_complain(String time_of_complain) {
         this.time_of_complain = time_of_complain;
     }
 
-    public String get_respond() {
+    public String getRespond() {
         return respond;
     }
-
-    public void set_respond(String respond) {
+    public void setRespond(String respond) {
         this.respond = respond;
     }
 
-    public boolean get_status() {
+    public boolean getStatus() {
         return respond_status;
     }
-
-    public void set_status(boolean respond_status) {
+    public void setStatus(boolean respond_status) {
         this.respond_status = respond_status;
     }
 
-    public String get_cinema_branch() {
+    public String getCinema_branch() {
         return cinema_branch;
     }
-
-    public void set_cinema_branch(String cinema_branch) {
+    public void setCinema_branch(String cinema_branch) {
         this.cinema_branch = cinema_branch;
     }
 }
