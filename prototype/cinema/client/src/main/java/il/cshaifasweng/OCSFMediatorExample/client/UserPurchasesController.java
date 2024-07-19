@@ -47,13 +47,13 @@ import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.getClient;
 public class UserPurchasesController {
 
     @FXML
-    private Button show_movies;
+    private Button select_purchases;
 
     @FXML
-    private Button select_movie;
+    private Button cancel_purchase;
 
     @FXML
-    private Button delete_movie;
+    private TableColumn<UserPurchases, Integer> auto_number_purchase;
 
     @FXML
     private TableColumn<UserPurchases, String> seats_column;
@@ -74,7 +74,7 @@ public class UserPurchasesController {
     private TableColumn<Screening, String> branch_column;
 
     @FXML
-    private TableColumn<Screening, Date> date_column;
+    private TableColumn<UserPurchases, Date> date_column;
 
     @FXML
     private TableView<UserPurchases> table_view;
@@ -94,11 +94,12 @@ public class UserPurchasesController {
         List<UserPurchases> user_list = (List<UserPurchases>) message.getObject();
         System.out.println(user_list.size());
 
+        auto_number_purchase.setCellValueFactory(new PropertyValueFactory<>("auto_number_purchase"));
         seats_column.setCellValueFactory(new PropertyValueFactory<>("seats"));
         payment_type_column.setCellValueFactory(new PropertyValueFactory<>("payment_type"));
         payment_amount_column.setCellValueFactory(new PropertyValueFactory<>("payment_amount"));
         link_column.setCellValueFactory(new PropertyValueFactory<>("link"));
-        id_column.setCellValueFactory(new PropertyValueFactory<>("id_user")); // Assuming UserPurchases has an IdUser field
+        date_column.setCellValueFactory(new PropertyValueFactory<>("date_of_purchase"));
 
         list = FXCollections.observableArrayList(user_list);
         table_view.setItems(list);

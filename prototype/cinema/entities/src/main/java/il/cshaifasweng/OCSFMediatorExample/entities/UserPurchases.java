@@ -2,6 +2,8 @@ package il.cshaifasweng.OCSFMediatorExample.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "UserPurchases")
@@ -24,21 +26,24 @@ public class UserPurchases implements Serializable{
     private String purchase_type;
     private String link;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date date_of_purchase;
+
     // constructors
     public UserPurchases() {
-
     }
 
-    public UserPurchases(String seats, String payment_type, double payment_amount, IdUser id_user,Screening screening, String purchase_type){
+    public UserPurchases(String seats, String payment_type, double payment_amount, IdUser id_user,Screening screening, String purchase_type, Date date_of_purchase){
         this.seats = seats;
         this.payment_type = payment_type;
         this.payment_amount = payment_amount;
         this.id_user = id_user;
         this.screening = screening;
         this.purchase_type = purchase_type;
+        this.date_of_purchase = date_of_purchase;
     }
 
-    public UserPurchases(String seats, String payment_type, double payment_amount, IdUser id_user,Screening screening, String purchase_type, String link){
+    public UserPurchases(String seats, String payment_type, double payment_amount, IdUser id_user,Screening screening, String purchase_type, String link, Date date_of_purchase){
         this.seats = seats;
         this.payment_type = payment_type;
         this.payment_amount = payment_amount;
@@ -46,10 +51,11 @@ public class UserPurchases implements Serializable{
         this.screening = screening;
         this.purchase_type = purchase_type;
         this.link = link;
+        this.date_of_purchase = date_of_purchase;
     }
 
     // get/set methods
-    public int get_auto_number_purchase() {
+    public int getAuto_number_purchase() {
         return auto_number_purchase;
     }
 
@@ -95,4 +101,6 @@ public class UserPurchases implements Serializable{
     public void setLink(String link) {
         this.link = link;
     }
+    public Date getDate_of_purchase() { return date_of_purchase; }
+    public void setDate_of_purchase(Date date_of_purchase) {this.date_of_purchase = date_of_purchase;}
 }
