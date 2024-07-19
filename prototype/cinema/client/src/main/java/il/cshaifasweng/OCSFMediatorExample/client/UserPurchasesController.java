@@ -40,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.net.URL;
 import java.sql.Time;
 import java.util.*;
+import javafx.scene.control.TextArea;
 
 import static il.cshaifasweng.OCSFMediatorExample.client.MovieEditingDetailsController.go_to_screening_movie;
 import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.Current_Message;
@@ -47,10 +48,10 @@ import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.getClient;
 public class UserPurchasesController {
 
     @FXML
-    private Button select_purchases;
+    private Button cancel_purchase;
 
     @FXML
-    private Button cancel_purchase;
+    private TextArea purchase_detailed_text;
 
     @FXML
     private TableColumn<UserPurchases, Integer> auto_number_purchase;
@@ -66,9 +67,6 @@ public class UserPurchasesController {
 
     @FXML
     private TableColumn<UserPurchases, String> link_column;
-
-    @FXML
-    private TableColumn<IdUser, String> id_column;
 
     @FXML
     private TableColumn<Screening, String> branch_column;
@@ -119,5 +117,39 @@ public class UserPurchasesController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        // Add double-click listener to table rows
+        table_view.setOnMouseClicked((MouseEvent event) -> {
+            if (event.getClickCount() == 2) {
+                show_purchase_information();
+            }
+        });
+    }
+    @FXML
+    public void show_purchase_information(){
+// Get the selected row index
+        int selectedRow = table_view.getSelectionModel().getSelectedIndex();
+
+        // Check if the selected row is valid
+        if (selectedRow >= 0 && selectedRow < table_view.getItems().size()) {
+            // Get the columns
+            ObservableList<TableColumn<UserPurchases, ?>> columns = table_view.getColumns();
+
+            StringBuilder contentText = new StringBuilder();
+
+            // Iterate through columns to get cell data
+            for (TableColumn<UserPurchases, ?> column : columns) {
+                Object cellData = column.getCellData(selectedRow);
+                contentText.append(column.getText()).append(": ").append(cellData).append("\n");
+            }
+
+            // Set the information in the TextArea
+            purchase_detailed_text.setText(contentText.toString());
+
+        } else {
+            // If no valid row is selected, clear the TextArea and show a warning alert
+            purchase_detailed_text.clear();
+        }
     }
 }
+

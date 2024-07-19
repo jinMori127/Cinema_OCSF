@@ -190,7 +190,6 @@ public class SimpleServer extends AbstractServer {
 		{
 			movie.setPrice(new_price);
 			session.update(movie);
-
 		}
 		session.getTransaction().commit();
 		session.close();
