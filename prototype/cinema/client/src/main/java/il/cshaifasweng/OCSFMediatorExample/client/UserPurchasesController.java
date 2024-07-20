@@ -90,8 +90,6 @@ public class UserPurchasesController {
     @FXML
     private Text ErrorMessage;
 
-    @FXML
-    private Text WarningMessage;
 
 
     @FXML
@@ -160,43 +158,55 @@ public class UserPurchasesController {
         table_view.setOnMouseClicked((MouseEvent event) -> {
             if (event.getClickCount() == 2) {
                 show_purchase_information();
-              //  WarningMessage.setVisible(true);
-               // WarningMessage.setText("select a screening");
+
             }
         });
     }
     @FXML
-    public void show_purchase_information(){
-// Get the selected row index
-        int selectedRow = table_view.getSelectionModel().getSelectedIndex();
-        //   WarningMessage.setVisible(false);
+    public void show_purchase_information() {
+        try {
+            // Hide warning message initially
+            ErrorMessage.setVisible(false);
+
+            // Get the selected row index
+            int selectedRow = table_view.getSelectionModel().getSelectedIndex();
+
+            // Check if the selected row is valid
+            if (selectedRow >= 0 && selectedRow < table_view.getItems().size()) {
+                // Get the columns
+                ObservableList<TableColumn<UserPurchases, ?>> columns = table_view.getColumns();
+
+                StringBuilder contentText = new StringBuilder();
+
+                // Iterate through columns to get cell data
+                for (TableColumn<UserPurchases, ?> column : columns) {
+                    Object cellData = column.getCellData(selectedRow);
+                    contentText.append(column.getText()).append(": ").append(cellData).append("\n");
+                }
+
+                purchase_detailed_text.setText(contentText.toString());
 
 
-        // Check if the selected row is valid
-        if (selectedRow >= 0 && selectedRow < table_view.getItems().size()) {
-            // Get the columns
-            ObservableList<TableColumn<UserPurchases, ?>> columns = table_view.getColumns();
-
-            StringBuilder contentText = new StringBuilder();
-
-            // Iterate through columns to get cell data
-            for (TableColumn<UserPurchases, ?> column : columns) {
-                Object cellData = column.getCellData(selectedRow);
-                contentText.append(column.getText()).append(": ").append(cellData).append("\n");
+                // Set warning message and make it visible
+                ErrorMessage.setVisible(true);
+                ErrorMessage.setText("Note:\nif still more than 3 hours you will get 100%\nif still between 1-3 hours you will get 50%\n" +
+                        "in Other cases you will get 0 %");
+            } else {
+                purchase_detailed_text.clear();
             }
-
-            purchase_detailed_text.setText(contentText.toString());
-
-        } else {
-            purchase_detailed_text.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("Error: " + e.getMessage());
         }
     }
+
     @FXML
     private void CancelPurchase(ActionEvent event) {
         ErrorMessage.setVisible(false);
 
         int selectedRow = table_view.getSelectionModel().getSelectedIndex();
-        int flag=0;
+        int percent_return=0;
 
         int auto_num=-1;
         if (!table_view.getColumns().isEmpty()) {
@@ -207,10 +217,7 @@ public class UserPurchasesController {
             Date curr_date = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-
-
-
-            TableColumn<UserPurchases, ?> Sec_col = table_view.getColumns().get(1);
+            TableColumn<UserPurchases, ?> Sec_col = table_view.getColumns().get(4);
             cellData = Sec_col.getCellData(selectedRow);
             Date date_screening=(Date)cellData;
 
@@ -219,8 +226,9 @@ public class UserPurchasesController {
 
             if (date_screening.before(curr_date)) {
                 ErrorMessage.setVisible(true);
+                percent_return=0;
+
                 ErrorMessage.setText("Unable to remove purache, The movie already passed");
-                flag=0;
 
                 return;
 
@@ -233,29 +241,44 @@ public class UserPurchasesController {
                 calendar.add(Calendar.HOUR, +3);
                 Date curr_date_3 = calendar.getTime();
 
-                calendar.add(Calendar.HOUR, +1);
-                Date curr_date_1 = calendar.getTime();
+
+                Calendar calendar2 = Calendar.getInstance();
+                calendar2.setTime(curr_date);
+                calendar2.add(Calendar.HOUR, +1);
+                Date curr_date_1 = calendar2.getTime();
+
+                System.out.println("curr_date_1"+curr_date_1);
+                System.out.println("date_screening"+date_screening);
+                System.out.println("curr_date_3"+curr_date_3);
+
+
+                TableColumn<UserPurchases, ?> third_col = table_view.getColumns().get(5);
+                cellData = third_col.getCellData(selectedRow);
+                double price =(double)cellData;
+
 
 
 
 
                 if (curr_date_3.before(date_screening)) {
                     ErrorMessage.setVisible(true);
-                    ErrorMessage.setText("Ok, No problem");
-                    flag = 100;
+                    ErrorMessage.setText("Value returned 100%,Your Total Will be:"+price);
+                    percent_return = 100;
                                                       }
+
+
 
                 else if (curr_date_1.before(date_screening)) {
                     ErrorMessage.setVisible(true);
-                    ErrorMessage.setText("Ok, No problem,But you will got 50 %");
-                    flag = 50;
+                    ErrorMessage.setText("Value returned 50%,Your Total Will be:"+(price/2));
+                    percent_return = 50;
 
                 }
 
                 else {
                     ErrorMessage.setVisible(true);
-                    ErrorMessage.setText("You got 0 %");
-                    flag = 0;
+                    ErrorMessage.setText("Value returned 0%,Your Total Will be:"+0);
+                    percent_return = 0;
                      }
             }
         }
