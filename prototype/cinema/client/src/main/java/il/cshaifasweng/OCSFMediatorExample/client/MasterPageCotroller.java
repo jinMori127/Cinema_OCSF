@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -8,11 +9,12 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.event.ActionEvent;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
 
 public class MasterPageCotroller {
-    public static String page = null;
 
     @FXML
     private StackPane content_area;
@@ -20,14 +22,24 @@ public class MasterPageCotroller {
     @FXML
     private Menu catalog_menu;
 
+    @Subscribe
+    public void change_content(ContentChangeEvent event)
+    {
+        Platform.runLater(()->{
+            setContent(event.getPage()+".fxml");
+        });
+    }
+
     @FXML
     public void initialize() {
+        System.out.println("Initializing MasterPageCotroller");
+        EventBus.getDefault().register(this);
+        System.out.println("Registered MasterPageCotroller");
         // Initialize common UI components and behavior here
         // catalog_menu.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> setContent("Movie_editing_details.fxml"));
-        if (page == null || page.equals(""))
-            setContent("HomePage.fxml");
-        else
-            setContent(page+".fxml");
+
+        setContent("HomePage.fxml");
+
 
     }
 
@@ -76,6 +88,7 @@ public class MasterPageCotroller {
 
 
     }
+
 
 
 }
