@@ -75,17 +75,35 @@ public class UserPurchasesController {
     private TableColumn<UserPurchases, Date> date_column;
 
     @FXML
+    private TableColumn<UserPurchases, Date> date_screening_column;
+
+
+
+
+
+    @FXML
     private TableView<UserPurchases> table_view;
 
     private ObservableList<UserPurchases> purchasesList = FXCollections.observableArrayList();
 
     @Subscribe
+    public void delete_purchases_for_user(DeletePurchasesBoxEvent event)
+    {
+        Platform.runLater(()->{
+            update_list(event.getMessage());
+        });
+    }
+
+    @Subscribe
+
     public void show_purchases_for_user(ShowPurchasesBoxEvent event)
     {
         Platform.runLater(()->{
             create_user_purchases(event.getMessage());
         });
     }
+
+
     private ObservableList<UserPurchases> list;
 
     public void create_user_purchases(Message message) {
@@ -93,14 +111,20 @@ public class UserPurchasesController {
         System.out.println(user_list.size());
 
         auto_number_purchase.setCellValueFactory(new PropertyValueFactory<>("auto_number_purchase"));
+        date_screening_column.setCellValueFactory(new PropertyValueFactory<>("screening_time"));
         seats_column.setCellValueFactory(new PropertyValueFactory<>("seats"));
         payment_type_column.setCellValueFactory(new PropertyValueFactory<>("payment_type"));
         payment_amount_column.setCellValueFactory(new PropertyValueFactory<>("payment_amount"));
         link_column.setCellValueFactory(new PropertyValueFactory<>("link"));
         date_column.setCellValueFactory(new PropertyValueFactory<>("date_of_purchase"));
 
+
         list = FXCollections.observableArrayList(user_list);
         table_view.setItems(list);
+    }
+    public void update_list(Message message){
+        create_user_purchases(message);
+
     }
 
 
@@ -151,5 +175,55 @@ public class UserPurchasesController {
             purchase_detailed_text.clear();
         }
     }
+    @FXML
+    private void CancelPurchase(ActionEvent event) {
+
+        int selectedRow = table_view.getSelectionModel().getSelectedIndex();
+
+        int auto_num=-1;
+        if (!table_view.getColumns().isEmpty()) {
+            TableColumn<UserPurchases, ?> firstColumn = table_view.getColumns().get(0);
+            Object cellData = firstColumn.getCellData(selectedRow);
+            auto_num=(int)cellData;
+
+        }
+
+
+        System.out.println("hii");
+
+        // Check if the selected row is valid
+
+        if (auto_num >= 0 && selectedRow < table_view.getItems().size()) {
+
+
+
+
+            System.out.println("l1");
+            System.out.println("l2");
+
+            Message delete_message = new Message(21,"#delete_purchases");
+            System.out.println("l3");
+
+            delete_message.setObject(auto_num);
+            System.out.println("l4");
+
+            try {
+                System.out.println("OKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
+                SimpleClient.getClient().sendToServer(delete_message);
+
+            } catch (IOException e) {
+                System.out.println("lllllllllllllllllllllllllllllllllllaaa");
+                throw new RuntimeException(e);
+            }
+
+
+        }
+
+
+    }
+
+
+
+
 }
 

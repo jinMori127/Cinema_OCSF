@@ -7,19 +7,20 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.UserPurchasesController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.UserPurchasesController">
     <children>
         <TableView fx:id="table_view" prefHeight="200.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="200.0">
             <columns>
-                <TableColumn fx:id="auto_number_purchase" prefWidth="91.5" text="purchase ID" />
-                <TableColumn fx:id="payment_type_column" prefWidth="89.5" text="payment type" />
-                <TableColumn fx:id="payment_amount_column" prefWidth="116.5" text="Payment amount" />
-                <TableColumn fx:id="link_column" minWidth="2.5" prefWidth="46.5" text="link" />
-                <TableColumn fx:id="date_column" minWidth="7.5" prefWidth="135.5" text="purchase_date" />
-                <TableColumn fx:id="seats_column" prefWidth="75.0" text="seats" />
+                <TableColumn fx:id="auto_number_purchase" text="purchase ID" />
+                <TableColumn fx:id="date_screening_column" prefWidth="94.0" text="Screening time" />
+                <TableColumn fx:id="payment_amount_column" prefWidth="112.0" text="Payment amount" />
+                <TableColumn fx:id="link_column" minWidth="2.5" prefWidth="60.0" text="link" />
+                <TableColumn fx:id="date_column" minWidth="7.5" prefWidth="103.0" text="purchase_date" />
+                <TableColumn fx:id="seats_column" prefWidth="48.0" text="seats" />
+            <TableColumn fx:id="payment_type_column" prefWidth="135.0" text="payment type" />
             </columns>
         </TableView>
-        <Button fx:id="delete_movie" text="Cancel Purchase" textFill="#b71f1f" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="150.0">
+        <Button fx:id="delete_movie" onAction="#CancelPurchase" text="Cancel Purchase" textFill="#b71f1f" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="150.0">
             <font>
                 <Font name="System Bold" size="12.0" />
             </font>

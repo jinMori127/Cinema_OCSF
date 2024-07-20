@@ -103,4 +103,7 @@ public class UserPurchases implements Serializable{
     }
     public Date getDate_of_purchase() { return date_of_purchase; }
     public void setDate_of_purchase(Date date_of_purchase) {this.date_of_purchase = date_of_purchase;}
+    public Date getScreening_time() {
+        return screening.getDate_time();
+    }
 }

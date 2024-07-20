@@ -266,6 +266,42 @@ public class SimpleServer extends AbstractServer {
 
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	private List<UserPurchases> delete_user_purchases(int auto_num) throws Exception {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		// Find the UserPurchases object with the specified auto_num
+		System.out.println("here11");
+
+		UserPurchases purchase = session.get(UserPurchases.class, auto_num);
+		System.out.println("here22");
+
+		// If the purchase is not found, return false
+		if (purchase == null) {
+			session.getTransaction().rollback();
+			session.close();
+			return  search_user_purchases("327876116");
+
+		}
+		System.out.println("here33");
+
+
+		// Delete the UserPurchases object
+		session.delete(purchase);
+
+
+
+		// Commit the transaction
+		session.getTransaction().commit();
+		session.close();
+		List<UserPurchases> data = search_user_purchases("327876116");
+
+
+
+
+		return data;
+	}
+
 
 	private List<UserPurchases> search_user_purchases(String id) throws Exception {
 		Session session = sessionFactory.openSession();
@@ -281,6 +317,15 @@ public class SimpleServer extends AbstractServer {
 
 		return data;
 	}
+
+	private void delete_purchase(UserPurchases purchase) throws Exception {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		session.delete(purchase);
+		session.getTransaction().commit();
+		session.close();
+	}
+
 
 
 
@@ -419,11 +464,11 @@ public class SimpleServer extends AbstractServer {
 				client.sendToClient(message);
 
 			}
+
 			//////////////////////////////////////////////////////////////////////////////////////////////
 
 			else if (message.getMessage().equals("#show_purchases"))
 			{
-				System.out.println("hello salam ass2");
 
 				String id = (String) message.getObject();
 
@@ -434,6 +479,16 @@ public class SimpleServer extends AbstractServer {
 
 				client.sendToClient(message);
 
+
+			}
+
+			else if (message.getMessage().equals("#delete_purchases")) {
+				int auto_num =  (int)message.getObject();
+				System.out.println("hhhhhhhhiiii");
+				message.setMessage("#delete_purchases_client");
+				message.setObject(delete_user_purchases(auto_num));
+				System.out.println(message.getMessage());
+				client.sendToClient(message);
 
 			}
 

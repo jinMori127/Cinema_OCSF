@@ -1,6 +1,8 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
+import il.cshaifasweng.OCSFMediatorExample.entities.UserPurchases;
+
 import javafx.application.Platform;
 import org.greenrobot.eventbus.EventBus;
 
@@ -85,10 +87,16 @@ public class SimpleClient extends AbstractClient {
 		{
 			EventBus.getDefault().post(new ShowPurchasesBoxEvent(message));
 		}
+		else if(message.getMessage().equals("#delete_purchases_client")){
+			EventBus.getDefault().post(new DeletePurchasesBoxEvent(message));
+		}
 
 		else {
 			EventBus.getDefault().post(new MessageEvent(message));
 		}
+
+
+
 	}
 	
 	public static SimpleClient getClient() {
