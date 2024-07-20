@@ -18,7 +18,6 @@ import java.util.*;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import static il.cshaifasweng.OCSFMediatorExample.client.MasterPageCotroller.page;
 
 /**
  * JavaFX App
@@ -49,15 +48,15 @@ public class SimpleChatClient extends Application {
     }
 
     public static void setRoot(String pageName) throws IOException {
-        /*Parent root = loadFXML(pageName);
-        scene = new Scene(root);
-        appStage.setScene(scene);
-        appStage.show();*/
-        page = pageName;
-        Parent root = loadFXML("MasterPage");
-        scene = new Scene(root);
-        appStage.setScene(scene);
-        appStage.show();
+        if (pageName == null || pageName.equals("")) {
+            Parent root = loadFXML("MasterPage");
+            scene = new Scene(root);
+            appStage.setScene(scene);
+            appStage.show();
+        }
+        else {
+            EventBus.getDefault().post(new ContentChangeEvent(pageName));
+        }
     }
 
     /*static void setRoot(String fxml) throws IOException {

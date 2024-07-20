@@ -295,7 +295,11 @@ public class SimpleServer extends AbstractServer {
 		try {
 			if(message.getMessage().equals("#GetAllMovies")){
 				SubscribedClient connection = new SubscribedClient(client);
-				SubscribersList.add(connection);
+				if (SubscribersList.contains(connection) == false)
+				{
+					SubscribersList.add(connection);
+
+				}
 				List<Movie> movies = getAllMovies();
 				message.setObject(movies);
 				message.setMessage("#GotAllMovies");

@@ -362,14 +362,6 @@ public class MovieEditingDetailsController {
 
         try {
             SimpleClient.getClient().sendToServer(insert_message);
-            Platform.runLater(() -> {
-                SimpleChatClient.setWindowTitle("masterPage");
-                try {
-                    SimpleChatClient.setRoot("Movie_editing_details");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
 
         } catch (IOException e) {
             throw new RuntimeException(e);
