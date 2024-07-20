@@ -362,7 +362,14 @@ public class MovieEditingDetailsController {
 
         try {
             SimpleClient.getClient().sendToServer(insert_message);
-
+            Platform.runLater(() -> {
+                SimpleChatClient.setWindowTitle("masterPage");
+                try {
+                    SimpleChatClient.setRoot("Movie_editing_details");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -571,7 +578,20 @@ public class MovieEditingDetailsController {
         catgory.getItems().add("Action");
         catgory.getItems().add("Romance");
         catgory.getItems().add("Family");
-        create_catalog(Current_Message);
+        Message message = new Message(2, "#GetAllMovies");
+        try {
+            SimpleClient.getClient().sendToServer(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Subscribe
+    public void show_all_movies(ShowMoviesEvent event)
+    {
+        Platform.runLater(()->{
+            create_catalog(event.getMessage());
+        });
     }
 
 }

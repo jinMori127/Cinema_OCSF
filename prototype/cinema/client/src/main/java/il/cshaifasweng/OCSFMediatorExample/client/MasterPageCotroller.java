@@ -12,6 +12,7 @@ import javafx.event.ActionEvent;
 import java.io.IOException;
 
 public class MasterPageCotroller {
+    public static String page = null;
 
     @FXML
     private StackPane content_area;
@@ -23,7 +24,11 @@ public class MasterPageCotroller {
     public void initialize() {
         // Initialize common UI components and behavior here
         // catalog_menu.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> setContent("Movie_editing_details.fxml"));
-        setContent("Movie_editing_details.fxml");
+        if (page == null || page.equals(""))
+            setContent("HomePage.fxml");
+        else
+            setContent(page+".fxml");
+
     }
 
     public void setContent(String file) {
@@ -50,7 +55,7 @@ public class MasterPageCotroller {
         MenuItem source = (MenuItem) event.getSource();
         String menuItemText = source.getText();
         if (menuItemText.equals("Home page")) {
-            setContent("Movie_editing_details.fxml");
+            setContent("HomePage.fxml");
         }
         else if(menuItemText.equals("id")){
             setContent("UserLoginWithID.fxml");
@@ -65,11 +70,12 @@ public class MasterPageCotroller {
         {
             setContent("UserComplains.fxml");
         }
-        else if (menuItemText.equals("Sign out")) {
-            
+        else if (menuItemText.equals("Sing out")) {
+            setContent("Movie_editing_details.fxml");
         }
 
 
     }
+
 
 }

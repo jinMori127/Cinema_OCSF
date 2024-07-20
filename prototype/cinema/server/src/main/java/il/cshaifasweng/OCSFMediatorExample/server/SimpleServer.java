@@ -2,6 +2,8 @@ package il.cshaifasweng.OCSFMediatorExample.server;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -17,16 +19,15 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+
+import javax.persistence.criteria.*;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;import java.util.List;
+import java.time.LocalDateTime;
 
 public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
@@ -65,6 +66,27 @@ public class SimpleServer extends AbstractServer {
 		super(port);
 		
 	}
+	private static List<Movie> get_near_movies()throws Exception
+	{
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder cb = session.getCriteriaBuilder();
+		CriteriaQuery<Movie> cq = cb.createQuery(Movie.class);
+		Root<Movie> movie = cq.from(Movie.class);
+		Join<Movie, Screening> screeningTime = movie.join("screenings");
+
+		Date now = new Date();
+		Date nextWeek = Date.from(Instant.now().plus(7, ChronoUnit.DAYS));
+
+		cq.select(movie).distinct(true);
+				//.where(cb.between(screeningTime.get("date_time"), now, nextWeek));
+
+		List<Movie> result =  session.createQuery(cq).getResultList();
+		session.getTransaction().commit();
+		session.close();
+		return result;
+	}
+
 	private static List<Movie> getAllMovies() throws Exception {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
@@ -271,12 +293,12 @@ public class SimpleServer extends AbstractServer {
 		String request = message.getMessage();
 
 		try {
-			if(message.getId()==0){
+			if(message.getMessage().equals("#GetAllMovies")){
 				SubscribedClient connection = new SubscribedClient(client);
 				SubscribersList.add(connection);
 				List<Movie> movies = getAllMovies();
 				message.setObject(movies);
-				message.setMessage("Success, go to main page");
+				message.setMessage("#GotAllMovies");
 				client.sendToClient(message);
 			}
 			else if (message.getMessage().equals("#DeleteMovie")){
@@ -398,6 +420,14 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(getAllMovies());
 				client.sendToClient(message);
 
+			}
+			else if(message.getMessage().equals("#GetHomePage"))
+			{
+
+				List<Movie> movies= get_near_movies();
+				message.setMessage("#GoToHomePage");
+				message.setObject(movies);
+				client.sendToClient(message);
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
