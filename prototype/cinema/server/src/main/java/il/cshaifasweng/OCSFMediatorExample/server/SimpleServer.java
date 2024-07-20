@@ -271,10 +271,8 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 
 		// Find the UserPurchases object with the specified auto_num
-		System.out.println("here11");
 
 		UserPurchases purchase = session.get(UserPurchases.class, auto_num);
-		System.out.println("here22");
 
 		// If the purchase is not found, return false
 		if (purchase == null) {
@@ -283,7 +281,6 @@ public class SimpleServer extends AbstractServer {
 			return  search_user_purchases("327876116");
 
 		}
-		System.out.println("here33");
 
 
 		// Delete the UserPurchases object
@@ -313,7 +310,6 @@ public class SimpleServer extends AbstractServer {
 		session.getTransaction().commit();
 		session.close();
 //		data.removeIf(userPurchase -> !userPurchase.get_id_user().equals(id));
-		System.out.println(data.size());
 
 		return data;
 	}
@@ -484,7 +480,6 @@ public class SimpleServer extends AbstractServer {
 
 			else if (message.getMessage().equals("#delete_purchases")) {
 				int auto_num =  (int)message.getObject();
-				System.out.println("hhhhhhhhiiii");
 				message.setMessage("#delete_purchases_client");
 				message.setObject(delete_user_purchases(auto_num));
 				System.out.println(message.getMessage());

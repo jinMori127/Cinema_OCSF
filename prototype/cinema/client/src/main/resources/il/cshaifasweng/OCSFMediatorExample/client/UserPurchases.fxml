@@ -6,8 +6,9 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.UserPurchasesController">
+<AnchorPane prefHeight="472.0" prefWidth="713.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.UserPurchasesController">
     <children>
         <TableView fx:id="table_view" prefHeight="200.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="200.0">
             <columns>
@@ -18,6 +19,7 @@
                 <TableColumn fx:id="date_column" minWidth="7.5" prefWidth="103.0" text="purchase_date" />
                 <TableColumn fx:id="seats_column" prefWidth="48.0" text="seats" />
             <TableColumn fx:id="payment_type_column" prefWidth="135.0" text="payment type" />
+            <TableColumn fx:id="movie_name_column" prefWidth="75.0" text="Movie name" />
             </columns>
         </TableView>
         <Button fx:id="delete_movie" onAction="#CancelPurchase" text="Cancel Purchase" textFill="#b71f1f" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="150.0">
@@ -26,5 +28,6 @@
             </font>
         </Button>
         <TextArea fx:id="purchase_detailed_text" editable="false" layoutX="24.0" layoutY="18.0" prefHeight="161.0" prefWidth="301.0" promptText="purchase information " />
+      <Text fx:id="ErrorMessage" fill="RED" layoutX="586.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="87.0" />
     </children>
 </AnchorPane>

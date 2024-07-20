@@ -106,4 +106,9 @@ public class UserPurchases implements Serializable{
     public Date getScreening_time() {
         return screening.getDate_time();
     }
+
+    public String getMovie_name() {
+        return screening.getMovie().getMovie_name();
+    }
+
 }
