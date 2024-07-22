@@ -12,9 +12,10 @@ public class IdUser implements Serializable {
     private int auto_number_id_user;
 
     private String user_id;
-    private String name;
+    private String user_name;
     private String phone_number;
     private String email;
+    private boolean isLoggedIn;
 
     @OneToMany(mappedBy = "id_user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserPurchases> user_purchases;
@@ -29,11 +30,12 @@ public class IdUser implements Serializable {
     public IdUser() {}
 
     // constructor
-    public IdUser(String user_id, String name, String phone_number, String email) {
+    public IdUser(String user_id, String user_name, String phone_number, String email) {
         this.user_id = user_id;
-        this.name = name;
+        this.user_name = user_name;
         this.phone_number = phone_number;
         this.email = email;
+        this.isLoggedIn = false;
     }
 
     // getter and setter
@@ -53,11 +55,11 @@ public class IdUser implements Serializable {
 
 
     public String get_name() {
-        return name;
+        return user_name;
     }
 
-    public void set_name(String name) {
-        this.name = name;
+    public void set_name(String user_name) {
+        this.user_name = user_name;
     }
 
 
@@ -80,6 +82,8 @@ public class IdUser implements Serializable {
         this.email = email;
     }
 
+    public boolean get_isLoggedIn() {return isLoggedIn;}
+    public void set_isLoggedIn(boolean isLoggedIn) {this.isLoggedIn = isLoggedIn;}
 
 
     public List<UserPurchases> get_user_purchases() {
@@ -110,3 +114,4 @@ public class IdUser implements Serializable {
         this.complains = complains;
     }
 }
+
