@@ -228,7 +228,6 @@ public class UserPurchasesController {
                 ErrorMessage.setVisible(true);
                 percent_return=0;
 
-                Unable to cancel purchase, The screening time already passed
 
 
 
