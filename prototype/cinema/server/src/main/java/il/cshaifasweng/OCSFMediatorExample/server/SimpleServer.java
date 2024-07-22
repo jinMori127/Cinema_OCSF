@@ -486,10 +486,6 @@ public class SimpleServer extends AbstractServer {
 				client.sendToClient(message);
 
 			}
-
-
-
-
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} catch (Exception e) {

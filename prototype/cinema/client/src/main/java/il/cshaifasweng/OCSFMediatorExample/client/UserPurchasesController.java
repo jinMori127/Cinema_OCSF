@@ -228,7 +228,11 @@ public class UserPurchasesController {
                 ErrorMessage.setVisible(true);
                 percent_return=0;
 
-                ErrorMessage.setText("Unable to remove purache, The movie already passed");
+                Unable to cancel purchase, The screening time already passed
+
+
+
+                ErrorMessage.setText("Unable to cancel purchase, The screening time already passed");
 
                 return;
 
@@ -238,7 +242,9 @@ public class UserPurchasesController {
             else {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(curr_date);
-                calendar.add(Calendar.HOUR, +3);
+                calendar.add(Calendar.HOUR, +3);// adding here to the current date three hours so we will
+                                                // be able to check whether the time of the screening have more that 3 hours left
+                                                                            // current_date_plus_3
                 Date curr_date_3 = calendar.getTime();
 
 
@@ -247,17 +253,10 @@ public class UserPurchasesController {
                 calendar2.add(Calendar.HOUR, +1);
                 Date curr_date_1 = calendar2.getTime();
 
-                System.out.println("curr_date_1"+curr_date_1);
-                System.out.println("date_screening"+date_screening);
-                System.out.println("curr_date_3"+curr_date_3);
-
 
                 TableColumn<UserPurchases, ?> third_col = table_view.getColumns().get(5);
                 cellData = third_col.getCellData(selectedRow);
                 double price =(double)cellData;
-
-
-
 
 
                 if (curr_date_3.before(date_screening)) {
@@ -265,8 +264,6 @@ public class UserPurchasesController {
                     ErrorMessage.setText("Value returned 100%,Your Total Will be:"+price);
                     percent_return = 100;
                                                       }
-
-
 
                 else if (curr_date_1.before(date_screening)) {
                     ErrorMessage.setVisible(true);
