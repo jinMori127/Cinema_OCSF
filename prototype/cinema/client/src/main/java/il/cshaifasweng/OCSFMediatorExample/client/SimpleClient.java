@@ -20,17 +20,8 @@ public class SimpleClient extends AbstractClient {
 	@Override
 	protected void handleMessageFromServer(Object msg) {
 		Message message = (Message) msg;
-		if(message.getMessage().equals("Success, go to main page")){
-			System.out.println("here");
-			Current_Message = message;
-			Platform.runLater(() -> {
-				SimpleChatClient.setWindowTitle("masterPage");
-				try {
-					SimpleChatClient.setRoot("MasterPage");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			});
+		if(message.getMessage().equals("#GotAllMovies")){
+			EventBus.getDefault().post(new ShowMoviesEvent(message));
 			/*Platform.runLater(() -> {
 				SimpleChatClient.setWindowTitle("editing_details");
 				try {
@@ -40,6 +31,10 @@ public class SimpleClient extends AbstractClient {
 				}
 			});*/
         }
+		else if (message.getMessage().equals("#GoToHomePage")){
+			EventBus.getDefault().post(new ShowMoviesEvent(message));
+
+		}
 		else if (message.getMessage().equals("#UpdateMovieList")){
 
 			EventBus.getDefault().post(new UpdateCatalogEvent(message));

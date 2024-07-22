@@ -1,6 +1,7 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -28,8 +29,14 @@ public class HostController {
         client =  new SimpleClient(host,portg);
         try{
             client.openConnection();
-            Message message = new Message(0,"");
-            client.sendToServer(message);
+            Platform.runLater(() -> {
+				SimpleChatClient.setWindowTitle("masterPage");
+				try {
+					SimpleChatClient.setRoot("");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
         } catch (IOException e){
             throw new RuntimeException(e);
         }

@@ -41,6 +41,7 @@ import static il.cshaifasweng.OCSFMediatorExample.client.MovieEditingDetailsCont
 import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.Current_Message;
 import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.getClient;
 
+
 public class EditScreeningController {
 
 
@@ -367,14 +368,16 @@ public class EditScreeningController {
     @FXML
     void back_to_catalog(ActionEvent event) {
         ErrorMessage.setVisible(false);
-        Message message = new Message(0,"");
         EventBus.getDefault().unregister(this);
-        try {
-            SimpleClient.getClient().sendToServer(message);
+        Platform.runLater(() -> {
+				SimpleChatClient.setWindowTitle("editing_details");
+				try {
+					SimpleChatClient.setRoot("Movie_editing_details");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @FXML
@@ -453,7 +456,7 @@ public class EditScreeningController {
         search_branch_combobox.getItems().add("Haifa");
         search_branch_combobox.getItems().add("Nazareth");
         search_branch_combobox.getItems().add("Nhif");
-        get_data(Current_Message);
+
 
     }
 
