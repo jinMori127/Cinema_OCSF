@@ -15,11 +15,6 @@
    <children>
       <AnchorPane layoutX="3.0" layoutY="-1.0" prefHeight="75.0" prefWidth="800.0" style="-fx-background-color: white;">
          <children>
-            <Text layoutX="232.0" layoutY="65.0" strokeType="OUTSIDE" strokeWidth="0.0" text="CoolNoa System" textAlignment="CENTER" wrappingWidth="301.47003173828125">
-               <font>
-                  <Font name="Agency FB Bold" size="45.0" />
-               </font>
-            </Text>
             <Text fx:id="ErrorMessage" fill="#d70e0e" layoutX="61.0" layoutY="42.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" visible="false" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                <font>
                   <Font size="19.0" />

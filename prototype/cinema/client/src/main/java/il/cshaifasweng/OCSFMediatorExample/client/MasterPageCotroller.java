@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -8,6 +9,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.event.ActionEvent;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
 
@@ -19,11 +22,25 @@ public class MasterPageCotroller {
     @FXML
     private Menu catalog_menu;
 
+    @Subscribe
+    public void change_content(ContentChangeEvent event)
+    {
+        Platform.runLater(()->{
+            setContent(event.getPage()+".fxml");
+        });
+    }
+
     @FXML
     public void initialize() {
+        System.out.println("Initializing MasterPageCotroller");
+        EventBus.getDefault().register(this);
+        System.out.println("Registered MasterPageCotroller");
         // Initialize common UI components and behavior here
         // catalog_menu.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> setContent("Movie_editing_details.fxml"));
-        setContent("Movie_editing_details.fxml");
+
+        setContent("HomePage.fxml");
+
+
     }
 
     public void setContent(String file) {
@@ -50,7 +67,7 @@ public class MasterPageCotroller {
         MenuItem source = (MenuItem) event.getSource();
         String menuItemText = source.getText();
         if (menuItemText.equals("Home page")) {
-            setContent("Movie_editing_details.fxml");
+            setContent("HomePage.fxml");
         }
         else if(menuItemText.equals("id")){
             setContent("UserLoginWithID.fxml");
@@ -65,11 +82,13 @@ public class MasterPageCotroller {
         {
             setContent("UserComplains.fxml");
         }
-        else if (menuItemText.equals("Sign out")) {
-            
+        else if (menuItemText.equals("Sing out")) {
+            setContent("Movie_editing_details.fxml");
         }
 
 
     }
+
+
 
 }
