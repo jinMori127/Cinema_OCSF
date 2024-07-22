@@ -80,6 +80,13 @@ public class SimpleClient extends AbstractClient {
 		{
 			EventBus.getDefault().post(new ServerErrorEvent(message));
 		}
+
+		else if(message.getMessage().equals("#loginWorkerFailedUserName") ||
+				message.getMessage().equals("##loginWorker") ||
+				message.getMessage().equals("#loginWorkerFailedPass")){
+			EventBus.getDefault().post(new ServerErrorEvent(message));
+		}
+
 		else {
 			EventBus.getDefault().post(new MessageEvent(message));
 		}

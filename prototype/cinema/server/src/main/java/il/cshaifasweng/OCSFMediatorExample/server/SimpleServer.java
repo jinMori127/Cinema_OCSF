@@ -17,6 +17,9 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
+import sun.tools.jconsole.Messages;
+import sun.tools.jconsole.Worker;
+
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -399,6 +402,38 @@ public class SimpleServer extends AbstractServer {
 				client.sendToClient(message);
 
 			}
+			else if (message.getMessage().equals("#LogIn_worker")) {
+				Session session = sessionFactory.openSession();
+				session.beginTransaction();
+
+
+
+
+				String userName= (String) message.getObject();
+				String password = (String) message.getObject2();
+
+				Worker worker = session.get(Worker.class, userName);
+
+				if(worker == null){
+					message.setMessage("#loginWorkerFailedUserName");
+					client.sendToClient(message);
+				}
+
+				if (worker.get_password().equals(password)){
+					message.setMessage("#loginWorker");
+					client.sendToClient(message);
+				}
+
+				else {
+					message.setMessage("#loginWorkerFailedPass");
+					client.sendToClient(message);
+				}
+
+				// Commit the transaction
+				session.getTransaction().commit();
+				session.close();
+
+
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} catch (Exception e) {
