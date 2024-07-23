@@ -20,6 +20,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 
 import javax.persistence.criteria.*;
@@ -66,7 +67,7 @@ public class SimpleServer extends AbstractServer {
 
 	public SimpleServer(int port) {
 		super(port);
-		
+
 	}
 	private static List<Movie> get_near_movies()throws Exception
 	{
@@ -442,12 +443,49 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(movies);
 				client.sendToClient(message);
 			}
-		}
-		 catch(IOException e1){
-				e1.printStackTrace();
-			} catch(Exception e){
-				throw new RuntimeException(e);
+
+			else if (message.getMessage().equals("#login")) {
+				Session session = sessionFactory.openSession();
+				Transaction transaction = session.beginTransaction();
+				try {
+					String queryString1 = "SELECT u FROM IdUser u WHERE u.user_id = :user_id";
+					Query<IdUser> query1 = session.createQuery(queryString1, IdUser.class);
+					String id = message.getObject2().toString();
+					query1.setParameter("user_id", id);
+					IdUser user = query1.uniqueResult();
+
+					if (user == null) {
+						message.setMessage("#userNotFound");
+						client.sendToClient(message);
+					} else {
+						if (user.get_isLoggedIn()) {
+							message.setMessage("#alreadyLoggedIn");
+							client.sendToClient(message);
+						} else {
+							user.set_isLoggedIn(true);
+							session.update(user);
+							transaction.commit();
+							message.setMessage("#loginConfirmed");
+							client.sendToClient(message);
+						}
+					}
+				} catch (Exception e) {
+					if (transaction != null) {
+						transaction.rollback();
+					}
+					message.setMessage("#serverError");
+					client.sendToClient(message);
+					e.printStackTrace();
+				} finally {
+					session.close();
+				}
 			}
+
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void sendToAllClients(Message message) {
