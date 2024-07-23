@@ -372,25 +372,31 @@ public class MovieEditingDetailsController {
     }
     private static Movie SelectedMovie;
     @Subscribe
-    public void update_each_user_catalog(UpdateEachUserCatalogEvent event)
+    public void update_each_user_catalog(BaseEventBox event)
     {
-        Platform.runLater(()->{
-            create_catalog(event.getMessage());
-        });
+        if(event.getId()==6) {
+            Platform.runLater(() -> {
+                create_catalog(event.getMessage());
+            });
+        }
     }
 
     @Subscribe
-    public void create_catlog_event(UpdateCatalogEvent E)
+    public void create_catlog_event(BaseEventBox E)
     {
-        search_movie_name_function();
+        if(E.getId() == 4) {
+            search_movie_name_function();
+        }
     }
     @Subscribe
-    public void change_Movie_ID(UpdateMovieIdBoxEvent event){
-        Platform.runLater(()->{
-            Movie the_movie = (Movie) event.getMessage().getObject();
-            Movie_id.setText(Integer.toString(the_movie.getAuto_number_movie()));
-            SelectedMovie = the_movie;
-        });
+    public void change_Movie_ID(BaseEventBox event){
+        if (event.getId() == 9) {
+            Platform.runLater(() -> {
+                Movie the_movie = (Movie) event.getMessage().getObject();
+                Movie_id.setText(Integer.toString(the_movie.getAuto_number_movie()));
+                SelectedMovie = the_movie;
+            });
+        }
     }
 
     @FXML
@@ -579,11 +585,12 @@ public class MovieEditingDetailsController {
     }
 
     @Subscribe
-    public void show_all_movies(ShowMoviesEvent event)
+    public void show_all_movies(BaseEventBox event)
     {
-        Platform.runLater(()->{
-            create_catalog(event.getMessage());
-        });
+        if(event.getId() == 5) {
+            Platform.runLater(() -> {
+                create_catalog(event.getMessage());
+            });
+        }
     }
-
 }

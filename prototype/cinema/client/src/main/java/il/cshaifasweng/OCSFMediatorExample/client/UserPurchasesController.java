@@ -98,20 +98,23 @@ public class UserPurchasesController {
     private ObservableList<UserPurchases> purchasesList = FXCollections.observableArrayList();
 
     @Subscribe
-    public void delete_purchases_for_user(DeletePurchasesBoxEvent event)
+    public void delete_purchases_for_user(BaseEventBox event)
     {
-        Platform.runLater(()->{
-            update_list(event.getMessage());
-        });
+        if (event.getId() == 1) {
+            Platform.runLater(() -> {
+                update_list(event.getMessage());
+            });
+        }
     }
 
     @Subscribe
-
-    public void show_purchases_for_user(ShowPurchasesBoxEvent event)
+    public void show_purchases_for_user(BaseEventBox event)
     {
-        Platform.runLater(()->{
-            create_user_purchases(event.getMessage());
-        });
+        if(event.getId()==3) {
+            Platform.runLater(() -> {
+                create_user_purchases(event.getMessage());
+            });
+        }
     }
 
 

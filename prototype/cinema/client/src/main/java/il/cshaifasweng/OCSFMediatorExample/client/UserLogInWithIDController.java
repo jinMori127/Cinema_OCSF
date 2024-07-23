@@ -97,33 +97,35 @@ public class UserLogInWithIDController {
     }
 
     @Subscribe
-    public void onUpdateIdUserEvent(UpdateIdUserEvent event) {
-        Message message = event.getMessage();
-        Platform.runLater(() -> {
-            switch (message.getMessage()) {
-                case "#userNotFound":
-                    error_message.setVisible(true);
-                    error_message.setText("You have not done any activity in our cinema yet!");
-                    break;
-                case "#alreadyLoggedIn":
-                    error_message.setVisible(true);
-                    error_message.setText("This user ID is already logged in!");
-                    break;
-                case "#loginConfirmed":
-                    error_message.setVisible(true);
-                    error_message.setText("You have successfully logged in");
-                    idUser = (IdUser)message.getObject();
-                    break;
-                case "#serverError":
-                    error_message.setVisible(true);
-                    error_message.setText("An error occurred on the server!");
-                    break;
-                default:
-                    error_message.setVisible(true);
-                    error_message.setText("An unknown error occurred!");
-                    break;
-            }
-        });
+    public void onUpdateIdUserEvent(BaseEventBox event) {
+        if(event.getId()==8) {
+            Message message = event.getMessage();
+            Platform.runLater(() -> {
+                switch (message.getMessage()) {
+                    case "#userNotFound":
+                        error_message.setVisible(true);
+                        error_message.setText("You have not done any activity in our cinema yet!");
+                        break;
+                    case "#alreadyLoggedIn":
+                        error_message.setVisible(true);
+                        error_message.setText("This user ID is already logged in!");
+                        break;
+                    case "#loginConfirmed":
+                        error_message.setVisible(true);
+                        error_message.setText("You have successfully logged in");
+                        idUser = (IdUser) message.getObject();
+                        break;
+                    case "#serverError":
+                        error_message.setVisible(true);
+                        error_message.setText("An error occurred on the server!");
+                        break;
+                    default:
+                        error_message.setVisible(true);
+                        error_message.setText("An unknown error occurred!");
+                        break;
+                }
+            });
+        }
     }
 
 

@@ -98,21 +98,23 @@ public class WorkerLogInController {
     static Worker worker;
 
     @Subscribe
-    public void onUpdateIdUserEvent(LogInworkerEventBox event) {
-        Message message = event.getMessage();
-        Platform.runLater(() -> {
-            switch (message.getMessage()) {
-                case "#loginWorkerFailedUserName":
-                    output.setText("Incorrect username or password");
-                    break;
-                case "#loginWorker":
-                    output.setText("Successfully logged in");
-                    worker = (Worker) message.getObject();
-                    break;
-                case "#loginWorkerFailedPass":
-                    output.setText("Incorrect username or password");
-                    break;
-            }
-        });
+    public void onUpdateIdUserEvent(BaseEventBox event) {
+        if(event.getId()==2) {
+            Message message = event.getMessage();
+            Platform.runLater(() -> {
+                switch (message.getMessage()) {
+                    case "#loginWorkerFailedUserName":
+                        output.setText("Incorrect username or password");
+                        break;
+                    case "#loginWorker":
+                        output.setText("Successfully logged in");
+                        worker = (Worker) message.getObject();
+                        break;
+                    case "#loginWorkerFailedPass":
+                        output.setText("Incorrect username or password");
+                        break;
+                }
+            });
+        }
     }
 }
