@@ -8,6 +8,9 @@ import java.util.Calendar;
 import java.util.Date;
 import javax.persistence.criteria.Join;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import com.mysql.cj.xdevapi.Client;
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
@@ -19,6 +22,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 
 import javax.persistence.criteria.*;
@@ -65,7 +69,7 @@ public class SimpleServer extends AbstractServer {
 
 	public SimpleServer(int port) {
 		super(port);
-		
+
 	}
 	private static List<Movie> get_near_movies()throws Exception
 	{
@@ -354,10 +358,9 @@ public class SimpleServer extends AbstractServer {
 		String request = message.getMessage();
 
 		try {
-			if(message.getMessage().equals("#GetAllMovies")){
+			if (message.getMessage().equals("#GetAllMovies")) {
 				SubscribedClient connection = new SubscribedClient(client);
-				if (SubscribersList.contains(connection) == false)
-				{
+				if (SubscribersList.contains(connection) == false) {
 					SubscribersList.add(connection);
 
 				}
@@ -365,55 +368,44 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(movies);
 				message.setMessage("#GotAllMovies");
 				client.sendToClient(message);
-			}
-			else if (message.getMessage().equals("#DeleteMovie")){
-				Movie movie = (Movie)message.getObject();
+			} else if (message.getMessage().equals("#DeleteMovie")) {
+				Movie movie = (Movie) message.getObject();
 				remove_movie(movie);
 				message.setObject(getAllMovies());
 				message.setMessage("#UpdateMovieList");
 				sendToAllClients(message);
-			}
-			else if (message.getMessage().equals("#GoToScreenings"))
-			{
-				Movie movie = (Movie)message.getObject();
+			} else if (message.getMessage().equals("#GoToScreenings")) {
+				Movie movie = (Movie) message.getObject();
 				System.out.println("screening number");
 				System.out.println(movie.getScreenings().size());
 				message.setObject(movie.getScreenings());
 				message.setMessage("#ScreeningsGot");
 				client.sendToClient(message);
 
-			}
-			else if (message.getMessage().equals("#InsertMovie"))
-			{
-				Movie movie = (Movie)message.getObject();
+			} else if (message.getMessage().equals("#InsertMovie")) {
+				Movie movie = (Movie) message.getObject();
 				insert_movie(movie);
 				message.setObject(getAllMovies());
 				message.setMessage("#UpdateMovieList");
 				sendToAllClients(message);
-				Message message1 = new Message(10,"#ChangeMovieIdBox");
+				Message message1 = new Message(10, "#ChangeMovieIdBox");
 				message1.setObject(movie);
 				client.sendToClient(message1);
-			}
-			else if (message.getMessage().equals("#UpdateMovie"))
-			{
-				Movie movie = (Movie)message.getObject();
+			} else if (message.getMessage().equals("#UpdateMovie")) {
+				Movie movie = (Movie) message.getObject();
 				update_movie(movie);
 				message.setObject(getAllMovies());
 				message.setMessage("#UpdateMovieList");
 				sendToAllClients(message);
-			}
-			else if (message.getMessage().equals("#SearchMovies"))
-			{
-				String movieName = (String)message.getObject();
+			} else if (message.getMessage().equals("#SearchMovies")) {
+				String movieName = (String) message.getObject();
 				message.setObject(get_movies_by_name(movieName));
 				message.setMessage("#UpdateMovieList_Eatch");
 				client.sendToClient(message);
-			}
-			else if(message.getMessage().equals("#AddNewScreening"))
-			{
-				Screening screening = (Screening)message.getObject();
-				boolean add =  check_the_new_screening(screening,false);
-				if(add) {
+			} else if (message.getMessage().equals("#AddNewScreening")) {
+				Screening screening = (Screening) message.getObject();
+				boolean add = check_the_new_screening(screening, false);
+				if (add) {
 					add_new_screening(screening);
 					message.setMessage("#UpdateScreeningForMovie");
 					message.setObject2(screening.getMovie());
@@ -424,62 +416,51 @@ public class SimpleServer extends AbstractServer {
 					message1.setObject(screening);
 
 					client.sendToClient(message1);
-				}
-				else{
+				} else {
 					message.setMessage("#ServerError");
 					message.setData("there is already a screening at this time");
 					client.sendToClient(message);
 				}
-			}
-			else if (message.getMessage().equals("#get_screening_from_id"))
-			{
-				int screening_id = (Integer)message.getObject();
+			} else if (message.getMessage().equals("#get_screening_from_id")) {
+				int screening_id = (Integer) message.getObject();
 				message.setObject(get_screening(screening_id));
 				message.setMessage("#UpdateBoxesInScreening");
 				client.sendToClient(message);
-			}
-			else if (message.getMessage().equals("#RemoveScreening")) {
-				Movie movie = ((Screening)message.getObject()).getMovie();
-				Screening screening =  (Screening)message.getObject();
+			} else if (message.getMessage().equals("#RemoveScreening")) {
+				Movie movie = ((Screening) message.getObject()).getMovie();
+				Screening screening = (Screening) message.getObject();
 				remove_screening(screening);
 				message.setObject(get_screening_for_movie(movie));
 				message.setObject2(movie);
 				message.setMessage("#UpdateScreeningForMovie");
 				sendToAllClients(message);
-			}
-			else if (message.getMessage().equals("#SearchBranchForScreening"))
-			{
+			} else if (message.getMessage().equals("#SearchBranchForScreening")) {
 				Movie movie = (Movie) message.getObject();
-				String Branch = (String)message.getObject2();
+				String Branch = (String) message.getObject2();
 				List<Screening> screenings = search_sreening_branch_and_movie(Branch, movie);
 				message.setObject(screenings);
 				message.setObject2(movie);
 				message.setMessage("#UpdateScreeningForMovie_each");
 				client.sendToClient(message);
-			}
-			else if (message.getMessage().equals("#UpdateScreening"))
-			{
+			} else if (message.getMessage().equals("#UpdateScreening")) {
 				Movie movie = ((Screening) message.getObject()).getMovie();
-				Screening screening =  (Screening)message.getObject();
+				Screening screening = (Screening) message.getObject();
 				screening.setMovie(movie);
-				boolean add =  check_the_new_screening(screening,true);
-				if(add) {
+				boolean add = check_the_new_screening(screening, true);
+				if (add) {
 					update_screening(screening);
 					message.setObject(get_screening_for_movie(movie));
 					message.setObject2(movie);
 					message.setMessage("#UpdateScreeningForMovie");
 					sendToAllClients(message);
-				}
-				else{
+				} else {
 					message.setMessage("#ServerError");
 					message.setData("there is already a screening at this time");
 					client.sendToClient(message);
 				}
 
-			}
-			else if (message.getMessage().equals("#ChangeAllPrices"))
-			{
-				int new_price = (int)message.getObject();
+			} else if (message.getMessage().equals("#ChangeAllPrices")) {
+				int new_price = (int) message.getObject();
 				update_all_prices(new_price);
 				message.setMessage("#UpdateMovieList");
 				message.setObject(getAllMovies());
@@ -511,21 +492,91 @@ public class SimpleServer extends AbstractServer {
 
 			}
 
-			else if(message.getMessage().equals("#GetHomePage"))
-			{
 
-				List<Movie> movies= get_near_movies();
+			else if (message.getMessage().equals("#LogIn_worker")) {
+				try {
+					Session session = sessionFactory.openSession();
+					session.beginTransaction();
+
+					String userName = (String) message.getObject();
+					String password = (String) message.getObject2();
+
+					// Use HQL to fetch the Worker object by user_name
+					Query query = session.createQuery("FROM Worker WHERE user_name = :userName");
+					query.setParameter("userName", userName);
+					Worker worker = (Worker) query.uniqueResult();
+
+					if (worker == null) {
+						message.setMessage("#loginWorkerFailedUserName");
+						client.sendToClient(message);
+					} else if (worker.getPassword().equals(password)) {
+						message.setMessage("#loginWorker");
+						message.setObject(worker);
+						client.sendToClient(message);
+
+					} else {
+						message.setMessage("#loginWorkerFailedPass");
+						client.sendToClient(message);
+					}
+
+					// Commit the transaction
+					session.getTransaction().commit();
+					session.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+
+			} else if (message.getMessage().equals("#GetHomePage")) {
+				List<Movie> movies = get_near_movies();
 				message.setMessage("#GoToHomePage");
 				message.setObject(movies);
 				client.sendToClient(message);
 			}
 
+			else if (message.getMessage().equals("#login")) {
+				Session session = sessionFactory.openSession();
+				Transaction transaction = session.beginTransaction();
+				try {
+					String queryString1 = "SELECT u FROM IdUser u WHERE u.user_id = :user_id";
+					Query<IdUser> query1 = session.createQuery(queryString1, IdUser.class);
+					String id = message.getObject2().toString();
+					query1.setParameter("user_id", id);
+					IdUser user = query1.uniqueResult();
+
+					if (user == null) {
+						message.setMessage("#userNotFound");
+						client.sendToClient(message);
+					} else {
+						if (user.getIsLoggedIn()) {
+							message.setMessage("#alreadyLoggedIn");
+							client.sendToClient(message);
+						} else {
+							user.setIsLoggedIn(true);
+							session.update(user);
+							transaction.commit();
+							message.setMessage("#loginConfirmed");
+							client.sendToClient(message);
+						}
+					}
+				} catch (Exception e) {
+					if (transaction != null) {
+						transaction.rollback();
+					}
+					message.setMessage("#serverError");
+					client.sendToClient(message);
+					e.printStackTrace();
+				} finally {
+					session.close();
+				}
+			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+			throw new RuntimeException(e);
+		}
+	}
 
 	public void sendToAllClients(Message message) {
 		try {

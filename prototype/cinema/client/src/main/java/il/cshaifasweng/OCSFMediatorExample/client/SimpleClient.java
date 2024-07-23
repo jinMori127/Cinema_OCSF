@@ -1,15 +1,12 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
+
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
-import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
 import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
 
 import javafx.application.Platform;
 import org.greenrobot.eventbus.EventBus;
-
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
-
 import java.io.IOException;
-
 
 public class SimpleClient extends AbstractClient {
 	public static Message Current_Message;
@@ -37,11 +34,9 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new ShowMoviesEvent(message));
 
 		}
-		else if (message.getMessage().equals("#UpdateMovieList")){
-
+		else if (message.getMessage().equals("#UpdateMovieList")){	
 			EventBus.getDefault().post(new UpdateCatalogEvent(message));
-		}
-		else if (message.getMessage().equals("#ScreeningsGot")){
+		} else if (message.getMessage().equals("#ScreeningsGot")) {
 			Current_Message = message;
 			Platform.runLater(() -> {
 				SimpleChatClient.setWindowTitle("edit_screenings");
@@ -51,30 +46,18 @@ public class SimpleClient extends AbstractClient {
 					e.printStackTrace();
 				}
 			});
-		}
-		else if (message.getMessage().equals("#UpdateScreeningForMovie"))
-		{
+		} else if (message.getMessage().equals("#UpdateScreeningForMovie")) {
 			EventBus.getDefault().post(new UpdateScreeningForMovieEvent(message));
-		}
-		else if (message.getMessage().equals("#UpdateBoxesInScreening"))
-		{
+		} else if (message.getMessage().equals("#UpdateBoxesInScreening")) {
 			EventBus.getDefault().post(new UpdateScreeningBoxesEvent(message));
-		}
-		else if (message.getMessage().equals("#ChangeMovieIdBox"))
-		{
+		} else if (message.getMessage().equals("#ChangeMovieIdBox")) {
 			System.out.println("I got your message");
 			EventBus.getDefault().post(new UpdateMovieIdBoxEvent(message));
-		}
-		else if(message.getMessage().equals("#UpdateMovieList_Eatch"))
-		{
+		} else if (message.getMessage().equals("#UpdateMovieList_Eatch")) {
 			EventBus.getDefault().post(new UpdateEachUserCatalogEvent(message));
-		}
-		else if(message.getMessage().equals("#UpdateScreeningForMovie_each"))
-		{
+		} else if (message.getMessage().equals("#UpdateScreeningForMovie_each")) {
 			EventBus.getDefault().post(new UpdateEachUserScreeningEvent(message));
-		}
-		else if(message.getMessage().equals("#ServerError"))
-		{
+		} else if (message.getMessage().equals("#ServerError")) {
 			EventBus.getDefault().post(new ServerErrorEvent(message));
 		}
 
@@ -84,23 +67,31 @@ public class SimpleClient extends AbstractClient {
 		}
 		else if(message.getMessage().equals("#delete_purchases_client")){
 			EventBus.getDefault().post(new DeletePurchasesBoxEvent(message));
-
-
 		}
 
+		else if(message.getMessage().equals("#loginWorkerFailedUserName") ||
+				message.getMessage().equals("#loginWorker") ||
+				message.getMessage().equals("#loginWorkerFailedPass")){
+			EventBus.getDefault().post(new LogInworkerEventBox(message));
+		}
+
+		else if (message.getMessage().equals("#userNotFound") ||
+				message.getMessage().equals("#alreadyLoggedIn") ||
+				message.getMessage().equals("#loginConfirmed") ||
+				message.getMessage().equals("#serverError")) {
+			// Handle login related messages
+			EventBus.getDefault().post(new UpdateIdUserEvent(message));
+		} 
 		else {
 			EventBus.getDefault().post(new MessageEvent(message));
 		}
-
-
-
 	}
-	
+
+
 	public static SimpleClient getClient() {
 		if (client == null) {
 			client = new SimpleClient("localhost", 3000);
 		}
 		return client;
 	}
-
 }
