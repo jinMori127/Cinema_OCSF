@@ -57,7 +57,15 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new UpdateEachUserScreeningEvent(message));
 		} else if (message.getMessage().equals("#ServerError")) {
 			EventBus.getDefault().post(new ServerErrorEvent(message));
-		} else if (message.getMessage().equals("#userNotFound") ||
+		}
+
+		else if(message.getMessage().equals("#loginWorkerFailedUserName") ||
+				message.getMessage().equals("#loginWorker") ||
+				message.getMessage().equals("#loginWorkerFailedPass")){
+			EventBus.getDefault().post(new LogInworkerEventBox(message));
+		}
+
+		else if (message.getMessage().equals("#userNotFound") ||
 				message.getMessage().equals("#alreadyLoggedIn") ||
 				message.getMessage().equals("#loginConfirmed") ||
 				message.getMessage().equals("#serverError")) {
