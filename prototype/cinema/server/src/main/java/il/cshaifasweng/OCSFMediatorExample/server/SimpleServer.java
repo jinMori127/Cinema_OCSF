@@ -557,6 +557,7 @@ public class SimpleServer extends AbstractServer {
 							session.update(user);
 							transaction.commit();
 							message.setMessage("#loginConfirmed");
+							message.setObject(user);
 							client.sendToClient(message);
 						}
 					}

@@ -112,6 +112,7 @@ public class UserLogInWithIDController {
                 case "#loginConfirmed":
                     error_message.setVisible(true);
                     error_message.setText("You have successfully logged in");
+                    idUser = (IdUser)message.getObject();
                     break;
                 case "#serverError":
                     error_message.setVisible(true);
