@@ -25,20 +25,20 @@ public class MultiEntryTicket implements Serializable{
     }
 
     // get/set methods
-    public int get_auto_number_multi_entry_ticket() {
+    public int getAuto_number_multi_entry_ticket() {
         return auto_number_multi_entry_ticket;
     }
 
-    public IdUser get_id_user(){
+    public IdUser getId_user(){
         return id_user;
     }
-    public void set_id_user(IdUser id_user){
+    public void setId_user(IdUser id_user){
         this.id_user = id_user;
     }
-    public int get_remain_tickets() {
+    public int getRemain_tickets() {
         return remain_tickets;
     }
-    public void set_remain_tickets(int remain_tickets) {
+    public void setRemain_tickets(int remain_tickets) {
         this.remain_tickets = remain_tickets;
     }
 }

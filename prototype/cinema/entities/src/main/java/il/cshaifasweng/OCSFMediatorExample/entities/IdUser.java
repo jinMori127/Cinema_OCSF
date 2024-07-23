@@ -44,73 +44,65 @@ public class IdUser implements Serializable {
     }
 
 
-    public String get_user_id() {
+    public String getUser_id() {
         return user_id;
     }
 
-    public void set_user_id(String user_id) {
+    public void setUser_id(String user_id) {
         this.user_id = user_id;
     }
 
 
-
-    public String get_name() {
+    public String getName() {
         return user_name;
     }
 
-    public void set_name(String user_name) {
+    public void setName(String user_name) {
         this.user_name = user_name;
     }
 
-
-
-    public String get_phone_number() {
+    public String getPhone_number() {
         return phone_number;
     }
 
-    public void set_phone_number(String phone_number) {
+    public void setPhone_number(String phone_number) {
         this.phone_number = phone_number;
     }
 
-
-
-    public String get_email() {
+    public String getEmail() {
         return email;
     }
 
-    public void set_email(String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
-    public boolean get_isLoggedIn() {return isLoggedIn;}
-    public void set_isLoggedIn(boolean isLoggedIn) {this.isLoggedIn = isLoggedIn;}
 
+    public boolean getIsLoggedIn() {return isLoggedIn;}
+    
+    public void setIsLoggedIn(boolean isLoggedIn) {this.isLoggedIn = isLoggedIn;}
 
-    public List<UserPurchases> get_user_purchases() {
+    public List<UserPurchases> getUser_purchases() {
         return user_purchases;
     }
 
-    public void set_user_purchases(List<UserPurchases> user_purchases) {
+    public void setUser_purchases(List<UserPurchases> user_purchases) {
         this.user_purchases = user_purchases;
     }
 
-
-
-    public List<MultiEntryTicket> get_multi_entry_ticket() {
+    public List<MultiEntryTicket> getMulti_entry_ticket() {
         return multi_entry_ticket;
     }
 
-    public void set_multi_entry_ticket(List<MultiEntryTicket> multi_entry_ticket) {
+    public void setMulti_entry_ticket(List<MultiEntryTicket> multi_entry_ticket) {
         this.multi_entry_ticket = multi_entry_ticket;
     }
 
-
-
-    public List<Complains> get_complains() {
+    public List<Complains> getComplains() {
         return complains;
     }
 
-    public void set_complains(List<Complains> complains) {
+    public void setComplains(List<Complains> complains) {
         this.complains = complains;
     }
 }

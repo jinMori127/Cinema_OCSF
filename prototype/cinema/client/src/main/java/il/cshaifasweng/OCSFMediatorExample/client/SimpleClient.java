@@ -1,6 +1,8 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
+import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
+
 import javafx.application.Platform;
 import org.greenrobot.eventbus.EventBus;
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
@@ -59,6 +61,14 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new ServerErrorEvent(message));
 		}
 
+		else if(message.getMessage().equals("#show_purchases_client"))
+		{
+			EventBus.getDefault().post(new ShowPurchasesBoxEvent(message));
+		}
+		else if(message.getMessage().equals("#delete_purchases_client")){
+			EventBus.getDefault().post(new DeletePurchasesBoxEvent(message));
+		}
+
 		else if(message.getMessage().equals("#loginWorkerFailedUserName") ||
 				message.getMessage().equals("#loginWorker") ||
 				message.getMessage().equals("#loginWorkerFailedPass")){
@@ -71,10 +81,12 @@ public class SimpleClient extends AbstractClient {
 				message.getMessage().equals("#serverError")) {
 			// Handle login related messages
 			EventBus.getDefault().post(new UpdateIdUserEvent(message));
-		} else {
+		} 
+		else {
 			EventBus.getDefault().post(new MessageEvent(message));
 		}
 	}
+
 
 	public static SimpleClient getClient() {
 		if (client == null) {

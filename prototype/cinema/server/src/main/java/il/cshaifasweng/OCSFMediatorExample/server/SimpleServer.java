@@ -6,6 +6,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
+import javax.persistence.criteria.Join;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -214,7 +216,6 @@ public class SimpleServer extends AbstractServer {
 		{
 			movie.setPrice(new_price);
 			session.update(movie);
-
 		}
 		session.getTransaction().commit();
 		session.close();
@@ -290,6 +291,67 @@ public class SimpleServer extends AbstractServer {
 		}
 
 	}
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	private List<UserPurchases> delete_user_purchases(int auto_num) throws Exception {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		// Find the UserPurchases object with the specified auto_num
+
+		UserPurchases purchase = session.get(UserPurchases.class, auto_num);
+
+		// If the purchase is not found, return false
+		if (purchase == null) {
+			session.getTransaction().rollback();
+			session.close();
+			return  search_user_purchases("327876116");
+
+		}
+
+
+		// Delete the UserPurchases object
+		session.delete(purchase);
+
+
+
+		// Commit the transaction
+		session.getTransaction().commit();
+		session.close();
+		List<UserPurchases> data = search_user_purchases("327876116");
+
+
+
+
+		return data;
+	}
+
+
+	private List<UserPurchases> search_user_purchases(String id) throws Exception {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<UserPurchases> query = builder.createQuery(UserPurchases.class);
+		query.from(UserPurchases.class);
+		List<UserPurchases> data = session.createQuery(query).getResultList();
+		session.getTransaction().commit();
+		session.close();
+//		data.removeIf(userPurchase -> !userPurchase.get_id_user().equals(id));
+
+		return data;
+	}
+
+	private void delete_purchase(UserPurchases purchase) throws Exception {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		session.delete(purchase);
+		session.getTransaction().commit();
+		session.close();
+	}
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		Message message = (Message) msg;
@@ -404,7 +466,34 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(getAllMovies());
 				client.sendToClient(message);
 
-			} else if (message.getMessage().equals("#LogIn_worker")) {
+			}
+
+			else if (message.getMessage().equals("#show_purchases"))
+			{
+
+				String id = (String) message.getObject();
+
+				message.setMessage("#show_purchases_client");
+				System.out.println(message.getMessage());
+
+				message.setObject(search_user_purchases(id));
+
+				client.sendToClient(message);
+
+
+			}
+
+			else if (message.getMessage().equals("#delete_purchases")) {
+				int auto_num =  (int)message.getObject();
+				message.setMessage("#delete_purchases_client");
+				message.setObject(delete_user_purchases(auto_num));
+				System.out.println(message.getMessage());
+				client.sendToClient(message);
+
+			}
+
+
+			else if (message.getMessage().equals("#LogIn_worker")) {
 				try {
 					Session session = sessionFactory.openSession();
 					session.beginTransaction();
@@ -420,7 +509,7 @@ public class SimpleServer extends AbstractServer {
 					if (worker == null) {
 						message.setMessage("#loginWorkerFailedUserName");
 						client.sendToClient(message);
-					} else if (worker.get_password().equals(password)) {
+					} else if (worker.getPassword().equals(password)) {
 						message.setMessage("#loginWorker");
 						message.setObject(worker);
 						client.sendToClient(message);
@@ -460,14 +549,15 @@ public class SimpleServer extends AbstractServer {
 						message.setMessage("#userNotFound");
 						client.sendToClient(message);
 					} else {
-						if (user.get_isLoggedIn()) {
+						if (user.getIsLoggedIn()) {
 							message.setMessage("#alreadyLoggedIn");
 							client.sendToClient(message);
 						} else {
-							user.set_isLoggedIn(true);
+							user.setIsLoggedIn(true);
 							session.update(user);
 							transaction.commit();
 							message.setMessage("#loginConfirmed");
+							message.setObject(user);
 							client.sendToClient(message);
 						}
 					}
@@ -482,7 +572,6 @@ public class SimpleServer extends AbstractServer {
 					session.close();
 				}
 			}
-
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} catch (Exception e) {

@@ -30,47 +30,47 @@ public class Worker implements Serializable {
     }
 
     // getters and setters
-    public int get_auto_number_worker() {
+    public int getAuto_number_worker() {
         return auto_number_worker;
     }
 
-    public String get_user_name() {
+    public String getUser_name() {
         return user_name;
     }
 
-    public void set_user_name(String user_name) {
+    public void setUser_name(String user_name) {
         this.user_name = user_name;
     }
 
-    public String get_password() {
+    public String getPassword() {
         return password;
     }
 
-    public void set_password(String password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 
-    public String get_name() {
+    public String getName() {
         return name;
     }
 
-    public void set_name(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public String get_branch() {
+    public String getBranch() {
         return branch;
     }
 
-    public void set_branch(String branch) {
+    public void setBranch(String branch) {
         this.branch = branch;
     }
 
-    public String get_role() {
+    public String getRole() {
         return role;
     }
 
-    public void set_role(String role) {
+    public void setRole(String role) {
         this.role = role;
     }
 }
