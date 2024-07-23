@@ -292,20 +292,22 @@ public class EditScreeningController {
     }
 
     @Subscribe
-    public void update_each_user(UpdateEachUserScreeningEvent event){
-        Platform.runLater(()->{
-            get_data(event.getMessage());
-        });
+    public void update_each_user(BaseEventBox event){
+        if(event.getId()==7) {
+            Platform.runLater(() -> {
+                get_data(event.getMessage());
+            });
+        }
     }
 
     private ObservableList<Screening> list;
 
     @Subscribe
-    public void update_event(UpdateScreeningForMovieEvent event)
+    public void update_event(BaseEventBox event)
     {
-
-        search_branch_function();
-
+        if(event.getId() == 11) {
+            search_branch_function();
+        }
     }
 
     @FXML
@@ -346,24 +348,29 @@ public class EditScreeningController {
     }
 
     @Subscribe
-    public void printServerError(ServerErrorEvent event)
+    public void printServerError(BaseEventBox event)
     {
-        Platform.runLater(()->{
-            ErrorMessage.setVisible(true);
-            ErrorMessage.setText(event.getMessage().getData());
-        });
+        if(event.getId()==12) {
+            Platform.runLater(() -> {
+                ErrorMessage.setVisible(true);
+                ErrorMessage.setText(event.getMessage().getData());
+            });
+        }
     }
 
     private static Screening current_screening;
     @Subscribe
-    public void update_boxes(UpdateScreeningBoxesEvent event)
+    public void update_boxes(BaseEventBox event)
     {
-        Platform.runLater(()->{
-            Screening screening = (Screening) event.getMessage().getObject();
-            current_screening = screening;
-            Screening_ID.setText(Integer.toString(current_screening.getAuto_number_screening()));
-            theater_map.setText(screening.getTheater_map());
-        });
+        if(event.getId()==10) {
+
+            Platform.runLater(() -> {
+                Screening screening = (Screening) event.getMessage().getObject();
+                current_screening = screening;
+                Screening_ID.setText(Integer.toString(current_screening.getAuto_number_screening()));
+                theater_map.setText(screening.getTheater_map());
+            });
+        }
     }
     @FXML
     void back_to_catalog(ActionEvent event) {

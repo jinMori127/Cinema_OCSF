@@ -42,12 +42,13 @@ public class HomePageCotroller {
 
     }
     @Subscribe
-    public void show_list(ShowMoviesEvent event)
+    public void show_list(BaseEventBox event)
     {
-        Platform.runLater(()->{
-            create_catalog(event.getMessage());
-        });
-
+        if(event.getId()==5) {
+            Platform.runLater(() -> {
+                create_catalog(event.getMessage());
+            });
+        }
     }
     public void create_catalog(Message M)
     {

@@ -1,16 +1,17 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
-
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
-import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
 
-public class UpdateScreeningForMovieEvent {
+public class BaseEventBox {
     private Message message;
-
+    private int id;
+    public BaseEventBox(int id, Message message) {
+        this.message = message;
+        this.id = id;
+    }
     public Message getMessage() {
         return message;
     }
-
-    public UpdateScreeningForMovieEvent(Message message) {
-        this.message = message;
+    public int getId() {
+        return id;
     }
 }
