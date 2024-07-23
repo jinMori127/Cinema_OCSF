@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.IdUser;
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -7,8 +8,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -18,13 +19,19 @@ import java.io.IOException;
 public class UserLogInWithIDController {
 
     @FXML
+    private Text error_message;
+
+    @FXML
     private TextField user_id;
 
     private int id = -1;
 
+    static IdUser idUser;
+
     @FXML
     public void initialize() {
         EventBus.getDefault().register(this);
+        error_message.setVisible(false);
     }
 
     @FXML
@@ -44,27 +51,31 @@ public class UserLogInWithIDController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     @FXML
     void log_in_button(ActionEvent event) {
         if (user_id.getText().isEmpty()) {
-            showAlert("Validation Error", "Please fill in your ID");
+            error_message.setVisible(true);
+            error_message.setText("Please fill in your ID");
             return;
         }
 
         try {
             id = Integer.parseInt(user_id.getText());
         } catch (NumberFormatException e) {
-            Platform.runLater(() -> showAlert("Input Error", "ID must contain only numbers"));
             user_id.setText("");
+            error_message.setVisible(true);
+            error_message.setText("ID must contain only numbers");
             return;
         }
 
         String numString = Integer.toString(id);
 
         if (id < 0 || numString.length() != 9) {
-            Platform.runLater(() -> showAlert("Input Error", "ID must contain 9 digits"));
+            error_message.setVisible(true);
+            error_message.setText("ID must contain 9 digits");
             user_id.setText("");
             return;
         }
@@ -72,9 +83,11 @@ public class UserLogInWithIDController {
         try {
             LogIn(numString);
         } catch (IOException e) {
-            showAlert("Server Error", "Could not communicate with the server.");
             e.printStackTrace();
+            error_message.setVisible(true);
+            error_message.setText("Could not communicate with the server!");
         }
+
     }
 
     private void LogIn(String numString) throws IOException {
@@ -89,29 +102,29 @@ public class UserLogInWithIDController {
         Platform.runLater(() -> {
             switch (message.getMessage()) {
                 case "#userNotFound":
-                    showAlert("Login Error", "User ID not found.");
+                    error_message.setVisible(true);
+                    error_message.setText("You have not done any activity in our cinema yet!");
                     break;
                 case "#alreadyLoggedIn":
-                    showAlert("Login Error", "This user ID is already logged in.");
+                    error_message.setVisible(true);
+                    error_message.setText("This user ID is already logged in!");
                     break;
                 case "#loginConfirmed":
-                    showAlert("Login Successful", "You have successfully logged in.");
+                    error_message.setVisible(true);
+                    error_message.setText("You have successfully logged in");
                     break;
                 case "#serverError":
-                    showAlert("Server Error", "An error occurred on the server.");
+                    error_message.setVisible(true);
+                    error_message.setText("An error occurred on the server!");
                     break;
                 default:
-                    showAlert("Error", "An unknown error occurred.");
+                    error_message.setVisible(true);
+                    error_message.setText("An unknown error occurred!");
                     break;
             }
         });
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
+
+
 }

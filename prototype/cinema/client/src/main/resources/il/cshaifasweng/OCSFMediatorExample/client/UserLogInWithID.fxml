@@ -6,19 +6,20 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.UserLogInWithIDController">
    <children>
       <TextField fx:id="user_id" alignment="CENTER" layoutX="173.0" layoutY="200.0" prefHeight="25.0" prefWidth="252.0" promptText="ID NUMBER" />
       <Button layoutX="276.0" layoutY="253.0" mnemonicParsing="false" onAction="#log_in_button" text="LogIn" />
-      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
-      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
-      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
       <Text layoutX="146.0" layoutY="141.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Please insert your ID to connect to COOLNOA's system successfully " textAlignment="CENTER" wrappingWidth="306.66668701171875">
          <font>
             <Font name="Agency FB" size="16.0" />
          </font>
       </Text>
       <Button layoutX="276.0" layoutY="26.0" mnemonicParsing="false" onAction="#back_button" text="BACK" />
+      <Text fx:id="error_message" fill="#ef0404" layoutX="41.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="123.47006225585938">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Text>
    </children>
 </AnchorPane>
