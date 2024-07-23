@@ -421,7 +421,9 @@ public class SimpleServer extends AbstractServer {
 						client.sendToClient(message);
 					} else if (worker.get_password().equals(password)) {
 						message.setMessage("#loginWorker");
+						message.setObject(worker);
 						client.sendToClient(message);
+
 					} else {
 						message.setMessage("#loginWorkerFailedPass");
 						client.sendToClient(message);

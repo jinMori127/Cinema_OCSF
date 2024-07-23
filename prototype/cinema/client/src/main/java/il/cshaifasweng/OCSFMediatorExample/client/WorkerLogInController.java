@@ -7,7 +7,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import static il.cshaifasweng.OCSFMediatorExample.client.MovieEditingDetailsController.go_to_screening_movie;
 import javafx.collections.ObservableList;
-
+import il.cshaifasweng.OCSFMediatorExample.entities.Worker;
 import com.mysql.cj.protocol.x.XMessage;
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
@@ -47,6 +47,8 @@ import java.net.URL;
 import java.sql.Time;
 import java.util.*;
 import javafx.scene.control.TextArea;
+
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
@@ -93,6 +95,8 @@ public class WorkerLogInController {
         EventBus.getDefault().register(this);
     }
 
+    static Worker worker;
+
     @Subscribe
     public void onUpdateIdUserEvent(LogInworkerEventBox event) {
         Message message = event.getMessage();
@@ -103,6 +107,7 @@ public class WorkerLogInController {
                     break;
                 case "#loginWorker":
                     output.setText("Successfully logged in");
+                    worker = (Worker) message.getObject();
                     break;
                 case "#loginWorkerFailedPass":
                     output.setText("Incorrect username or password");
