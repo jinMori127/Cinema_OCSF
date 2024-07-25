@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.embed.swing.SwingFXUtils;
 
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
@@ -138,7 +139,7 @@ public class MovieEditingDetailsController {
             ErrorMessage.setText("Image not Uploaded");
             return;
         }
-        File f = File_uploaded;
+        byte[] f = File_uploaded;
 
         try{
             Integer.parseInt(year.getText());
@@ -191,7 +192,9 @@ public class MovieEditingDetailsController {
         movie.setDirector(directorC);
         movie.setPrice(priceC);
         movie.setDescription_(descriptionC);
+
         movie.setImageLocation(f);
+
 
         Message insert_message = new Message(3,"#InsertMovie");
         insert_message.setObject(movie);
@@ -206,7 +209,7 @@ public class MovieEditingDetailsController {
 
     }
 
-    private File File_uploaded;
+    private byte[] File_uploaded;
     @FXML
     void choose_image(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
@@ -219,7 +222,11 @@ public class MovieEditingDetailsController {
         if (f != null) {
             Image image = new Image(f.toURI().toString());
             selected_image.setImage(image);
-            File_uploaded = f;
+            try {
+                File_uploaded = Files.readAllBytes(f.toPath());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
     public void search_movie_name_function()
@@ -299,7 +306,7 @@ public class MovieEditingDetailsController {
             ErrorMessage.setText("Image not Uploaded");
             return;
         }
-        File f = File_uploaded;
+        byte[] f = File_uploaded;
 
         try{
             Integer.parseInt(year.getText());
@@ -352,7 +359,9 @@ public class MovieEditingDetailsController {
         movie.setDirector(directorC);
         movie.setPrice(priceC);
         movie.setDescription_(descriptionC);
+
         movie.setImageLocation(f);
+
         /*if (!image_name.equals( movie.getImage_location())) {
             File f4 = new File("src/main/resources/images/"+image_name);
             f4.delete();
@@ -439,10 +448,10 @@ public class MovieEditingDetailsController {
             hbox_movies.setSpacing(10);
             hbox_movies.setPrefHeight(180);
             ImageView imageView = new ImageView();
-            File file = movie.getImage_location();
+            byte[] file = movie.getImage_location();
             if(file != null) {
-                Image image = new Image(file.toURI().toString());
-                imageView.setImage(image);
+                //Image image = new Image(file.toURI().toString());
+                imageView.setImage(SwingFXUtils.toFXImage(Movie.convertByteArrayToImage(file),null));
             }
             else{
                 imageView.setImage(null);
@@ -479,6 +488,7 @@ public class MovieEditingDetailsController {
                 int current_movie_id = movie.getAuto_number_movie();
                 /*File f = new File("src/main/resources/images/"+movie.getImage_location());
                 f.delete();*/
+
                 Message delete_message = new Message(1, "#DeleteMovie");
                 delete_message.setObject(movie);
 
@@ -512,11 +522,12 @@ public class MovieEditingDetailsController {
             Button Button_Select = new Button();
             Button_Select.setText("Select");
             Button_Select.setOnAction(event->{
-                File file1 = movie.getImage_location();
+                byte[] file1 = movie.getImage_location();
                 File_uploaded = file1;
                 if(file1!=null) {
-                    Image image1 = new Image(file1.toURI().toString());
-                    selected_image.setImage(image1);
+                    //Image image1 = new Image(file1.toURI().toString());
+                    //selected_image.setImage(image1);
+                    selected_image.setImage(SwingFXUtils.toFXImage(Movie.convertByteArrayToImage(file1),null));
                 }
                 else
                 {

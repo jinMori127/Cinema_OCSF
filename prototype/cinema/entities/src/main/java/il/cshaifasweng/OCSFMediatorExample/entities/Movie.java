@@ -1,12 +1,17 @@
 package il.cshaifasweng.OCSFMediatorExample.entities;
 
+import javafx.scene.image.Image;
+import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
+
+import javax.imageio.ImageIO;
 import javax.persistence.*;
-import java.io.DataInput;
-import java.io.Serializable;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.io.File;
+import java.nio.file.Files;
 
 @Entity
 @Table(name = "movies")
@@ -23,7 +28,7 @@ public class Movie implements Serializable {
     @Temporal(TemporalType.TIME)
     private Date time_;
 
-    private File image_movie;
+    private byte[] image_movie;
     private int year_;
     private int price;
     private String director;
@@ -99,12 +104,29 @@ public class Movie implements Serializable {
         this.year_ = year_;
     }
 
-    public void setImageLocation(File image_location)
+    public void setImageLocation(byte[] image_location)
     {
-        this.image_movie = image_location;
+       this.image_movie = image_location;
     }
-    public File getImage_location()
+    public static BufferedImage convertByteArrayToImage(byte [] byteArray){
+        BufferedImage image = null;
+        try(ByteArrayInputStream bais = new ByteArrayInputStream(byteArray)){
+            image = ImageIO.read(bais);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return image;
+    }
+    public byte[] getImage_location()
     {
+        /*
+        BufferedImage buffered_image = convertByteArrayToImage(image_movie);
+        if(buffered_image != null)
+        {
+            Image fxImage = SwingFXUtils.toFXImage(buffered_image, null);
+            return fxImage;
+        }
+        return null;*/
         return image_movie;
     }
     public List<Screening> getScreenings() {return screenings;}

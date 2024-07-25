@@ -3,6 +3,7 @@ package il.cshaifasweng.OCSFMediatorExample.client;
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -61,10 +62,10 @@ public class HomePageCotroller {
             hbox_movies.setSpacing(10);
             hbox_movies.setPrefHeight(180);
             ImageView imageView = new ImageView();
-            File file = movie.getImage_location();
+            byte[] file = movie.getImage_location();
             if(file != null) {
-                Image image = new Image(file.toURI().toString());
-                imageView.setImage(image);
+                //Image image = new Image(file.toURI().toString());
+                imageView.setImage(SwingFXUtils.toFXImage(Movie.convertByteArrayToImage(file),null));
             }
             else{
                 imageView.setImage(null);
