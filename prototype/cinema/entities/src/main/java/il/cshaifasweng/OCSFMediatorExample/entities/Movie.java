@@ -28,6 +28,8 @@ public class Movie implements Serializable {
     @Temporal(TemporalType.TIME)
     private Date time_;
 
+    @Lob
+    @Column(name = "image_movie", columnDefinition = "LONGBLOB")
     private byte[] image_movie;
     private int year_;
     private int price;
