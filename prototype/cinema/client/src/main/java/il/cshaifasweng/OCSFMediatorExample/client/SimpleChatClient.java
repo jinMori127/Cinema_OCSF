@@ -80,7 +80,7 @@ public class SimpleChatClient extends Application {
 
     @Subscribe
     public void onMessageEvent(BaseEventBox message) {
-        if(message.getId()==300) {
+        if(message.getId()==13) {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
             Platform.runLater(() -> {
                 Alert alert = new Alert(AlertType.INFORMATION,

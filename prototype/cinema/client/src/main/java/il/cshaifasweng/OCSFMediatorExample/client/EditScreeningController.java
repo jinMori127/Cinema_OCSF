@@ -463,6 +463,7 @@ public class EditScreeningController {
         search_branch_combobox.getItems().add("Haifa");
         search_branch_combobox.getItems().add("Nazareth");
         search_branch_combobox.getItems().add("Nhif");
+        get_data(Current_Message);
 
 
     }
