@@ -375,7 +375,7 @@ public class EditScreeningController {
     @FXML
     void back_to_catalog(ActionEvent event) {
         ErrorMessage.setVisible(false);
-        EventBus.getDefault().unregister(this);
+        //EventBus.getDefault().unregister(this);
         Platform.runLater(() -> {
 				SimpleChatClient.setWindowTitle("editing_details");
 				try {

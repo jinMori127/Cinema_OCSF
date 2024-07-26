@@ -559,7 +559,7 @@ public class MovieEditingDetailsController {
                 try {
                     go_to_screening_movie = movie;
                     SimpleClient.getClient().sendToServer(screening_message);
-                    EventBus.getDefault().unregister(this);
+                    //EventBus.getDefault().unregister(this);
 
                 } catch (IOException e) {
                     ErrorMessage.setText("cant go to screening");
