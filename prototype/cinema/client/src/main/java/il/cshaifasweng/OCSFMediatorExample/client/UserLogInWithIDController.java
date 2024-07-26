@@ -127,6 +127,14 @@ public class UserLogInWithIDController {
             });
         }
     }
+    @Subscribe
+    public void change_content1(BeginContentChangeEnent event)
+    {
+
+        System.out.println(event.getPage());
+        EventBus.getDefault().unregister(this);
+        EventBus.getDefault().post(new ContentChangeEvent(event.getPage()));
+    }
 
 
 

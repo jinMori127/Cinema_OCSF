@@ -55,7 +55,7 @@ public class SimpleChatClient extends Application {
             appStage.show();
         }
         else {
-            EventBus.getDefault().post(new ContentChangeEvent(pageName));
+            EventBus.getDefault().post(new BeginContentChangeEnent(pageName));
         }
     }
 

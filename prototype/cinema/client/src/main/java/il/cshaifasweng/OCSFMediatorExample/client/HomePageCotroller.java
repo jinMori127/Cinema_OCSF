@@ -15,6 +15,7 @@ import javafx.scene.text.Text;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import javax.swing.plaf.nimbus.State;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -23,7 +24,7 @@ import java.util.List;
 import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.Current_Message;
 
 public class HomePageCotroller {
-
+    static HomePageCotroller current_home_page;
     @FXML
     private Text ErrorMssage;
 
@@ -32,7 +33,9 @@ public class HomePageCotroller {
 
     @FXML
     public void initialize() {
+
         EventBus.getDefault().register(this);
+        current_home_page = this;
         Message message = new Message(10,"#GetHomePage");
         try {
             SimpleClient.getClient().sendToServer(message);
@@ -45,12 +48,34 @@ public class HomePageCotroller {
     @Subscribe
     public void show_list(BaseEventBox event)
     {
+        System.out.println("show_list");
+        System.out.println(event.getMessage().getMessage());
         if(event.getId()==5) {
             Platform.runLater(() -> {
                 create_catalog(event.getMessage());
             });
         }
+        else if(event.getId()==BaseEventBox.get_event_id("UPDATE_SCREENING_FOR_MOVIE")) {
+            Message message = new Message(10,"#GetHomePage");
+            try {
+                SimpleClient.getClient().sendToServer(message);
+            } catch (IOException e) {
+                ErrorMssage.setText(e.getMessage());
+                ErrorMssage.setVisible(true);
+            }
+        }
+
     }
+
+    @Subscribe
+    public void change_content1(BeginContentChangeEnent event)
+    {
+
+        System.out.println(event.getPage());
+        EventBus.getDefault().unregister(this);
+        EventBus.getDefault().post(new ContentChangeEvent(event.getPage()));
+    }
+
     public void create_catalog(Message M)
     {
         Vbox_movies.getChildren().clear();
@@ -107,5 +132,4 @@ public class HomePageCotroller {
         }
         ErrorMssage.setVisible(false);
     }
-
 }
