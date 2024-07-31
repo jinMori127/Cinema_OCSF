@@ -34,6 +34,7 @@ public class Movie implements Serializable {
     private int year_;
     private int price;
     private String director;
+    private double rating;
 
     @OneToMany(mappedBy = "movie",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Screening> screenings = new ArrayList<Screening>();;
@@ -53,7 +54,14 @@ public class Movie implements Serializable {
     }
 
     // Getters and Setters
-
+    public double getRating()
+    {
+        return rating;
+    }
+    public void setRating(double rating)
+    {
+        this.rating = rating;
+    }
     public int getAuto_number_movie() {
         return auto_number_movie;
     }

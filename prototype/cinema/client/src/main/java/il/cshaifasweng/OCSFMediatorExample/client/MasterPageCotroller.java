@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -7,14 +8,19 @@ import javafx.scene.Node;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.event.ActionEvent;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import javafx.stage.Screen;
 
 import java.io.IOException;
 
 public class MasterPageCotroller {
+
+    @FXML
+    private BorderPane border_pane;
 
     @FXML
     private StackPane content_area;
@@ -28,7 +34,16 @@ public class MasterPageCotroller {
 
         Platform.runLater(()->{
             setContent(event.getPage()+".fxml");
+
         });
+        System.out.println(content_area.getLayoutX());
+        Platform.runLater(()->{
+            javafx.geometry.Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+            double screenWidth = screenBounds.getWidth();
+            double screenHeight = screenBounds.getHeight();
+            content_area.layoutXProperty().setValue(30);
+        });
+        System.out.println(content_area.getLayoutX());
 
     }
 
@@ -49,7 +64,7 @@ public class MasterPageCotroller {
         FXMLLoader new_content = null;
         try {
              new_content = new FXMLLoader(getClass().getResource(file));
-             System.out.println("we are here");
+
 
         } catch (Exception e) {
 
@@ -84,8 +99,22 @@ public class MasterPageCotroller {
         {
             EventBus.getDefault().post(new BeginContentChangeEnent("UserComplains"));
         }
-        else if (menuItemText.equals("Sing out")) {
+
+        else if (menuItemText.equals("Sign out")) {
+            Message m = new Message(30,"#SignOut");
+            try {
+                SimpleClient.getClient().sendToServer(m);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            EventBus.getDefault().post(new BeginContentChangeEnent("HomePage"));
+        }
+        else if (menuItemText.equals("MovieEditDetails")) {
             EventBus.getDefault().post(new BeginContentChangeEnent("Movie_editing_details"));
+        } else if (menuItemText.equals("Catalog")) {
+            System.out.println("what the fuck");
+            EventBus.getDefault().post(new BeginContentChangeEnent("Catalog"));
+
         }
 
 

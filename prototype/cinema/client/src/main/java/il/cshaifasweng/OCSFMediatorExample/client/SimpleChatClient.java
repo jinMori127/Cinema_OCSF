@@ -136,5 +136,15 @@ public class SimpleChatClient extends Application {
         values.add(column_size);
         rooms.put(keys,values);
     }
+    public static List<String> get_categories(){
+        ArrayList<String> categories = new ArrayList<>();
+        categories.add("Comedy");
+        categories.add("Sci-Fi");
+        categories.add("Action");
+        categories.add("Romance");
+        categories.add("Family");
+        return categories;
+
+    }
 
 }

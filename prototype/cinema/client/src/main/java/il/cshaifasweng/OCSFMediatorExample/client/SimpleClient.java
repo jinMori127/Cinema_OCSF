@@ -60,6 +60,10 @@ public class SimpleClient extends AbstractClient {
 		} else if (message.getMessage().equals("#ServerError")) {
 			EventBus.getDefault().post(new BaseEventBox("SERVER_ERROR_MESSAGE", message));
 		}
+		else if (message.getMessage().equals("#GotSearchMovieFillter"))
+		{
+			EventBus.getDefault().post(new BaseEventBox("GOT_SEARCH_MOVIE_FILTER", message));
+		}
 
 		else if(message.getMessage().equals("#show_purchases_client"))
 		{
