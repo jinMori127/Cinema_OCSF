@@ -83,8 +83,8 @@ public class SimpleServer extends AbstractServer {
 		Date now = new Date();
 		Date nextWeek = Date.from(Instant.now().plus(7, ChronoUnit.DAYS));
 
-		cq.select(movie).distinct(true);
-				//.where(cb.between(screeningTime.get("date_time"), now, nextWeek));
+		cq.select(movie).distinct(true)
+				.where(cb.between(screeningTime.get("date_time"), now, nextWeek));
 
 		List<Movie> result =  session.createQuery(cq).getResultList();
 		session.getTransaction().commit();
@@ -359,11 +359,7 @@ public class SimpleServer extends AbstractServer {
 
 		try {
 			if (message.getMessage().equals("#GetAllMovies")) {
-				SubscribedClient connection = new SubscribedClient(client);
-				if (SubscribersList.contains(connection) == false) {
-					SubscribersList.add(connection);
 
-				}
 				List<Movie> movies = getAllMovies();
 				message.setObject(movies);
 				message.setMessage("#GotAllMovies");
@@ -529,6 +525,11 @@ public class SimpleServer extends AbstractServer {
 				}
 
 			} else if (message.getMessage().equals("#GetHomePage")) {
+				SubscribedClient connection = new SubscribedClient(client);
+				if (SubscribersList.contains(connection) == false) {
+					SubscribersList.add(connection);
+
+				}
 				List<Movie> movies = get_near_movies();
 				message.setMessage("#GoToHomePage");
 				message.setObject(movies);
