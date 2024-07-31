@@ -375,7 +375,7 @@ public class EditScreeningController {
     @FXML
     void back_to_catalog(ActionEvent event) {
         ErrorMessage.setVisible(false);
-        EventBus.getDefault().unregister(this);
+        //EventBus.getDefault().unregister(this);
         Platform.runLater(() -> {
 				SimpleChatClient.setWindowTitle("editing_details");
 				try {
@@ -463,8 +463,17 @@ public class EditScreeningController {
         search_branch_combobox.getItems().add("Haifa");
         search_branch_combobox.getItems().add("Nazareth");
         search_branch_combobox.getItems().add("Nhif");
+        get_data(Current_Message);
 
 
+    }
+    @Subscribe
+    public void change_content1(BeginContentChangeEnent event)
+    {
+
+        System.out.println(event.getPage());
+        EventBus.getDefault().unregister(this);
+        EventBus.getDefault().post(new ContentChangeEvent(event.getPage()));
     }
 
 }

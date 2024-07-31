@@ -41,4 +41,9 @@ public class HostController {
             throw new RuntimeException(e);
         }
     }
+    @FXML
+    public void initialize() {
+    hostTextField.setText("localhost");
+    portTextField.setText("3000");
+    }
 }
