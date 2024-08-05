@@ -33,6 +33,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;import java.util.List;
 import java.time.LocalDateTime;
+import java.util.Iterator;
+
+import java.util.Collections;
 
 public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
@@ -350,6 +353,27 @@ public class SimpleServer extends AbstractServer {
 
 
 
+	private List<?> search_data(String className) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		try {
+			Class<?> clazz = Class.forName(className);
+
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<?> query = builder.createQuery(clazz);
+			query.from(clazz);
+
+			List<?> data = session.createQuery(query).getResultList();
+			session.getTransaction().commit();
+			return data;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			session.getTransaction().rollback();
+			return Collections.emptyList();
+		} finally {
+			session.close();
+		}
+	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
@@ -535,7 +559,24 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(movies);
 				client.sendToClient(message);
 			}
+			else if (message.getMessage().equals("#show_complains")){
+				// set massage
+				message.setMessage("#show_complains_for_client");
+				System.out.println(message.getMessage());
 
+				// delete the responded complains
+				List<Complains> data = (List<Complains>) search_data("Complains");
+				Iterator<Complains> iterator = data.iterator();
+				while (iterator.hasNext()) {
+					Complains complain = iterator.next();
+					if (complain.getStatus()) {
+						iterator.remove(); // Remove the element if getStatus() is true
+					}
+				}
+				message.setObject(data);
+				// send to client
+				client.sendToClient(message);
+			}
 			else if (message.getMessage().equals("#login")) {
 				Session session = sessionFactory.openSession();
 				Transaction transaction = session.beginTransaction();

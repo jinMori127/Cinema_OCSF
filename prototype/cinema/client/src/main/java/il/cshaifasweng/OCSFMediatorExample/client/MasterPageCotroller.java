@@ -87,6 +87,9 @@ public class MasterPageCotroller {
         else if (menuItemText.equals("Sing out")) {
             EventBus.getDefault().post(new BeginContentChangeEnent("Movie_editing_details"));
         }
+        else if (menuItemText.equals("handle complains")) {
+            EventBus.getDefault().post(new BeginContentChangeEnent("CustomerService"));
+        }
 
 
     }

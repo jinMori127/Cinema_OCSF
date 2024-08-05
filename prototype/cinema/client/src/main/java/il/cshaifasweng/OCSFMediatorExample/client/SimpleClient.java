@@ -60,9 +60,7 @@ public class SimpleClient extends AbstractClient {
 		} else if (message.getMessage().equals("#ServerError")) {
 			EventBus.getDefault().post(new BaseEventBox("SERVER_ERROR_MESSAGE", message));
 		}
-
-		else if(message.getMessage().equals("#show_purchases_client"))
-		{
+		else if(message.getMessage().equals("#show_purchases_client")) {
 			EventBus.getDefault().post(new BaseEventBox("SHOW_PURCHASES", message));
 		}
 		else if(message.getMessage().equals("#delete_purchases_client")){
@@ -74,7 +72,9 @@ public class SimpleClient extends AbstractClient {
 				message.getMessage().equals("#loginWorkerFailedPass")){
 			EventBus.getDefault().post(new BaseEventBox("LOGIN", message));
 		}
-
+		else if (message.getMessage().equals("#show_complains_for_client")) {
+			EventBus.getDefault().post(new BaseEventBox("SHOW_COMPLAINS", message));
+		}
 		else if (message.getMessage().equals("#userNotFound") ||
 				message.getMessage().equals("#alreadyLoggedIn") ||
 				message.getMessage().equals("#loginConfirmed") ||
