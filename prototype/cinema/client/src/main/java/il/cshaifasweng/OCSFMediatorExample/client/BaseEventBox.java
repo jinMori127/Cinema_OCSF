@@ -43,9 +43,11 @@ public class BaseEventBox {
     }
     private Message message;
     private int id;
+    private String enum_name;
     public BaseEventBox(String id, Message message) {
         this.message = message;
         this.id = EventEnum.getByName(id).getValue();
+        this.enum_name = id;
     }
     public Message getMessage() {
         return message;
@@ -56,4 +58,5 @@ public class BaseEventBox {
     public int getId() {
         return id;
     }
+    public String getEnum_name() {return enum_name;}
 }

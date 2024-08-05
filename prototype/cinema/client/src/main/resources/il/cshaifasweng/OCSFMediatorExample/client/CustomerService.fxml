@@ -13,11 +13,12 @@
             <columns>
                 <TableColumn fx:id="auto_number_complains" text="Complain ID " />
                 <TableColumn fx:id="client_name" prefWidth="75.0" text="client name" />
-                <TableColumn fx:id="complain_text" prefWidth="476.0" text="complaint" />
-                <TableColumn fx:id="date_f" minWidth="0.0" prefWidth="149.0" text="date" />
+                <TableColumn fx:id="complain_text" prefWidth="384.5" text="complaint" />
+                <TableColumn fx:id="date_f" minWidth="0.0" prefWidth="146.5" text="date" />
+            <TableColumn prefWidth="94.0" text="branch name" />
             </columns>
         </TableView>
-        <Button fx:id="submit_respond" layoutX="626.0" layoutY="127.0" onAction="#CancelPurchase" text="submit respond " textFill="#1fb550" AnchorPane.rightAnchor="42.5" AnchorPane.topAnchor="127.0">
+        <Button fx:id="submit_respond" layoutX="626.0" layoutY="127.0" onAction="#handle_submit_respond" text="submit respond " textFill="#1fb550" AnchorPane.rightAnchor="42.5" AnchorPane.topAnchor="127.0">
             <font>
                 <Font name="System Bold" size="12.0" />
             </font>

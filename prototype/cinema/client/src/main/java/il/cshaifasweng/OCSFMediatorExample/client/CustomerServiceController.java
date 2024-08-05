@@ -7,69 +7,40 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.collections.ObservableList;
-
-import com.mysql.cj.protocol.x.XMessage;
-import il.cshaifasweng.OCSFMediatorExample.entities.Message;
-import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
-import il.cshaifasweng.OCSFMediatorExample.entities.Screening;
-import il.cshaifasweng.OCSFMediatorExample.entities.UserPurchases;
-import il.cshaifasweng.OCSFMediatorExample.entities.IdUser;
-
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.InputMethodEvent;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.text.Text;
 import javafx.fxml.Initializable;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.util.converter.DateStringConverter;
-import javafx.scene.input.MouseEvent;
+import il.cshaifasweng.OCSFMediatorExample.entities.Message;
+import il.cshaifasweng.OCSFMediatorExample.entities.Complains;
 
-
-import javax.persistence.criteria.CriteriaBuilder;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.net.URL;
-import java.sql.Time;
+import java.util.List;
 import java.util.*;
-import javafx.scene.control.TextArea;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.LocalDateTime;
-import static il.cshaifasweng.OCSFMediatorExample.client.MovieEditingDetailsController.go_to_screening_movie;
-import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.Current_Message;
-import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.getClient;
 
 
 public class CustomerServiceController {
 
     @FXML
-    private TableColumn<?, ?> auto_number_complains;
+    private TableColumn<Complains, Integer> auto_number_complains;
 
     @FXML
-    private TableColumn<?, ?> client_name;
+    private TableColumn<Complains, String> branch_name;
 
     @FXML
-    private TableColumn<?, ?> complain_text;
+    private TableColumn<Complains, String> client_name;
+
+    @FXML
+    private TableColumn<Complains, String> complain_text;
 
     @FXML
     private TextArea complains_detailes;
 
     @FXML
-    private TableColumn<?, ?> date_f;
+    private TableColumn<Complains, Date> date_f;
 
     @FXML
     private TextArea respond;
@@ -78,9 +49,24 @@ public class CustomerServiceController {
     private Button submit_respond;
 
     @FXML
-    private TableView<?> table_view;
+    private TableView<Complains> table_view;
 
-    // initialize page function
+    ////////////////////////////////////////////////////////////////////////////
+        // Subscribe function //
+    ///////////////////////////////////////////////////////////////////////////
+    @Subscribe
+    public void show_complains(BaseEventBox event)
+    {
+        if (event.getEnum_name().equals("SHOW_COMPLAINS")) {
+            Platform.runLater(() -> {
+                create_complains_table(event.getMessage());
+            });
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+        // FXML function //
+    ///////////////////////////////////////////////////////////////////////////
     @FXML
     public void initialize() {
         EventBus.getDefault().register(this);
@@ -97,16 +83,50 @@ public class CustomerServiceController {
         table_view.setOnMouseClicked((MouseEvent event) -> {
             if (event.getClickCount() == 2) {
                 show_complain_information();
-
             }
         });
     }
 
-    void show_complain_information() {}
-
     @FXML
-    void CancelPurchase(ActionEvent event) {
+    public void  handle_submit_respond(ActionEvent event) {
 
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+        // Helper function //
+    ///////////////////////////////////////////////////////////////////////////
+    private ObservableList<Complains> list;
+
+    private void show_complain_information() {
+            // Get the selected row index
+            int selectedRow = table_view.getSelectionModel().getSelectedIndex();
+
+            // Check if the selected row is valid
+            if (selectedRow >= 0 && selectedRow < table_view.getItems().size()) {
+                // Get the columns
+                ObservableList<TableColumn<Complains, ?>> columns = table_view.getColumns();
+
+                StringBuilder contentText = new StringBuilder();
+
+                // Iterate through columns to get cell data
+                for (TableColumn<Complains, ?> column : columns) {
+                    Object cellData = column.getCellData(selectedRow);
+                    contentText.append(column.getText()).append(": ").append(cellData).append("\n");
+                }
+                complains_detailes.setText(contentText.toString());
+            }
+    }
+
+    private void create_complains_table(Message message) {
+        List<Complains> user_list = (List<Complains>) message.getObject();
+
+        auto_number_complains.setCellValueFactory(new PropertyValueFactory<>("auto_number_complains"));
+        client_name.setCellValueFactory(new PropertyValueFactory<>("client_name"));
+        complain_text.setCellValueFactory(new PropertyValueFactory<>("complain_text"));
+        date_f.setCellValueFactory(new PropertyValueFactory<>("time_of_complain"));
+        branch_name.setCellValueFactory(new PropertyValueFactory<>("cinema_branch"));
+
+        list = FXCollections.observableArrayList(user_list);
+        table_view.setItems(list);
+    }
 }

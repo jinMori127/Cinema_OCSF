@@ -91,7 +91,6 @@ public class MasterPageCotroller {
             EventBus.getDefault().post(new BeginContentChangeEnent("CustomerService"));
         }
 
-
     }
 
 
