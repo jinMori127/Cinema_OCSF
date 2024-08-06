@@ -6,10 +6,7 @@ import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -157,6 +154,10 @@ public class CatalogController {
         else if (Sort_direction.equals("ascending")){
             Sort_direction = "asc";
         }
+        else if (Sort_direction.equals("dont"))
+        {
+            Sort_direction = "dont";
+        }
         Movie movie = new Movie();
         movie.setRating(min_rating);
         movie.setYear_(year1);
@@ -168,6 +169,8 @@ public class CatalogController {
         dictionary.put("Sort_atribute", Sort_atribute);
         dictionary.put("Sort_direction", Sort_direction);
         dictionary.put("year2", String.valueOf(year2));
+        dictionary_search = dictionary;
+        current_search = movie;
         Message m = new Message(10,"#SearchMovieFillter");
         m.setObject(movie);
         m.setObject2(dictionary);
@@ -190,7 +193,8 @@ public class CatalogController {
         EventBus.getDefault().unregister(this);
         EventBus.getDefault().post(new ContentChangeEvent(event.getPage()));
     }
-
+    private Movie current_search = null ;
+    private Map<String, String> dictionary_search = null;
     public void create_catalog(Message M)
     {
         Vbox_movies.getChildren().clear();
@@ -255,8 +259,8 @@ public class CatalogController {
         catalog_Pane.layoutYProperty().setValue(0);
         Fillter_Pane.setVisible(false);
         sort_direction.getItems().clear();
-        sort_direction.getItems().addAll("descending", "ascending");
-        sort_direction.setValue("descending");
+        sort_direction.getItems().addAll("dont","descending", "ascending");
+        sort_direction.setValue("dont");
         sort_atribute.getItems().clear();
         sort_atribute.getItems().addAll("movie name","year","price","rating");
         sort_atribute.setValue("movie name");
@@ -292,6 +296,24 @@ public class CatalogController {
                 System.out.println("GOT_SEARCH_MOVIE_FILTER");
                 create_catalog(event.getMessage());
             });
+        }
+        else if(event.getId() == BaseEventBox.get_event_id("UPDATE_MOVIE_LIST")) {
+            if (current_search == null)
+            {
+                Platform.runLater(() -> {create_catalog(event.getMessage());});
+            }
+            else {
+                Message m = new Message(10,"#SearchMovieFillter");
+                m.setObject(current_search);
+                m.setObject2(dictionary_search);
+                try {
+                    SimpleClient.getClient().sendToServer(m);
+                } catch (IOException e) {
+                    ErrorMessage.setText(e.getMessage());
+                    ErrorMessage.setVisible(true);
+                    return;
+                }
+            }
         }
     }
 

@@ -31,6 +31,10 @@ public class SimpleClient extends AbstractClient {
 			});*/
         }
 		else if (message.getMessage().equals("#GoToHomePage")){
+			//System.out.println("we are here");
+			//System.out.println(BaseEventBox.get_event_id("MOVIES_GOT"));
+			//BaseEventBox b = new BaseEventBox("MOVIES_GO", message);
+
 			EventBus.getDefault().post(new BaseEventBox("MOVIES_GOT", message));
 
 		}
