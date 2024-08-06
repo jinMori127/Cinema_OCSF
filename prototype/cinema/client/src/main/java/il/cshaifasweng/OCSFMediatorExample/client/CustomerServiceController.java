@@ -20,6 +20,7 @@ import il.cshaifasweng.OCSFMediatorExample.entities.Complains;
 import java.io.IOException;
 import java.util.List;
 import java.util.*;
+import javax.swing.*;
 
 
 public class CustomerServiceController {
@@ -52,25 +53,30 @@ public class CustomerServiceController {
     private TableView<Complains> table_view;
 
     ////////////////////////////////////////////////////////////////////////////
-        // Subscribe function //
+    // Subscribe function //
     ///////////////////////////////////////////////////////////////////////////
     @Subscribe
-    public void show_complains(BaseEventBox event)
-    {
+    public void show_complains(BaseEventBox event) {
         if (event.getEnum_name().equals("SHOW_COMPLAINS")) {
             Platform.runLater(() -> {
                 create_complains_table(event.getMessage());
+            });
+        } else if (event.getEnum_name().equals("SHOW_COMPLAINS_AND_MESSAGE")) {
+            System.out.println("la la ");
+
+            Platform.runLater(() -> {
+                create_complains_table_and_message(event.getMessage());
             });
         }
     }
 
     ////////////////////////////////////////////////////////////////////////////
-        // FXML function //
+    // FXML function //
     ///////////////////////////////////////////////////////////////////////////
     @FXML
     public void initialize() {
         EventBus.getDefault().register(this);
-        Message insert_message = new Message(40,"#show_complains");
+        Message insert_message = new Message(40, "#show_complains");
 
         try {
             SimpleClient.getClient().sendToServer(insert_message);
@@ -88,33 +94,51 @@ public class CustomerServiceController {
     }
 
     @FXML
-    public void  handle_submit_respond(ActionEvent event) {
+    public void handle_submit_respond(ActionEvent event) {
+        Message insert_message = new Message(60, "#submit_respond");
 
+        int selectedRow = table_view.getSelectionModel().getSelectedIndex();
+
+        int auto_number = -1;
+        if (!table_view.getColumns().isEmpty()) {
+            TableColumn<Complains, ?> firstColumn = table_view.getColumns().get(0);
+            Object cellData = firstColumn.getCellData(selectedRow);
+            auto_number = (int) cellData;
+        }
+        System.out.println("la la ");
+        insert_message.setObject(respond.getText());
+        insert_message.setObject2(auto_number);
+        try {
+            SimpleClient.getClient().sendToServer(insert_message);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////
-        // Helper function //
+    // Helper function //
     ///////////////////////////////////////////////////////////////////////////
     private ObservableList<Complains> list;
 
     private void show_complain_information() {
-            // Get the selected row index
-            int selectedRow = table_view.getSelectionModel().getSelectedIndex();
+        // Get the selected row index
+        int selectedRow = table_view.getSelectionModel().getSelectedIndex();
 
-            // Check if the selected row is valid
-            if (selectedRow >= 0 && selectedRow < table_view.getItems().size()) {
-                // Get the columns
-                ObservableList<TableColumn<Complains, ?>> columns = table_view.getColumns();
+        // Check if the selected row is valid
+        if (selectedRow >= 0 && selectedRow < table_view.getItems().size()) {
+            // Get the columns
+            ObservableList<TableColumn<Complains, ?>> columns = table_view.getColumns();
 
-                StringBuilder contentText = new StringBuilder();
+            StringBuilder contentText = new StringBuilder();
 
-                // Iterate through columns to get cell data
-                for (TableColumn<Complains, ?> column : columns) {
-                    Object cellData = column.getCellData(selectedRow);
-                    contentText.append(column.getText()).append(": ").append(cellData).append("\n");
-                }
-                complains_detailes.setText(contentText.toString());
+            // Iterate through columns to get cell data
+            for (TableColumn<Complains, ?> column : columns) {
+                Object cellData = column.getCellData(selectedRow);
+                contentText.append(column.getText()).append(": ").append(cellData).append("\n");
             }
+            complains_detailes.setText(contentText.toString());
+        }
     }
 
     private void create_complains_table(Message message) {
@@ -128,5 +152,14 @@ public class CustomerServiceController {
 
         list = FXCollections.observableArrayList(user_list);
         table_view.setItems(list);
+    }
+
+    private void create_complains_table_and_message(Message message) {
+        create_complains_table(message);
+        System.out.println("sadsfafs number");
+
+        // Display a success message
+        JOptionPane.showMessageDialog(null, "Response sent successfully!", "Success",
+                JOptionPane.INFORMATION_MESSAGE);
     }
 }

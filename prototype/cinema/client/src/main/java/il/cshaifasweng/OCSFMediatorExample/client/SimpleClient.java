@@ -75,6 +75,11 @@ public class SimpleClient extends AbstractClient {
 		else if (message.getMessage().equals("#show_complains_for_client")) {
 			EventBus.getDefault().post(new BaseEventBox("SHOW_COMPLAINS", message));
 		}
+		else if (message.getMessage().equals("#submit_respond_for_client")) {
+			System.out.println("la la 23214");
+
+			EventBus.getDefault().post(new BaseEventBox("SHOW_COMPLAINS_AND_MESSAGE", message));
+		}
 		else if (message.getMessage().equals("#userNotFound") ||
 				message.getMessage().equals("#alreadyLoggedIn") ||
 				message.getMessage().equals("#loginConfirmed") ||

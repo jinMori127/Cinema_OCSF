@@ -17,7 +17,8 @@ public class BaseEventBox {
         UPDATE_SCREENING_FOR_MOVIE,
         SERVER_ERROR_MESSAGE,
         WRONG_NAMEING,
-        SHOW_COMPLAINS;
+        SHOW_COMPLAINS,
+        SHOW_COMPLAINS_AND_MESSAGE;
 
         public static EventEnum getByName(String name) {
             try {

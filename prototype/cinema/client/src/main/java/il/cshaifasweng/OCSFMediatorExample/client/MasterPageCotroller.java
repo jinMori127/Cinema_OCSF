@@ -25,11 +25,9 @@ public class MasterPageCotroller {
     @Subscribe
     public void change_content(ContentChangeEvent event)
     {
-
         Platform.runLater(()->{
             setContent(event.getPage()+".fxml");
         });
-
     }
 
     @FXML
@@ -41,7 +39,6 @@ public class MasterPageCotroller {
         // catalog_menu.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> setContent("Movie_editing_details.fxml"));
 
         setContent("HomePage.fxml");
-
 
     }
 

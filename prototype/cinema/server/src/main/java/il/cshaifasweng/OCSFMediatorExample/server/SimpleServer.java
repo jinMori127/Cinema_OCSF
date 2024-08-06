@@ -59,9 +59,6 @@ public class SimpleServer extends AbstractServer {
 		configuration.addAnnotatedClass(UserPurchases.class);
 		configuration.addAnnotatedClass(Worker.class);
 
-
-
-
 		ServiceRegistry serviceRegistry = new
 				StandardServiceRegistryBuilder()
 				.applySettings(configuration.getProperties())
@@ -120,7 +117,6 @@ public class SimpleServer extends AbstractServer {
 		session.save(movie);
 		session.getTransaction().commit();
 		session.close();
-
 	}
 	private void update_movie (Movie movie) throws Exception {
 		Session session = sessionFactory.openSession();
@@ -308,7 +304,6 @@ public class SimpleServer extends AbstractServer {
 			session.getTransaction().rollback();
 			session.close();
 			return  search_user_purchases("327876116");
-
 		}
 
 
@@ -338,7 +333,6 @@ public class SimpleServer extends AbstractServer {
 		List<UserPurchases> data = session.createQuery(query).getResultList();
 		session.getTransaction().commit();
 		session.close();
-//		data.removeIf(userPurchase -> !userPurchase.get_id_user().equals(id));
 
 		return data;
 	}
@@ -353,26 +347,42 @@ public class SimpleServer extends AbstractServer {
 
 
 
-	private List<?> search_data(String className) {
+	private List<Complains> search_data() {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-		try {
-			Class<?> clazz = Class.forName(className);
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Complains> query = builder.createQuery(Complains.class);
+		query.from(Complains.class);
+		List<Complains> data = session.createQuery(query).getResultList();
+		session.getTransaction().commit();
+		session.close();
+		data.removeIf(complain -> complain.getStatus());
 
-			CriteriaBuilder builder = session.getCriteriaBuilder();
-			CriteriaQuery<?> query = builder.createQuery(clazz);
-			query.from(clazz);
+		return data;
+	}
 
-			List<?> data = session.createQuery(query).getResultList();
-			session.getTransaction().commit();
-			return data;
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+	private List<Complains> update_respond(int auto_num, String respond_text) throws Exception {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		// Find the object with the specified auto_num
+		Complains complains = session.get(Complains.class, auto_num);
+
+		if (complains == null) {
 			session.getTransaction().rollback();
-			return Collections.emptyList();
-		} finally {
 			session.close();
+			return  search_data();
 		}
+		// update the complain object
+		complains.setRespond(respond_text);
+		complains.setStatus(true);
+		session.update(complains);
+
+		// Commit the transaction
+		session.getTransaction().commit();
+		session.close();
+		List<Complains> data = search_data();
+		return data;
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -565,16 +575,20 @@ public class SimpleServer extends AbstractServer {
 				System.out.println(message.getMessage());
 
 				// delete the responded complains
-				List<Complains> data = (List<Complains>) search_data("Complains");
-				Iterator<Complains> iterator = data.iterator();
-				while (iterator.hasNext()) {
-					Complains complain = iterator.next();
-					if (complain.getStatus()) {
-						iterator.remove(); // Remove the element if getStatus() is true
-					}
-				}
+				List<Complains> data = search_data();
+
 				message.setObject(data);
 				// send to client
+				client.sendToClient(message);
+			}
+			else if (message.getMessage().equals("#submit_respond")) {
+				String respond = (String)message.getObject();
+				int number = (int)message.getObject2();
+				List<Complains> data = update_respond(number, respond);
+
+				message.setMessage("#submit_respond_for_client");
+				// delete the responded complains
+				message.setObject(data);
 				client.sendToClient(message);
 			}
 			else if (message.getMessage().equals("#login")) {
