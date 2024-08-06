@@ -84,7 +84,6 @@ public class SimpleClient extends AbstractClient {
 		}
 
 		else if(message.getMessage().equals("#purchase_multi_ticket_client")){
-			System.out.println("get to Client");
 			EventBus.getDefault().post(new BaseEventBox(75, message));
 		}
 

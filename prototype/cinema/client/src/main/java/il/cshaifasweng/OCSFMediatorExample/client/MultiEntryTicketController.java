@@ -1,4 +1,12 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
+import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
+import javafx.scene.text.Text;
+import javafx.event.ActionEvent;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -19,7 +27,6 @@ import il.cshaifasweng.OCSFMediatorExample.entities.Screening;
 import il.cshaifasweng.OCSFMediatorExample.entities.UserPurchases;
 import il.cshaifasweng.OCSFMediatorExample.entities.IdUser;
 import il.cshaifasweng.OCSFMediatorExample.entities.MultiEntryTicket;
-
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -43,7 +50,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DateStringConverter;
 import javafx.scene.input.MouseEvent;
 
-
 import javax.persistence.criteria.CriteriaBuilder;
 import java.io.IOException;
 import java.text.ParseException;
@@ -58,17 +64,18 @@ import java.time.LocalDateTime;
 import static il.cshaifasweng.OCSFMediatorExample.client.MovieEditingDetailsController.go_to_screening_movie;
 import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.Current_Message;
 import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.getClient;
-
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 
 public class MultiEntryTicketController {
 
     @FXML
     private TextField id;
 
-
     @FXML
     private TextField first_name;
-
 
     @FXML
     private TextField last_name;
@@ -80,12 +87,19 @@ public class MultiEntryTicketController {
     private TextField phone_number;
 
     @FXML
+    private TextField card_number_col;
+
+    @FXML
+    private TextField cvv_col;
+
+    @FXML
+    private TextField date_col;
+
+    @FXML
     private Button purchase; // Value injected by FXMLLoader
 
     @FXML
     private Text error_message;
-
-
 
     @Subscribe
     public void delete_purchases_for_user(BaseEventBox event) {
@@ -97,114 +111,176 @@ public class MultiEntryTicketController {
     }
 
     public void print_success(Message message) {
-        System.out.println("success");
-
     }
-
 
     @FXML
     public void purchase_button(ActionEvent event) {
-        System.out.println("start purchase");
 
+        if (id.getText().isEmpty()) {
+            error_message.setVisible(true);
+            error_message.setText("Please enter your ID.");
+            return;
+        }
 
-            if (id.getText().isEmpty()) {
-                error_message.setVisible(true);
-                error_message.setText("Please enter your ID.");
-                return;
-            }
-            System.out.println("id is ");
-            if (first_name.getText().isEmpty()) {
-                error_message.setVisible(true);
-                error_message.setText("Please enter your first name.");
-                return;
-
-            }
-            System.out.println("FIRST is ");
+        if (first_name.getText().isEmpty()) {
+            error_message.setVisible(true);
+            error_message.setText("Please enter your first name.");
+            return;
+        }
 
         if (last_name.getText().isEmpty()) {
-                error_message.setVisible(true);
-                error_message.setText("Please enter your last name.");
-                return;
-
-            }
-        System.out.println("LAST is ");
+            error_message.setVisible(true);
+            error_message.setText("Please enter your last name.");
+            return;
+        }
 
         if (email_col.getText().isEmpty()) {
-                error_message.setVisible(true);
-                error_message.setText("Please enter your email .");
-                return;
-
-            }
-        System.out.println("email is ");
+            error_message.setVisible(true);
+            error_message.setText("Please enter your email.");
+            return;
+        }
 
         if (phone_number.getText().isEmpty()) {
-                error_message.setVisible(true);
-                error_message.setText("Please enter your number .");
-                return;
-            }
-        System.out.println("phone is ");
+            error_message.setVisible(true);
+            error_message.setText("Please enter your number.");
+            return;
+        }
 
+        if (card_number_col.getText().isEmpty()) {
+            error_message.setVisible(true);
+            error_message.setText("Please enter your card number.");
+            return;
+        }
 
+        if (cvv_col.getText().isEmpty()) {
+            error_message.setVisible(true);
+            error_message.setText("Please enter your CVV.");
+            return;
+        }
+
+        if (date_col.getText().isEmpty()) {
+            error_message.setVisible(true);
+            error_message.setText("Please enter your card expiry date.");
+            return;
+        }
 
         int curr_id = Integer.parseInt(id.getText());
-            String id_str = Integer.toString(curr_id);
-            if (curr_id < 0 || id_str.length() != 9) {
-                error_message.setVisible(true);
-                error_message.setText("ID must contain 9 digits");
-                id.setText("");
-                return;
-            }
-        System.out.println("END_CECKS44");
+        String id_str = Integer.toString(curr_id);
+        if (curr_id < 0 || id_str.length() != 9) {
+            error_message.setVisible(true);
+            error_message.setText("ID must contain 9 digits");
+            id.setText("");
+            return;
+        }
 
+        String phone_check_number = phone_number.getText();
 
-       // int curr_phone = Integer.parseInt(phone_number.getText());
-        System.out.println("END_CECKS55");
-
-        String phone_str = (String) (phone_number.getText());
-        System.out.println("END_CECKS66");
-         //   if (curr_phone < 0 || phone_str.length() != 10) {
-           //     error_message.setVisible(true);
-             //   error_message.setText("phone number must contain 10 digits");
-               // phone_number.setText("");
-                //return;
-            //}
-            System.out.println("END_CECKS");
-
-            String curr_first_name = (String)first_name.getText();
-            String curr_last_name =(String) last_name.getText();
-            String curr_email =(String) email_col.getText();
-            System.out.println("enter purcahseeeeeeeee abree");
-            IdUser id_user=new IdUser(id_str,curr_first_name,phone_str,curr_email);
-            if(id_user==null)
-                System.out.println("ID IS NULL");
-            MultiEntryTicket multiTicket = new MultiEntryTicket(1000);
-            multiTicket.setId_user(id_user);
-
-
-            Message message = new Message(25, "#purchase_multi_ticket");
-            message.setObject(multiTicket);
-            try {
-                SimpleClient.getClient().sendToServer(message);
-                System.out.println("ended");
-
-            }
-            catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        if (!phone_check_number.matches("\\d{10}")) {
+            error_message.setVisible(true);
+            error_message.setText("Phone number must contain exactly 10 digits");
+            phone_number.setText("");
+            return;
+        }
 
 
 
+        String card_number = card_number_col.getText();
+
+        if (!card_number.matches("\\d{12}")) {
+            error_message.setVisible(true);
+            error_message.setText("Card number must contain exactly 12 digits");
+            card_number_col.setText("");
+            return;
+        }
+////////////////////////date checking
+        String date_str = date_col.getText();
+        String date_pattern = "^(0[1-9]|1[0-2])/\\d{2}$";
+
+        if (!date_str.matches(date_pattern)) {
+            error_message.setVisible(true);
+            error_message.setText("Date must be in the format mm/yy and mm should be a valid month (01-12)");
+            date_col.setText("");
+            return;
+        }        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
+        YearMonth inputDate;
+        try {
+            inputDate = YearMonth.parse(date_str, formatter);
+        } catch (DateTimeParseException e) {
+            error_message.setVisible(true);
+            error_message.setText("Date parsing error. Please check the format.");
+            date_col.setText("");
+            return;
+        }
+
+        // Get the current date
+        YearMonth currentMonth = YearMonth.now();
+
+        // Compare the current date with the input date
+        if (inputDate.isBefore(currentMonth)) {
+            error_message.setVisible(true);
+            error_message.setText("The expiry date cannot be in the past.");
+            date_col.setText("");
+            return;
+        }
+
+        YearMonth endMonth = currentMonth.plusMonths(4);
+
+        if (inputDate.isAfter(endMonth)) {
+            error_message.setVisible(true);
+            error_message.setText("Date must be within the next four months from the current date.");
+            date_col.setText("");
+            return;
+        }
 
 
+        /////////////////////////////////////////
+        String cvv_str = cvv_col.getText();
+        if (!cvv_str.matches("\\d{3}")) {
+            error_message.setVisible(true);
+            error_message.setText("CVV must contain exactly 3 digits");
+            cvv_col.setText("");
+            return;
+        }
+
+        String phone_str = phone_number.getText();
 
 
+        String curr_first_name = first_name.getText();
+        String curr_last_name = last_name.getText();
+        String full_name = curr_first_name + " " + curr_last_name;
 
+        String curr_email = email_col.getText();
+
+        IdUser id_user = new IdUser(id_str, full_name, phone_str, curr_email);
+        MultiEntryTicket multiTicket = new MultiEntryTicket(20);
+        multiTicket.setId_user(id_user);
+
+        Message message = new Message(25, "#purchase_multi_ticket");
+        message.setObject(multiTicket);
+        clearFields();
+
+        try {
+            SimpleClient.getClient().sendToServer(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    private void clearFields() {
+        id.setText("");
+        first_name.setText("");
+        last_name.setText("");
+        email_col.setText("");
+        phone_number.setText("");
+        card_number_col.setText("");
+        cvv_col.setText("");
+        date_col.setText("");
+        error_message.setText(""); // Clear the error message as well
+    }
+
+
     @FXML
     public void initialize() {
-
-        System.out.println("initialize");
         EventBus.getDefault().register(this);
     }
-
 }

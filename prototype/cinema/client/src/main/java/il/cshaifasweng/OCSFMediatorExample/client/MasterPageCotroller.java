@@ -85,6 +85,9 @@ public class MasterPageCotroller {
         else if (menuItemText.equals("Sing out")) {
             setContent("MultiEntryTicket.fxml");
         }
+        else if (menuItemText.equals("Purchase Multi Entry Ticket")) {
+            setContent("MultiEntryTicket.fxml");
+        }
 
 
 
