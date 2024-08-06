@@ -347,7 +347,7 @@ public class SimpleServer extends AbstractServer {
 
 
 
-	private List<Complains> search_data() {
+	private List<Complains> search_data(boolean do_show_not_responded) {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -356,12 +356,16 @@ public class SimpleServer extends AbstractServer {
 		List<Complains> data = session.createQuery(query).getResultList();
 		session.getTransaction().commit();
 		session.close();
-		data.removeIf(complain -> complain.getStatus());
-
+		if (do_show_not_responded) {
+			data.removeIf(complain -> complain.getStatus());
+		}
+		else {
+			data.removeIf(complain -> !complain.getStatus());
+		}
 		return data;
 	}
 
-	private List<Complains> update_respond(int auto_num, String respond_text) throws Exception {
+	private List<Complains> update_respond(int auto_num, String respond_text, boolean phase) throws Exception {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 
@@ -371,7 +375,7 @@ public class SimpleServer extends AbstractServer {
 		if (complains == null) {
 			session.getTransaction().rollback();
 			session.close();
-			return  search_data();
+			return  search_data(phase);
 		}
 		// update the complain object
 		complains.setRespond(respond_text);
@@ -381,7 +385,7 @@ public class SimpleServer extends AbstractServer {
 		// Commit the transaction
 		session.getTransaction().commit();
 		session.close();
-		List<Complains> data = search_data();
+		List<Complains> data = search_data(phase);
 		return data;
 	}
 
@@ -572,19 +576,32 @@ public class SimpleServer extends AbstractServer {
 			else if (message.getMessage().equals("#show_complains")){
 				// set massage
 				message.setMessage("#show_complains_for_client");
-				System.out.println(message.getMessage());
 
 				// delete the responded complains
-				List<Complains> data = search_data();
+				List<Complains> data = search_data(true);
+
+				message.setObject(data);
+				// send to client
+				client.sendToClient(message);
+			}
+			else if (message.getMessage().equals("#show_respond")){
+				// set massage
+				message.setMessage("#show_respond_complains_for_client");
+
+				// delete the responded complains
+				List<Complains> data = search_data(false);
 
 				message.setObject(data);
 				// send to client
 				client.sendToClient(message);
 			}
 			else if (message.getMessage().equals("#submit_respond")) {
-				String respond = (String)message.getObject();
+
+				String respondText = (String)((List<Object>)message.getObject()).get(0);
+				boolean phase = (boolean) ((List<Object>)message.getObject()).get(1);
+
 				int number = (int)message.getObject2();
-				List<Complains> data = update_respond(number, respond);
+				List<Complains> data = update_respond(number, respondText, phase);
 
 				message.setMessage("#submit_respond_for_client");
 				// delete the responded complains

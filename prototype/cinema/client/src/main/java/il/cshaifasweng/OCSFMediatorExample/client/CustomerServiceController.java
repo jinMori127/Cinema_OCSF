@@ -38,6 +38,9 @@ public class CustomerServiceController {
     private TableColumn<Complains, String> complain_text;
 
     @FXML
+    private TableColumn<Complains, String> respond_col;
+
+    @FXML
     private TextArea complains_detailes;
 
     @FXML
@@ -50,7 +53,15 @@ public class CustomerServiceController {
     private Button submit_respond;
 
     @FXML
+    private Button show_responded;
+
+    @FXML
+    private Button not_responded;
+
+    @FXML
     private TableView<Complains> table_view;
+
+    private boolean phase;
 
     ////////////////////////////////////////////////////////////////////////////
     // Subscribe function //
@@ -62,12 +73,23 @@ public class CustomerServiceController {
                 create_complains_table(event.getMessage());
             });
         } else if (event.getEnum_name().equals("SHOW_COMPLAINS_AND_MESSAGE")) {
-            System.out.println("la la ");
-
             Platform.runLater(() -> {
                 create_complains_table_and_message(event.getMessage());
             });
         }
+        else if (event.getEnum_name().equals("SHOW_COMPLAINS_RESPOND")) {
+            Platform.runLater(() -> {
+                create_complains_table(event.getMessage());
+            });
+        }
+    }
+
+    @Subscribe
+    public void change_content1(BeginContentChangeEnent event)
+    {
+        System.out.println(event.getPage());
+        EventBus.getDefault().unregister(this);
+        EventBus.getDefault().post(new ContentChangeEvent(event.getPage()));
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -77,6 +99,10 @@ public class CustomerServiceController {
     public void initialize() {
         EventBus.getDefault().register(this);
         Message insert_message = new Message(40, "#show_complains");
+        respond.setEditable(false);
+        submit_respond.setDisable(true);
+        respond_col.setVisible(false);
+        phase = true;
 
         try {
             SimpleClient.getClient().sendToServer(insert_message);
@@ -89,6 +115,8 @@ public class CustomerServiceController {
         table_view.setOnMouseClicked((MouseEvent event) -> {
             if (event.getClickCount() == 2) {
                 show_complain_information();
+                respond.setEditable(true);
+                submit_respond.setDisable(false);
             }
         });
     }
@@ -105,9 +133,37 @@ public class CustomerServiceController {
             Object cellData = firstColumn.getCellData(selectedRow);
             auto_number = (int) cellData;
         }
-        System.out.println("la la ");
-        insert_message.setObject(respond.getText());
+        List<Object> respond_then_phase = new ArrayList<>();
+        respond_then_phase.add(respond.getText());
+        respond_then_phase.add(phase);
+        insert_message.setObject(respond_then_phase);
         insert_message.setObject2(auto_number);
+        try {
+            SimpleClient.getClient().sendToServer(insert_message);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @FXML
+    public void handle_show_respond_complains(ActionEvent event) {
+        phase = false;
+        respond_col.setVisible(true);
+        Message insert_message = new Message(90, "#show_respond");
+        try {
+            SimpleClient.getClient().sendToServer(insert_message);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @FXML
+    public void handle_show_complains(ActionEvent event) {
+        phase = true;
+        respond_col.setVisible(false);
+        Message insert_message = new Message(23, "#show_complains");
         try {
             SimpleClient.getClient().sendToServer(insert_message);
 
@@ -134,8 +190,11 @@ public class CustomerServiceController {
 
             // Iterate through columns to get cell data
             for (TableColumn<Complains, ?> column : columns) {
-                Object cellData = column.getCellData(selectedRow);
-                contentText.append(column.getText()).append(": ").append(cellData).append("\n");
+                // Check if the column is visible
+                if (column.isVisible()) {
+                    Object cellData = column.getCellData(selectedRow);
+                    contentText.append(column.getText()).append(": ").append(cellData).append("\n");
+                }
             }
             complains_detailes.setText(contentText.toString());
         }
@@ -149,17 +208,25 @@ public class CustomerServiceController {
         complain_text.setCellValueFactory(new PropertyValueFactory<>("complain_text"));
         date_f.setCellValueFactory(new PropertyValueFactory<>("time_of_complain"));
         branch_name.setCellValueFactory(new PropertyValueFactory<>("cinema_branch"));
+        respond_col.setCellValueFactory(new PropertyValueFactory<>("respond"));
 
         list = FXCollections.observableArrayList(user_list);
         table_view.setItems(list);
     }
 
+
+
     private void create_complains_table_and_message(Message message) {
         create_complains_table(message);
-        System.out.println("sadsfafs number");
 
         // Display a success message
         JOptionPane.showMessageDialog(null, "Response sent successfully!", "Success",
                 JOptionPane.INFORMATION_MESSAGE);
+
+        // set the text to empty
+        complains_detailes.setText("");
+        respond.setText("");
+        respond.setEditable(false);
+        submit_respond.setDisable(true);
     }
 }

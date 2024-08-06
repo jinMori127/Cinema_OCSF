@@ -18,7 +18,8 @@ public class BaseEventBox {
         SERVER_ERROR_MESSAGE,
         WRONG_NAMEING,
         SHOW_COMPLAINS,
-        SHOW_COMPLAINS_AND_MESSAGE;
+        SHOW_COMPLAINS_AND_MESSAGE,
+        SHOW_COMPLAINS_RESPOND;
 
         public static EventEnum getByName(String name) {
             try {

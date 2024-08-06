@@ -13,9 +13,10 @@
             <columns>
                 <TableColumn fx:id="auto_number_complains" text="Complain ID " />
                 <TableColumn fx:id="client_name" prefWidth="75.0" text="client name" />
-                <TableColumn fx:id="complain_text" prefWidth="384.5" text="complaint" />
-                <TableColumn fx:id="date_f" minWidth="0.0" prefWidth="146.5" text="date" />
-            <TableColumn fx:id="branch_name" prefWidth="94.0" text="branch name" />
+                <TableColumn fx:id="complain_text" prefWidth="256.5" text="complaint" />
+                <TableColumn fx:id="date_f" minWidth="0.0" prefWidth="148.5" text="date" />
+            <TableColumn fx:id="branch_name" prefWidth="88.0" text="branch name" />
+            <TableColumn fx:id="respond_col" prefWidth="132.0" text="respond" visible="false" />
             </columns>
         </TableView>
         <Button fx:id="submit_respond" layoutX="626.0" layoutY="127.0" onAction="#handle_submit_respond" text="submit respond " textFill="#1fb550" AnchorPane.rightAnchor="42.5" AnchorPane.topAnchor="127.0">
@@ -25,5 +26,7 @@
         </Button>
         <TextArea fx:id="complains_detailes" editable="false" layoutX="24.0" layoutY="18.0" prefHeight="134.0" prefWidth="344.0" promptText="complaint detailes" />
       <TextArea fx:id="respond" layoutX="391.0" layoutY="21.0" prefHeight="127.0" prefWidth="202.0" promptText="enter respond " />
+      <Button fx:id="show_responded" layoutX="631.0" layoutY="60.0" mnemonicParsing="false" onAction="#handle_show_respond_complains" text="responded complains" textFill="#045372" />
+      <Button fx:id="not_responded" layoutX="623.0" layoutY="21.0" mnemonicParsing="false" onAction="#handle_show_complains" text="not responded complains" textFill="#771515" />
     </children>
 </AnchorPane>
