@@ -82,9 +82,6 @@ public class MultiEntryTicketController {
     @FXML
     private Button purchase; // Value injected by FXMLLoader
 
-
-
-
     @FXML
     private Text error_message;
 
@@ -180,7 +177,8 @@ public class MultiEntryTicketController {
             IdUser id_user=new IdUser(id_str,curr_first_name,phone_str,curr_email);
             if(id_user==null)
                 System.out.println("ID IS NULL");
-            MultiEntryTicket multiTicket = new MultiEntryTicket(id_user,20);
+            MultiEntryTicket multiTicket = new MultiEntryTicket(1000);
+            multiTicket.setId_user(id_user);
 
 
             Message message = new Message(25, "#purchase_multi_ticket");

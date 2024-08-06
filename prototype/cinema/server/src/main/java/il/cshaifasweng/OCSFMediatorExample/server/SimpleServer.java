@@ -548,37 +548,50 @@ public class SimpleServer extends AbstractServer {
 
 				System.out.println("enterrrrrrrrrr_server");
 
-				MultiEntryTicket t =  (MultiEntryTicket)message.getObject();
-				if (t==null){
-					System.out.println("MultiEntryTicketLL is null");
+				MultiEntryTicket t = (MultiEntryTicket) message.getObject();
+				if (t == null) {
+					System.out.println("MultiEntryTicket is null");
+					return;
 				}
+				System.out.println(t.getAuto_number_multi_entry_ticket());
 
-
-
-
-
+				// Retrieve or create the IdUser entity referenced by MultiEntryTicket
+				IdUser idUser = t.getId_user(); // Adjust according to your getter method
+				if (idUser == null) {
+					System.out.println("IdUser is null");
+					return;
+				}
 
 				Session session = null;
 				Transaction transaction = null;
-				session = sessionFactory.openSession();
-				session.beginTransaction();
-				session.save(t);
-				session.getTransaction().commit();
-				session.close();
-			//	String first_name =  (String) message.getObject2();
-			//	String last_name =  (String) message.getObject3();
-			//	String email =  (String) message.getObject4();
-			//	String phone_number =  (String) message.getObject5();
-			//	IdUser id_user=new IdUser(id,first_name,phone_number,email);
-				//MultiEntryTicket multiTicket = new MultiEntryTicket(id_user, first_name, last_name, email, phone_number,20);
-				//System.out.println(multiTicket);
 
-				//saveMultiEntryTicket(t);
-				System.out.println("saved_1");
+				try {
+					session = sessionFactory.openSession();
+					transaction = session.beginTransaction();
 
 
-				message.setMessage("#purchase_multi_ticket_client");
-				client.sendToClient(message);
+						session.save(idUser);
+						System.out.println(t.getAuto_number_multi_entry_ticket());
+
+
+					session.save(t);
+
+					transaction.commit();
+					System.out.println("saved_1");
+
+					message.setMessage("#purchase_multi_ticket_client");
+					client.sendToClient(message);
+				} catch (Exception e) {
+					if (transaction != null) {
+						transaction.rollback();
+					}
+					e.printStackTrace();
+					System.out.println("Error while saving MultiEntryTicket: " + e.getMessage());
+				} finally {
+					if (session != null) {
+						session.close();
+					}
+				}
 			}
 
 			else if (message.getMessage().equals("#login")) {
