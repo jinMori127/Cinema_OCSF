@@ -83,8 +83,10 @@ public class MasterPageCotroller {
             setContent("UserComplains.fxml");
         }
         else if (menuItemText.equals("Sing out")) {
-            setContent("Movie_editing_details.fxml");
+            setContent("MultiEntryTicket.fxml");
         }
+
+
 
 
     }

@@ -352,6 +352,13 @@ public class SimpleServer extends AbstractServer {
 
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private  void saveMultiEntryTicket(MultiEntryTicket ticket) throws Exception {
+
+
+
+	}
+
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		Message message = (Message) msg;
@@ -502,6 +509,7 @@ public class SimpleServer extends AbstractServer {
 					String password = (String) message.getObject2();
 
 					// Use HQL to fetch the Worker object by user_name
+					// Use HQL to fetch the Worker object by user_name
 					Query query = session.createQuery("FROM Worker WHERE user_name = :userName");
 					query.setParameter("userName", userName);
 					Worker worker = (Worker) query.uniqueResult();
@@ -532,6 +540,44 @@ public class SimpleServer extends AbstractServer {
 				List<Movie> movies = get_near_movies();
 				message.setMessage("#GoToHomePage");
 				message.setObject(movies);
+				client.sendToClient(message);
+			}
+
+			else if (message.getMessage().equals("#purchase_multi_ticket")) {
+				System.out.println("get to Server");
+
+				System.out.println("enterrrrrrrrrr_server");
+
+				MultiEntryTicket t =  (MultiEntryTicket)message.getObject();
+				if (t==null){
+					System.out.println("MultiEntryTicketLL is null");
+				}
+
+
+
+
+
+
+				Session session = null;
+				Transaction transaction = null;
+				session = sessionFactory.openSession();
+				session.beginTransaction();
+				session.save(t);
+				session.getTransaction().commit();
+				session.close();
+			//	String first_name =  (String) message.getObject2();
+			//	String last_name =  (String) message.getObject3();
+			//	String email =  (String) message.getObject4();
+			//	String phone_number =  (String) message.getObject5();
+			//	IdUser id_user=new IdUser(id,first_name,phone_number,email);
+				//MultiEntryTicket multiTicket = new MultiEntryTicket(id_user, first_name, last_name, email, phone_number,20);
+				//System.out.println(multiTicket);
+
+				//saveMultiEntryTicket(t);
+				System.out.println("saved_1");
+
+
+				message.setMessage("#purchase_multi_ticket_client");
 				client.sendToClient(message);
 			}
 
