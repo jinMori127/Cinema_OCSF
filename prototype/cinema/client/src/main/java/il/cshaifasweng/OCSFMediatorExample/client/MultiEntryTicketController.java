@@ -102,7 +102,7 @@ public class MultiEntryTicketController {
     private Text error_message;
 
     @Subscribe
-    public void delete_purchases_for_user(BaseEventBox event) {
+    public void purchases_sucess(BaseEventBox event) {
         if (event.getId() == 75) {
             Platform.runLater(() -> {
                 print_success(event.getMessage());
@@ -111,7 +111,8 @@ public class MultiEntryTicketController {
     }
 
     public void print_success(Message message) {
-    }
+        error_message.setVisible(true);
+        error_message.setText("Purchaes Success.");    }
 
     @FXML
     public void purchase_button(ActionEvent event) {
@@ -164,14 +165,14 @@ public class MultiEntryTicketController {
             return;
         }
 
-        int curr_id = Integer.parseInt(id.getText());
-        String id_str = Integer.toString(curr_id);
-        if (curr_id < 0 || id_str.length() != 9) {
+        String id_str = id.getText();
+        if (id_str.length() != 9 || !id_str.matches("\\d{9}")) {
             error_message.setVisible(true);
-            error_message.setText("ID must contain 9 digits");
+            error_message.setText("ID must contain exactly 9 digits");
             id.setText("");
             return;
         }
+
 
         String phone_check_number = phone_number.getText();
 
@@ -223,17 +224,7 @@ public class MultiEntryTicketController {
             return;
         }
 
-        YearMonth endMonth = currentMonth.plusMonths(4);
 
-        if (inputDate.isAfter(endMonth)) {
-            error_message.setVisible(true);
-            error_message.setText("Date must be within the next four months from the current date.");
-            date_col.setText("");
-            return;
-        }
-
-
-        /////////////////////////////////////////
         String cvv_str = cvv_col.getText();
         if (!cvv_str.matches("\\d{3}")) {
             error_message.setVisible(true);
@@ -257,7 +248,7 @@ public class MultiEntryTicketController {
 
         Message message = new Message(25, "#purchase_multi_ticket");
         message.setObject(multiTicket);
-        clearFields();
+       clearFields();
 
         try {
             SimpleClient.getClient().sendToServer(message);
