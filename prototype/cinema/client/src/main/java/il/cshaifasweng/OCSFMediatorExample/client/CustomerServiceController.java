@@ -68,16 +68,16 @@ public class CustomerServiceController {
     ///////////////////////////////////////////////////////////////////////////
     @Subscribe
     public void show_complains(BaseEventBox event) {
-        if (event.getEnum_name().equals("SHOW_COMPLAINS")) {
+        if (event.getId() == BaseEventBox.get_event_id("SHOW_COMPLAINS")) {
             Platform.runLater(() -> {
                 create_complains_table(event.getMessage());
             });
-        } else if (event.getEnum_name().equals("SHOW_COMPLAINS_AND_MESSAGE")) {
+        } else if (event.getId() == BaseEventBox.get_event_id("SHOW_COMPLAINS_AND_MESSAGE")) {
             Platform.runLater(() -> {
                 create_complains_table_and_message(event.getMessage());
             });
         }
-        else if (event.getEnum_name().equals("SHOW_COMPLAINS_RESPOND")) {
+        else if (event.getId() == BaseEventBox.get_event_id("SHOW_COMPLAINS_RESPOND")) {
             Platform.runLater(() -> {
                 create_complains_table(event.getMessage());
             });
