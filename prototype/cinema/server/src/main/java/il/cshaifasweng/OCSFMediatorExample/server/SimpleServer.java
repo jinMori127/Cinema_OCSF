@@ -440,8 +440,48 @@ public class SimpleServer extends AbstractServer {
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////// login functions
 
+	// find user by ID
+	private IdUser findUserById(Session session, String id) {
+		String queryString = "SELECT u FROM IdUser u WHERE u.user_id = :user_id";
+		Query<IdUser> query = session.createQuery(queryString, IdUser.class);
+		query.setParameter("user_id", id);
+		return query.uniqueResult();
+	}
 
+	// handle the login logic
+	private void handleUserLogin(IdUser user, Session session, Transaction transaction, Message message, ConnectionToClient client) throws IOException {
+		if (user == null) {
+			message.setMessage("#userNotFound");
+			client.sendToClient(message);
+		} else if (user.getIsLoggedIn()) {
+			message.setMessage("#alreadyLoggedIn");
+			client.sendToClient(message);
+		} else {
+			user.setIsLoggedIn(true);
+			session.update(user);
+			transaction.commit();
+			message.setMessage("#loginConfirmed");
+			message.setObject(user);
+			client.sendToClient(message);
+		}
+	}
+
+	// handle exceptions
+	private void handleException(Exception e, Transaction transaction, Message message, ConnectionToClient client) {
+		if (transaction != null) {
+			transaction.rollback();
+		}
+		message.setMessage("#serverError");
+		try {
+			client.sendToClient(message);
+		} catch (IOException ioException) {
+			ioException.printStackTrace();
+		}
+		e.printStackTrace();
+	}
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		Message message = (Message) msg;
@@ -733,36 +773,15 @@ public class SimpleServer extends AbstractServer {
 			else if (message.getMessage().equals("#login")) {
 				Session session = sessionFactory.openSession();
 				Transaction transaction = session.beginTransaction();
-				try {
-					String queryString1 = "SELECT u FROM IdUser u WHERE u.user_id = :user_id";
-					Query<IdUser> query1 = session.createQuery(queryString1, IdUser.class);
-					String id = message.getObject2().toString();
-					query1.setParameter("user_id", id);
-					IdUser user = query1.uniqueResult();
 
-					if (user == null) {
-						message.setMessage("#userNotFound");
-						client.sendToClient(message);
-					} else {
-						if (user.getIsLoggedIn()) {
-							message.setMessage("#alreadyLoggedIn");
-							client.sendToClient(message);
-						} else {
-							user.setIsLoggedIn(true);
-							session.update(user);
-							transaction.commit();
-							message.setMessage("#loginConfirmed");
-							message.setObject(user);
-							client.sendToClient(message);
-						}
-					}
+				try {
+					String id = message.getObject2().toString();
+					IdUser user = findUserById(session, id);
+
+					handleUserLogin(user, session, transaction, message, client);
+
 				} catch (Exception e) {
-					if (transaction != null) {
-						transaction.rollback();
-					}
-					message.setMessage("#serverError");
-					client.sendToClient(message);
-					e.printStackTrace();
+					handleException(e, transaction, message, client);
 				} finally {
 					session.close();
 				}
