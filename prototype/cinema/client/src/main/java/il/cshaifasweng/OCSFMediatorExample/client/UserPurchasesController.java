@@ -139,11 +139,10 @@ public class UserPurchasesController {
     }
     public void update_list(Message message){
         create_user_purchases(message);
-
     }
 
 
-    private String curr_id = "327876116";
+    private String curr_id = UserLogInWithIDController.idUser.getUser_id();
     @FXML
     public void initialize() {
         EventBus.getDefault().register(this);
@@ -285,6 +284,7 @@ public class UserPurchasesController {
         if (auto_num >= 0 && selectedRow < table_view.getItems().size()) {
             Message delete_message = new Message(21,"#delete_purchases");
             delete_message.setObject(auto_num);
+            delete_message.setObject2(curr_id);
             try {
                 SimpleClient.getClient().sendToServer(delete_message);
 

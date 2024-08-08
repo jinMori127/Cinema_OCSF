@@ -95,7 +95,7 @@ public class WorkerLogInController {
         EventBus.getDefault().register(this);
     }
 
-    static Worker worker;
+    public static Worker worker;
 
     @Subscribe
     public void onUpdateIdUserEvent(BaseEventBox event) {
@@ -109,6 +109,11 @@ public class WorkerLogInController {
                     case "#loginWorker":
                         output.setText("Successfully logged in");
                         worker = (Worker) message.getObject();
+                        try {
+                            SimpleChatClient.setRoot("HomePage");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                         break;
                     case "#loginWorkerFailedPass":
                         output.setText("Incorrect username or password");
