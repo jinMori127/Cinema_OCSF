@@ -94,7 +94,6 @@ public class UserLogInWithIDController {
         Message message = new Message(10, "#login");
         message.setObject2(numString);
         SimpleClient.getClient().sendToServer(message);
-
     }
 
     @Subscribe
