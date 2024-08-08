@@ -25,16 +25,18 @@ public class MasterPageCotroller {
     @Subscribe
     public void change_content(ContentChangeEvent event)
     {
+
         Platform.runLater(()->{
             setContent(event.getPage()+".fxml");
         });
+
     }
 
     @FXML
     public void initialize() {
-        System.out.println("Initializing MasterPageCotroller");
+
         EventBus.getDefault().register(this);
-        System.out.println("Registered MasterPageCotroller");
+
         // Initialize common UI components and behavior here
         // catalog_menu.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> setContent("Movie_editing_details.fxml"));
 
@@ -67,23 +69,23 @@ public class MasterPageCotroller {
         MenuItem source = (MenuItem) event.getSource();
         String menuItemText = source.getText();
         if (menuItemText.equals("Home page")) {
-            setContent("HomePage.fxml");
+            EventBus.getDefault().post(new BeginContentChangeEnent("HomePage"));
         }
         else if(menuItemText.equals("id")){
-            setContent("UserLoginWithID.fxml");
+            EventBus.getDefault().post(new BeginContentChangeEnent("UserLoginWithID"));
         }
         else if (menuItemText.equals("worker"))
         {
-            setContent("WorkerLogIn.fxml");
+            EventBus.getDefault().post(new BeginContentChangeEnent("WorkerLogIn"));
         } else if (menuItemText.equals("Purchases")) {
-            setContent("UserPurchases.fxml");
+            EventBus.getDefault().post(new BeginContentChangeEnent("UserPurchases"));
         }
         else if(menuItemText.equals("Complains"))
         {
-            setContent("UserComplains.fxml");
+            EventBus.getDefault().post(new BeginContentChangeEnent("UserComplains"));
         }
         else if (menuItemText.equals("Sing out")) {
-            setContent("MultiEntryTicket.fxml");
+            EventBus.getDefault().post(new BeginContentChangeEnent("Movie_editing_details"));
         }
         else if (menuItemText.equals("Purchase Multi Entry Ticket")) {
             setContent("MultiEntryTicket.fxml");

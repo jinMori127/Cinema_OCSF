@@ -20,7 +20,7 @@ public class SimpleClient extends AbstractClient {
 	protected void handleMessageFromServer(Object msg) {
 		Message message = (Message) msg;
 		if(message.getMessage().equals("#GotAllMovies")){
-			EventBus.getDefault().post(new BaseEventBox(5, message));
+			EventBus.getDefault().post(new BaseEventBox("MOVIES_GOT", message));
 			/*Platform.runLater(() -> {
 				SimpleChatClient.setWindowTitle("editing_details");
 				try {
@@ -31,11 +31,11 @@ public class SimpleClient extends AbstractClient {
 			});*/
         }
 		else if (message.getMessage().equals("#GoToHomePage")){
-			EventBus.getDefault().post(new BaseEventBox(5, message));
+			EventBus.getDefault().post(new BaseEventBox("MOVIES_GOT", message));
 
 		}
 		else if (message.getMessage().equals("#UpdateMovieList")){	
-			EventBus.getDefault().post(new BaseEventBox(4, message));
+			EventBus.getDefault().post(new BaseEventBox("UPDATE_MOVIE_LIST", message));
 		} else if (message.getMessage().equals("#ScreeningsGot")) {
 			Current_Message = message;
 			Platform.runLater(() -> {
@@ -47,32 +47,32 @@ public class SimpleClient extends AbstractClient {
 				}
 			});
 		} else if (message.getMessage().equals("#UpdateScreeningForMovie")) {
-			EventBus.getDefault().post(new BaseEventBox(11, message));
+			EventBus.getDefault().post(new BaseEventBox("UPDATE_SCREENING_FOR_MOVIE", message));
 		} else if (message.getMessage().equals("#UpdateBoxesInScreening")) {
-			EventBus.getDefault().post(new BaseEventBox(10, message));
+			EventBus.getDefault().post(new BaseEventBox("UPDATE_BOXES_IN_SCREENING", message));
 		} else if (message.getMessage().equals("#ChangeMovieIdBox")) {
 			System.out.println("I got your message");
-			EventBus.getDefault().post(new BaseEventBox(9, message));
+			EventBus.getDefault().post(new BaseEventBox("CHANGE_MOVIE_ID_BOX", message));
 		} else if (message.getMessage().equals("#UpdateMovieList_Eatch")) {
-			EventBus.getDefault().post(new BaseEventBox(6, message));
+			EventBus.getDefault().post(new BaseEventBox("UPDATE_MOVIE_LIST_EACH", message));
 		} else if (message.getMessage().equals("#UpdateScreeningForMovie_each")) {
-			EventBus.getDefault().post(new BaseEventBox(7,message));
+			EventBus.getDefault().post(new BaseEventBox("UPDATE_SCREENING_FOR_MOVIE_EACH",message));
 		} else if (message.getMessage().equals("#ServerError")) {
-			EventBus.getDefault().post(new BaseEventBox(12, message));
+			EventBus.getDefault().post(new BaseEventBox("SERVER_ERROR_MESSAGE", message));
 		}
 
 		else if(message.getMessage().equals("#show_purchases_client"))
 		{
-			EventBus.getDefault().post(new BaseEventBox(3, message));
+			EventBus.getDefault().post(new BaseEventBox("SHOW_PURCHASES", message));
 		}
 		else if(message.getMessage().equals("#delete_purchases_client")){
-			EventBus.getDefault().post(new BaseEventBox(1, message));
+			EventBus.getDefault().post(new BaseEventBox("DELETE_PURCHASE", message));
 		}
 
 		else if(message.getMessage().equals("#loginWorkerFailedUserName") ||
 				message.getMessage().equals("#loginWorker") ||
 				message.getMessage().equals("#loginWorkerFailedPass")){
-			EventBus.getDefault().post(new BaseEventBox(2, message));
+			EventBus.getDefault().post(new BaseEventBox("LOGIN", message));
 		}
 
 		else if (message.getMessage().equals("#userNotFound") ||
@@ -80,15 +80,15 @@ public class SimpleClient extends AbstractClient {
 				message.getMessage().equals("#loginConfirmed") ||
 				message.getMessage().equals("#serverError")) {
 			// Handle login related messages
-			EventBus.getDefault().post(new BaseEventBox(8, message));
-		}
+		EventBus.getDefault().post(new BaseEventBox("SERVER_ERROR_MESSAGE1", message));
+	} 		
 
 		else if(message.getMessage().equals("#purchase_multi_ticket_client")){
 			EventBus.getDefault().post(new BaseEventBox(75, message));
 		}
 
 		else {
-			EventBus.getDefault().post(new BaseEventBox(300, message));
+			EventBus.getDefault().post(new BaseEventBox("WRONG_NAMEING", message));
 		}
 	}
 
