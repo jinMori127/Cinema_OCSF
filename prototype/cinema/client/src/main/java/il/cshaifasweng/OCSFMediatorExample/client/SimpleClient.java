@@ -81,10 +81,10 @@ public class SimpleClient extends AbstractClient {
 				message.getMessage().equals("#serverError")) {
 			// Handle login related messages
 		EventBus.getDefault().post(new BaseEventBox("SERVER_ERROR_MESSAGE1", message));
-	} 		
+		}
 
 		else if(message.getMessage().equals("#purchase_multi_ticket_client")){
-			EventBus.getDefault().post(new BaseEventBox(75, message));
+			EventBus.getDefault().post(new BaseEventBox("SAVE_MULTI_TICKET", message));
 		}
 
 		else {

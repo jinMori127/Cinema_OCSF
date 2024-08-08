@@ -103,11 +103,19 @@ public class MultiEntryTicketController {
 
     @Subscribe
     public void purchases_sucess(BaseEventBox event) {
-        if (event.getId() == 75) {
+        if (event.getId() == BaseEventBox.get_event_id("SAVE_MULTI_TICKET")) {
             Platform.runLater(() -> {
                 print_success(event.getMessage());
             });
         }
+    }
+
+    @Subscribe
+    public void change_content1(BeginContentChangeEnent event)
+    {
+        System.out.println(event.getPage());
+        EventBus.getDefault().unregister(this);
+        EventBus.getDefault().post(new ContentChangeEvent(event.getPage()));
     }
 
     public void print_success(Message message) {
