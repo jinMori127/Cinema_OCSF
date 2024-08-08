@@ -158,7 +158,7 @@ public class MasterPageCotroller {
         }
 
         else if (menuItemText.equals("Purchase Multi Entry Ticket")) {
-            setContent("MultiEntryTicket.fxml");
+            EventBus.getDefault().post(new BeginContentChangeEnent("MultiEntryTicket"));
         }
 
         else if (menuItemText.equals("Sign out")) {
