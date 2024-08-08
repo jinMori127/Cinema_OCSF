@@ -17,7 +17,12 @@ public class BaseEventBox {
         UPDATE_SCREENING_FOR_MOVIE,
         SERVER_ERROR_MESSAGE,
         WRONG_NAMEING,
-        SAVE_MULTI_TICKET;
+        SAVE_MULTI_TICKET,
+        SHOW_COMPLAINS,
+        SHOW_COMPLAINS_AND_MESSAGE,
+        SHOW_COMPLAINS_RESPOND,
+        GOT_SEARCH_MOVIE_FILTER,
+        SIGN_OUT;
 
         public static EventEnum getByName(String name) {
             try {

@@ -42,6 +42,8 @@ import java.util.ResourceBundle;
 
 
 public class MovieEditingDetailsController {
+    @FXML
+    private TextField rating;
 
     @FXML
     private Text ErrorMessage;
@@ -131,6 +133,10 @@ public class MovieEditingDetailsController {
             ErrorMessage.setVisible(true);
             ErrorMessage.setText("Please enter a description");
             return;
+        } else if (rating.getText().trim().isEmpty()) {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("Please enter a rating");
+            return;
         }
         Movie movie = new Movie();
         if(File_uploaded == null)
@@ -148,6 +154,15 @@ public class MovieEditingDetailsController {
         {
             ErrorMessage.setVisible(true);
             ErrorMessage.setText("year must be an integer");
+            return;
+        }
+        try {
+            Double.parseDouble(rating.getText().trim());
+        }
+        catch(NumberFormatException e)
+        {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("year must be a double");
             return;
         }
         try{
@@ -178,12 +193,20 @@ public class MovieEditingDetailsController {
         String directorC = director.getText();
         int priceC = Integer.parseInt(price.getText());
         String descriptionC = description.getText();
+        double ratingC = Double.parseDouble(rating.getText());
+        if (ratingC <0 || ratingC > 10)
+        {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("rating must be between 0 and 10");
+            return;
+        }
 
         SimpleDateFormat timeFormate = new SimpleDateFormat("HH:mm");
         movie.setMovie_name(name);
         movie.setMain_actors(main_actor);
         movie.setCategory(catgoryC);
         movie.setYear_(yearC);
+        movie.setRating(ratingC);
         try {
             movie.setTime_(timeFormate.parse(durationC));
         } catch (ParseException e) {
@@ -298,6 +321,10 @@ public class MovieEditingDetailsController {
             ErrorMessage.setVisible(true);
             ErrorMessage.setText("Please enter a description");
             return;
+        }else if (rating.getText().trim().isEmpty()) {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("Please enter a rating");
+            return;
         }
         Movie movie = SelectedMovie;
         if(File_uploaded == null)
@@ -327,6 +354,17 @@ public class MovieEditingDetailsController {
             return;
         }
         try {
+            Double.parseDouble(rating.getText());
+        }
+        catch(NumberFormatException e)
+        {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("rating must be a double");
+            return;
+
+        }
+
+        try {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
             sdf.setLenient(false); // Strict parsing
             sdf.parse(duration.getText());
@@ -345,11 +383,19 @@ public class MovieEditingDetailsController {
         String directorC = director.getText();
         int priceC = Integer.parseInt(price.getText());
         String descriptionC = description.getText();
+        double ratingC = Double.parseDouble(rating.getText());
+        if (ratingC <0 || ratingC > 10)
+        {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("rating must be between 0 and 10");
+            return;
+        }
 
         movie.setMovie_name(name);
         movie.setMain_actors(main_actor);
         movie.setCategory(catgoryC);
         movie.setYear_(yearC);
+        movie.setRating(ratingC);
         SimpleDateFormat timeFormate = new SimpleDateFormat("HH:mm");
         try {
             movie.setTime_(timeFormate.parse(durationC));
@@ -543,6 +589,7 @@ public class MovieEditingDetailsController {
                 price.setText(Integer.toString(movie.getPrice()));
                 description.setText(movie.getDescription_());
                 year.setText(Integer.toString(movie.getYear_()));
+                rating.setText(Double.toString(movie.getRating()));
                 SelectedMovie = movie;
 
             });
@@ -581,12 +628,11 @@ public class MovieEditingDetailsController {
     @FXML
     public void initialize() {
         EventBus.getDefault().register(this);
+        List<String> cat = SimpleChatClient.get_categories();
+        for (String cat_ : cat) {
+            catgory.getItems().add(cat_);
+        }
 
-        catgory.getItems().add("Comedy");
-        catgory.getItems().add("Sci-Fi");
-        catgory.getItems().add("Action");
-        catgory.getItems().add("Romance");
-        catgory.getItems().add("Family");
         Message message = new Message(2, "#GetAllMovies");
         try {
             SimpleClient.getClient().sendToServer(message);
@@ -608,11 +654,8 @@ public class MovieEditingDetailsController {
     @Subscribe
     public void change_content1(BeginContentChangeEnent event)
     {
-
         System.out.println(event.getPage());
         EventBus.getDefault().unregister(this);
         EventBus.getDefault().post(new ContentChangeEvent(event.getPage()));
-
-
     }
 }

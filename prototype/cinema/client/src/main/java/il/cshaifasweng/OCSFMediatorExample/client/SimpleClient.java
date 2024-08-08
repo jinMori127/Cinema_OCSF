@@ -31,6 +31,10 @@ public class SimpleClient extends AbstractClient {
 			});*/
         }
 		else if (message.getMessage().equals("#GoToHomePage")){
+			//System.out.println("we are here");
+			//System.out.println(BaseEventBox.get_event_id("MOVIES_GOT"));
+			//BaseEventBox b = new BaseEventBox("MOVIES_GO", message);
+
 			EventBus.getDefault().post(new BaseEventBox("MOVIES_GOT", message));
 
 		}
@@ -61,6 +65,11 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new BaseEventBox("SERVER_ERROR_MESSAGE", message));
 		}
 
+		else if (message.getMessage().equals("#GotSearchMovieFillter"))
+		{
+			EventBus.getDefault().post(new BaseEventBox("GOT_SEARCH_MOVIE_FILTER", message));
+		}
+
 		else if(message.getMessage().equals("#show_purchases_client"))
 		{
 			EventBus.getDefault().post(new BaseEventBox("SHOW_PURCHASES", message));
@@ -74,7 +83,16 @@ public class SimpleClient extends AbstractClient {
 				message.getMessage().equals("#loginWorkerFailedPass")){
 			EventBus.getDefault().post(new BaseEventBox("LOGIN", message));
 		}
-
+		else if (message.getMessage().equals("#show_complains_for_client")) {
+			EventBus.getDefault().post(new BaseEventBox("SHOW_COMPLAINS", message));
+		}
+		else if(message.getMessage().equals("#show_respond_complains_for_client"))
+		{
+			EventBus.getDefault().post(new BaseEventBox("SHOW_COMPLAINS_RESPOND", message));
+		}
+		else if (message.getMessage().equals("#submit_respond_for_client")) {
+			EventBus.getDefault().post(new BaseEventBox("SHOW_COMPLAINS_AND_MESSAGE", message));
+		}
 		else if (message.getMessage().equals("#userNotFound") ||
 				message.getMessage().equals("#alreadyLoggedIn") ||
 				message.getMessage().equals("#loginConfirmed") ||

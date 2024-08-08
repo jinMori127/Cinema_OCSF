@@ -12,7 +12,7 @@ public class MultiEntryTicket implements Serializable{
     private int auto_number_multi_entry_ticket;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", referencedColumnName = "auto_number_id_user")
+    @JoinColumn(name = "user_id")
     private IdUser id_user;
 
     private int remain_tickets;
