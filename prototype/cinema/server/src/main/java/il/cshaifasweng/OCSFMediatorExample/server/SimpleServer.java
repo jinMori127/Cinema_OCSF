@@ -290,7 +290,7 @@ public class SimpleServer extends AbstractServer {
 
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private List<UserPurchases> delete_user_purchases(int auto_num) throws Exception {
+	private List<UserPurchases> delete_user_purchases(int auto_num,String id) throws Exception {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 
@@ -302,7 +302,7 @@ public class SimpleServer extends AbstractServer {
 		if (purchase == null) {
 			session.getTransaction().rollback();
 			session.close();
-			return  search_user_purchases("327876116");
+			return  search_user_purchases(id);
 
 		}
 
@@ -315,7 +315,7 @@ public class SimpleServer extends AbstractServer {
 		// Commit the transaction
 		session.getTransaction().commit();
 		session.close();
-		List<UserPurchases> data = search_user_purchases("327876116");
+		List<UserPurchases> data = search_user_purchases(id);
 
 
 
@@ -329,7 +329,12 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 		CriteriaBuilder builder = session.getCriteriaBuilder();
 		CriteriaQuery<UserPurchases> query = builder.createQuery(UserPurchases.class);
-		query.from(UserPurchases.class);
+		Root<UserPurchases> root= query.from(UserPurchases.class);
+		String queryString1 = "SELECT u FROM IdUser u WHERE u.user_id = :user_id";
+		Query<IdUser> query1 = session.createQuery(queryString1, IdUser.class);
+		query1.setParameter("user_id", id);
+		IdUser user = query1.uniqueResult();
+		query.select(root).where(builder.equal(root.get("id_user"), user));
 		List<UserPurchases> data = session.createQuery(query).getResultList();
 		session.getTransaction().commit();
 		session.close();
@@ -377,6 +382,20 @@ public class SimpleServer extends AbstractServer {
 		return data;
 
 	}
+	private void SignOut_IDUser(IdUser user)
+	{
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		user.setIsLoggedIn(false);
+		session.update(user);
+		session.getTransaction().commit();
+		session.close();
+	}
+	private void SignOut_Worker(Worker worker)
+	{
+
+	}
+
 
 
 
@@ -509,8 +528,8 @@ public class SimpleServer extends AbstractServer {
 
 				message.setMessage("#show_purchases_client");
 				System.out.println(message.getMessage());
-
-				message.setObject(search_user_purchases(id));
+				List<UserPurchases> data = search_user_purchases(id);
+				message.setObject(data);
 
 				client.sendToClient(message);
 
@@ -519,8 +538,9 @@ public class SimpleServer extends AbstractServer {
 
 			else if (message.getMessage().equals("#delete_purchases")) {
 				int auto_num =  (int)message.getObject();
+				String id = (String)message.getObject2();
 				message.setMessage("#delete_purchases_client");
-				message.setObject(delete_user_purchases(auto_num));
+				message.setObject(delete_user_purchases(auto_num,id));
 				System.out.println(message.getMessage());
 				client.sendToClient(message);
 
@@ -573,7 +593,6 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(movies);
 				client.sendToClient(message);
 			}
-
 			else if (message.getMessage().equals("#login")) {
 				Session session = sessionFactory.openSession();
 				Transaction transaction = session.beginTransaction();
@@ -610,6 +629,16 @@ public class SimpleServer extends AbstractServer {
 				} finally {
 					session.close();
 				}
+			}
+			else if (message.getMessage().equals("#SignOut_UserID")) {
+				Object user = message.getObject();
+				if (user instanceof IdUser) {
+					SignOut_IDUser((IdUser) user);
+				}
+				else if (user instanceof Worker) {
+					SignOut_Worker((Worker)user);
+				}
+
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
