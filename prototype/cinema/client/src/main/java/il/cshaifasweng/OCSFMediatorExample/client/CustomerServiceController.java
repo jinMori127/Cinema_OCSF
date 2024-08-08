@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.ComboBox;
 import javafx.collections.ObservableList;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -61,6 +62,9 @@ public class CustomerServiceController {
     @FXML
     private TableView<Complains> table_view;
 
+    @FXML
+    private ComboBox<String> branch;
+
     private boolean phase;
 
     ////////////////////////////////////////////////////////////////////////////
@@ -103,6 +107,13 @@ public class CustomerServiceController {
         submit_respond.setDisable(true);
         respond_col.setVisible(false);
         phase = true;
+
+        branch.getItems().clear();
+        branch.getItems().add("All");
+        branch.getItems().add("Sakhnin");
+        branch.getItems().add("Haifa");
+        branch.getItems().add("Nazareth");
+        branch.getItems().add("Nhif");
 
         try {
             SimpleClient.getClient().sendToServer(insert_message);
@@ -148,6 +159,10 @@ public class CustomerServiceController {
 
     @FXML
     public void handle_show_respond_complains(ActionEvent event) {
+        complains_detailes.setText("");
+        respond.setText("");
+        respond.setEditable(false);
+        submit_respond.setDisable(true);
         phase = false;
         respond_col.setVisible(true);
         Message insert_message = new Message(90, "#show_respond");
@@ -161,6 +176,10 @@ public class CustomerServiceController {
 
     @FXML
     public void handle_show_complains(ActionEvent event) {
+        complains_detailes.setText("");
+        respond.setText("");
+        respond.setEditable(false);
+        submit_respond.setDisable(true);
         phase = true;
         respond_col.setVisible(false);
         Message insert_message = new Message(23, "#show_complains");
@@ -169,6 +188,30 @@ public class CustomerServiceController {
 
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @FXML
+    void choose_branch(ActionEvent event) {
+        String c_branch = branch.getValue();
+        if (c_branch == null || c_branch.isEmpty()) {
+            return;
+        }
+        if (c_branch.equals("All")) {
+            create_complains_table_c(list);
+            return;
+        }
+        ObservableList<Complains> filteredList = FXCollections.observableArrayList();
+
+        // Check if the original list is not null and not empty
+        if (list != null && !list.isEmpty()) {
+            for (Complains complain : list) {
+                // Assuming 'Complains' has a method getCinemaBranch() to get the branch name
+                if (c_branch.equals(complain.getCinema_branch())) {
+                    filteredList.add(complain);  // Add the complaint to the filtered list if it matches the branch
+                }
+            }
+            create_complains_table_c(filteredList);
         }
     }
 
@@ -212,6 +255,17 @@ public class CustomerServiceController {
 
         list = FXCollections.observableArrayList(user_list);
         table_view.setItems(list);
+    }
+
+    private void create_complains_table_c(ObservableList<Complains> filtered_list) {
+            auto_number_complains.setCellValueFactory(new PropertyValueFactory<>("auto_number_complains"));
+            client_name.setCellValueFactory(new PropertyValueFactory<>("client_name"));
+            complain_text.setCellValueFactory(new PropertyValueFactory<>("complain_text"));
+            date_f.setCellValueFactory(new PropertyValueFactory<>("time_of_complain"));
+            branch_name.setCellValueFactory(new PropertyValueFactory<>("cinema_branch"));
+            respond_col.setCellValueFactory(new PropertyValueFactory<>("respond"));
+
+            table_view.setItems(filtered_list);
     }
 
 

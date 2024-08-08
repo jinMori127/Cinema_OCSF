@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
@@ -9,7 +10,7 @@
 
 <AnchorPane prefHeight="615.0" prefWidth="781.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.CustomerServiceController">
     <children>
-        <TableView fx:id="table_view" prefHeight="200.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="200.0">
+        <TableView fx:id="table_view" layoutY="230.0" prefHeight="385.0" prefWidth="781.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="230.0">
             <columns>
                 <TableColumn fx:id="auto_number_complains" text="Complain ID " />
                 <TableColumn fx:id="client_name" prefWidth="75.0" text="client name" />
@@ -28,5 +29,6 @@
       <TextArea fx:id="respond" layoutX="391.0" layoutY="21.0" prefHeight="127.0" prefWidth="202.0" promptText="enter respond " />
       <Button fx:id="show_responded" layoutX="631.0" layoutY="60.0" mnemonicParsing="false" onAction="#handle_show_respond_complains" text="responded complains" textFill="#045372" />
       <Button fx:id="not_responded" layoutX="623.0" layoutY="21.0" mnemonicParsing="false" onAction="#handle_show_complains" text="not responded complains" textFill="#771515" />
+      <ComboBox fx:id="branch" layoutX="309.0" layoutY="183.0" onAction="#choose_branch" prefWidth="150.0" promptText="choose branch " />
     </children>
 </AnchorPane>
