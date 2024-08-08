@@ -31,6 +31,10 @@ public class SimpleClient extends AbstractClient {
 			});*/
         }
 		else if (message.getMessage().equals("#GoToHomePage")){
+			//System.out.println("we are here");
+			//System.out.println(BaseEventBox.get_event_id("MOVIES_GOT"));
+			//BaseEventBox b = new BaseEventBox("MOVIES_GO", message);
+
 			EventBus.getDefault().post(new BaseEventBox("MOVIES_GOT", message));
 
 		}
@@ -59,6 +63,10 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new BaseEventBox("UPDATE_SCREENING_FOR_MOVIE_EACH",message));
 		} else if (message.getMessage().equals("#ServerError")) {
 			EventBus.getDefault().post(new BaseEventBox("SERVER_ERROR_MESSAGE", message));
+		}
+		else if (message.getMessage().equals("#GotSearchMovieFillter"))
+		{
+			EventBus.getDefault().post(new BaseEventBox("GOT_SEARCH_MOVIE_FILTER", message));
 		}
 
 		else if(message.getMessage().equals("#show_purchases_client"))
