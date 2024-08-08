@@ -26,7 +26,7 @@ public class UserLogInWithIDController {
 
     private int id = -1;
 
-    static IdUser idUser;
+    public static IdUser idUser;
 
     @FXML
     public void initialize() {
@@ -94,6 +94,7 @@ public class UserLogInWithIDController {
         Message message = new Message(10, "#login");
         message.setObject2(numString);
         SimpleClient.getClient().sendToServer(message);
+
     }
 
     @Subscribe
@@ -114,6 +115,11 @@ public class UserLogInWithIDController {
                         error_message.setVisible(true);
                         error_message.setText("You have successfully logged in");
                         idUser = (IdUser) message.getObject();
+                        try {
+                            SimpleChatClient.setRoot("HomePage");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                         break;
                     case "#serverError":
                         error_message.setVisible(true);

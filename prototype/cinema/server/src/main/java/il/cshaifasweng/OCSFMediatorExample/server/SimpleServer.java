@@ -4,8 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 import javax.persistence.criteria.Join;
 
 import org.hibernate.Session;
@@ -29,9 +28,8 @@ import javax.persistence.criteria.*;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.PrivateKey;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;import java.util.List;
+import java.util.List;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 
@@ -291,7 +289,7 @@ public class SimpleServer extends AbstractServer {
 
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private List<UserPurchases> delete_user_purchases(int auto_num) throws Exception {
+	private List<UserPurchases> delete_user_purchases(int auto_num,String id) throws Exception {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 
@@ -303,7 +301,7 @@ public class SimpleServer extends AbstractServer {
 		if (purchase == null) {
 			session.getTransaction().rollback();
 			session.close();
-			return  search_user_purchases("327876116");
+			return  search_user_purchases(id);
 		}
 
 
@@ -315,7 +313,7 @@ public class SimpleServer extends AbstractServer {
 		// Commit the transaction
 		session.getTransaction().commit();
 		session.close();
-		List<UserPurchases> data = search_user_purchases("327876116");
+		List<UserPurchases> data = search_user_purchases(id);
 
 
 
@@ -329,7 +327,12 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 		CriteriaBuilder builder = session.getCriteriaBuilder();
 		CriteriaQuery<UserPurchases> query = builder.createQuery(UserPurchases.class);
-		query.from(UserPurchases.class);
+		Root<UserPurchases> root= query.from(UserPurchases.class);
+		String queryString1 = "SELECT u FROM IdUser u WHERE u.user_id = :user_id";
+		Query<IdUser> query1 = session.createQuery(queryString1, IdUser.class);
+		query1.setParameter("user_id", id);
+		IdUser user = query1.uniqueResult();
+		query.select(root).where(builder.equal(root.get("id_user"), user));
 		List<UserPurchases> data = session.createQuery(query).getResultList();
 		session.getTransaction().commit();
 		session.close();
@@ -344,6 +347,52 @@ public class SimpleServer extends AbstractServer {
 		session.getTransaction().commit();
 		session.close();
 	}
+
+	private List<Movie> search_with_filter(Movie movie,int year2 , String sorting_attribute,String Sorting_direction) throws Exception
+	{
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Movie> query = builder.createQuery(Movie.class);
+		Root<Movie> root =  query.from(Movie.class);
+		Predicate namePredicate = builder.like(root.get("movie_name"), "%"+movie.getMovie_name()+"%");
+		Predicate yearPredicate = builder.between(root.get("year_"),movie.getYear_(),year2);
+		Predicate ratingPredicate = builder.greaterThanOrEqualTo(root.get("rating"), movie.getRating());
+		Predicate categoryPredicate = builder.equal(root.get("category"), movie.getCategory());
+		Predicate directorPredicate = builder.like(root.get("director"), "%"+movie.getDirector()+"%");
+		Predicate mainActorPredicat = builder.like(root.get("main_actors"),"%"+movie.getMain_actors()+"%");
+		if(movie.getCategory()!=null && !movie.getCategory().isEmpty())
+			query.select(root).where(namePredicate,yearPredicate,ratingPredicate,categoryPredicate ,directorPredicate,mainActorPredicat);
+		else
+			query.select(root).where(namePredicate,yearPredicate,ratingPredicate ,directorPredicate,mainActorPredicat);
+		if (Sorting_direction.equals("asc"))
+		{
+			query.orderBy(builder.asc(root.get(sorting_attribute)));
+		}
+		else if (Sorting_direction.equals("desc"))
+		{
+			query.orderBy(builder.desc(root.get(sorting_attribute)));
+		}
+		List<Movie> data = session.createQuery(query).getResultList();
+		session.getTransaction().commit();
+		session.close();
+		return data;
+
+	}
+	private void SignOut_IDUser(IdUser user)
+	{
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		user.setIsLoggedIn(false);
+		session.update(user);
+		session.getTransaction().commit();
+		session.close();
+	}
+	private void SignOut_Worker(Worker worker)
+	{
+
+	}
+
 
 
 
@@ -402,6 +451,14 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(movies);
 				message.setMessage("#GotAllMovies");
 				client.sendToClient(message);
+			} else if (message.getMessage().equals("#SearchMovieFillter")) {
+				Movie m = (Movie)message.getObject();
+				Map<String, String> dictionary = (Map<String, String>) message.getObject2();
+				List<Movie> answer = search_with_filter(m,Integer.parseInt(dictionary.get("year2")),dictionary.get("Sort_atribute"),dictionary.get("Sort_direction"));
+				message.setObject(answer);
+				message.setMessage("#GotSearchMovieFillter");
+				client.sendToClient(message);
+
 			} else if (message.getMessage().equals("#DeleteMovie")) {
 				Movie movie = (Movie) message.getObject();
 				remove_movie(movie);
@@ -509,8 +566,8 @@ public class SimpleServer extends AbstractServer {
 
 				message.setMessage("#show_purchases_client");
 				System.out.println(message.getMessage());
-
-				message.setObject(search_user_purchases(id));
+				List<UserPurchases> data = search_user_purchases(id);
+				message.setObject(data);
 
 				client.sendToClient(message);
 
@@ -519,8 +576,9 @@ public class SimpleServer extends AbstractServer {
 
 			else if (message.getMessage().equals("#delete_purchases")) {
 				int auto_num =  (int)message.getObject();
+				String id = (String)message.getObject2();
 				message.setMessage("#delete_purchases_client");
-				message.setObject(delete_user_purchases(auto_num));
+				message.setObject(delete_user_purchases(auto_num,id));
 				System.out.println(message.getMessage());
 				client.sendToClient(message);
 
@@ -644,6 +702,16 @@ public class SimpleServer extends AbstractServer {
 				} finally {
 					session.close();
 				}
+			}
+			else if (message.getMessage().equals("#SignOut_UserID")) {
+				Object user = message.getObject();
+				if (user instanceof IdUser) {
+					SignOut_IDUser((IdUser) user);
+				}
+				else if (user instanceof Worker) {
+					SignOut_Worker((Worker)user);
+				}
+
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();

@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MasterPageCotroller">
+<BorderPane fx:id="border_pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MasterPageCotroller">
     <center>
         <VBox alignment="CENTER" fillWidth="true" spacing="0" VBox.vgrow="ALWAYS">
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="CoolNoa System" textAlignment="CENTER">
@@ -18,39 +18,51 @@
                 </font>
             </Text>
             <StackPane fx:id="content_area" style="-fx-background-color: #D3D3D3;" VBox.vgrow="ALWAYS">
-                <VBox alignment="TOP_CENTER" fillWidth="true" maxHeight="Infinity" maxWidth="Infinity" VBox.vgrow="ALWAYS">
+                <VBox alignment="TOP_CENTER" fillWidth="true" maxHeight="Infinity" maxWidth="Infinity" prefHeight="0.0" prefWidth="355.0" VBox.vgrow="ALWAYS">
                 </VBox>
             </StackPane>
         </VBox>
     </center>
     <top>
-        <MenuBar style="-fx-border-color: black; -fx-blend-mode: multiply; -fx-border-style: solid; -fx-background-color: Lavender;" BorderPane.alignment="CENTER">
+        <MenuBar prefHeight="29.0" prefWidth="571.0" style="-fx-border-color: black; -fx-blend-mode: multiply; -fx-border-style: solid; -fx-background-color: Lavender;" BorderPane.alignment="CENTER">
             <menus>
-                <Menu fx:id="catalog_menu" mnemonicParsing="false" onAction="#handle_action" styleClass="cool-menu" text="HomePage">
+                <Menu fx:id="Defalult_menu" mnemonicParsing="false" onAction="#handle_action" styleClass="cool-menu" text="Default">
                     <items>
                         <MenuItem onAction="#handle_action" styleClass="cool-menu-item" text="Home page" />
+                  <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Catalog" />
                     </items>
                 </Menu>
-            <Menu mnemonicParsing="false" text="worker action ">
+            <Menu fx:id="customer_service_menu" mnemonicParsing="false" text="CustomerService">
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#handle_action" text="handle complains" />
               </items>
             </Menu>
-                <Menu fx:id="user_action" mnemonicParsing="false" styleClass="cool-menu" text="User Action">
+            <Menu fx:id="data_manger_menu" mnemonicParsing="false" text="DataManger">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#handle_action" text="MovieEditDetails" />
+              </items>
+            </Menu>
+            <Menu fx:id="manger_menu" mnemonicParsing="false" text="Manager">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Reports" />
+                  <MenuItem mnemonicParsing="false" text="Edited Prices" />
+              </items>
+            </Menu>
+                <Menu fx:id="user_menu" mnemonicParsing="false" styleClass="cool-menu" text="User Action">
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#handle_action" styleClass="cool-menu-item" text="Purchases" />
                         <MenuItem mnemonicParsing="false" onAction="#handle_action" styleClass="cool-menu-item" text="Complains" />
                     </items>
                 </Menu>
-                <Menu fx:id="Sing_in" mnemonicParsing="false" styleClass="cool-menu" text="Sign in">
+                <Menu fx:id="Sing_in_menu" mnemonicParsing="false" styleClass="cool-menu" text="Sign in">
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#handle_action" styleClass="cool-menu-item" text="id" />
                         <MenuItem mnemonicParsing="false" onAction="#handle_action" styleClass="cool-menu-item" text="worker" />
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" styleClass="cool-menu" text="Sign out">
+                <Menu fx:id="sing_out_menu" mnemonicParsing="false" styleClass="cool-menu" text="Sign out">
                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#handle_action" styleClass="cool-menu-item" text="Sing out" />
+                        <MenuItem mnemonicParsing="false" onAction="#handle_action" styleClass="cool-menu-item" text="Sign out" />
                     </items>
                 </Menu>
             </menus>
