@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane fx:id="border_pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MasterPageCotroller">
+<BorderPane fx:id="border_pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MasterPageCotroller">
     <center>
         <VBox alignment="CENTER" fillWidth="true" spacing="0" VBox.vgrow="ALWAYS">
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="CoolNoa System" textAlignment="CENTER">
@@ -24,7 +24,7 @@
         </VBox>
     </center>
     <top>
-        <MenuBar style="-fx-border-color: black; -fx-blend-mode: multiply; -fx-border-style: solid; -fx-background-color: Lavender;" BorderPane.alignment="CENTER">
+        <MenuBar prefHeight="29.0" prefWidth="571.0" style="-fx-border-color: black; -fx-blend-mode: multiply; -fx-border-style: solid; -fx-background-color: Lavender;" BorderPane.alignment="CENTER">
             <menus>
                 <Menu fx:id="catalog_menu" mnemonicParsing="false" onAction="#handle_action" styleClass="cool-menu" text="Default">
                     <items>
@@ -32,9 +32,20 @@
                   <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Catalog" />
                     </items>
                 </Menu>
+            <Menu mnemonicParsing="false" text="CustomerService">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#handle_action" text="handle complains" />
+              </items>
+            </Menu>
             <Menu mnemonicParsing="false" text="DataManger">
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#handle_action" text="MovieEditDetails" />
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Manager">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Reports" />
+                  <MenuItem mnemonicParsing="false" text="Edited Prices" />
               </items>
             </Menu>
                 <Menu fx:id="user_action" mnemonicParsing="false" styleClass="cool-menu" text="User Action">
