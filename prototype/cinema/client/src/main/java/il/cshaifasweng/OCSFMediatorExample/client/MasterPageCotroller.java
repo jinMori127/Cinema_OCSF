@@ -157,6 +157,10 @@ public class MasterPageCotroller {
             EventBus.getDefault().post(new BeginContentChangeEnent("UserComplains"));
         }
 
+        else if (menuItemText.equals("Purchase Multi Entry Ticket")) {
+            EventBus.getDefault().post(new BeginContentChangeEnent("MultiEntryTicket"));
+        }
+
         else if (menuItemText.equals("Sign out")) {
             Message m = null ;
             if (UserLogInWithIDController.idUser != null) {

@@ -19,8 +19,8 @@ public class MultiEntryTicket implements Serializable{
 
     public MultiEntryTicket() {}
 
-    public MultiEntryTicket(IdUser id_user, int remain_tickets){
-        this.id_user = id_user;
+    public MultiEntryTicket(int remain_tickets){
+        this.id_user = new IdUser();
         this.remain_tickets = remain_tickets;
     }
 

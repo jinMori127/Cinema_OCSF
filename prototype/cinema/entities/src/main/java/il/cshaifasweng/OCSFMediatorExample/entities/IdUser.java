@@ -29,6 +29,8 @@ public class IdUser implements Serializable {
     // Default constructor
     public IdUser() {}
 
+
+
     // constructor
     public IdUser(String user_id, String user_name, String phone_number, String email) {
         this.user_id = user_id;

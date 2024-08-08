@@ -353,6 +353,7 @@ public class SimpleServer extends AbstractServer {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		CriteriaBuilder builder = session.getCriteriaBuilder();
+
 		CriteriaQuery<Movie> query = builder.createQuery(Movie.class);
 		Root<Movie> root =  query.from(Movie.class);
 		Predicate namePredicate = builder.like(root.get("movie_name"), "%"+movie.getMovie_name()+"%");
@@ -377,8 +378,8 @@ public class SimpleServer extends AbstractServer {
 		session.getTransaction().commit();
 		session.close();
 		return data;
-
 	}
+	
 	private void SignOut_IDUser(IdUser user)
 	{
 		Session session = sessionFactory.openSession();
@@ -439,6 +440,8 @@ public class SimpleServer extends AbstractServer {
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		Message message = (Message) msg;
@@ -594,6 +597,7 @@ public class SimpleServer extends AbstractServer {
 					String password = (String) message.getObject2();
 
 					// Use HQL to fetch the Worker object by user_name
+					// Use HQL to fetch the Worker object by user_name
 					Query query = session.createQuery("FROM Worker WHERE user_name = :userName");
 					query.setParameter("userName", userName);
 					Worker worker = (Worker) query.uniqueResult();
@@ -631,6 +635,66 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(movies);
 				client.sendToClient(message);
 			}
+
+			else if (message.getMessage().equals("#purchase_multi_ticket")) {
+
+				MultiEntryTicket t = (MultiEntryTicket) message.getObject();
+				IdUser idUser = t.getId_user(); // Adjust according to your getter method
+
+				Session session = null;
+				Transaction transaction = null;
+
+				try {
+					session = sessionFactory.openSession();
+					transaction = session.beginTransaction();
+
+					// Check if IdUser already exists in the database
+					CriteriaBuilder builder = session.getCriteriaBuilder();
+					CriteriaQuery<IdUser> idUserQuery = builder.createQuery(IdUser.class);
+					Root<IdUser> idUserRoot = idUserQuery.from(IdUser.class);
+					idUserQuery.select(idUserRoot).where(builder.equal(idUserRoot.get("user_id"), idUser.getUser_id()));
+					IdUser existingIdUser = session.createQuery(idUserQuery).uniqueResult();
+
+					if (existingIdUser != null) {
+						// If IdUser already exists, use the existing instance
+						idUser = existingIdUser;
+					} else {
+						// If IdUser does not exist, save it
+						session.save(idUser);
+					}
+
+					// Check if MultiEntryTicket already exists
+					CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
+					Root<MultiEntryTicket> root = query.from(MultiEntryTicket.class);
+					query.select(root).where(builder.equal(root.get("id_user"), idUser));
+					MultiEntryTicket t2 = session.createQuery(query).uniqueResult();
+
+					if (t2 != null) {
+						t2.setRemain_tickets(t2.getRemain_tickets() + t.getRemain_tickets());
+						session.update(t2);
+					} else {
+						t.setId_user(idUser); // Ensure the ticket references the existing IdUser
+						session.save(t);
+					}
+
+					transaction.commit();
+
+					message.setMessage("#purchase_multi_ticket_client");
+					client.sendToClient(message);
+
+				} catch (Exception e) {
+					if (transaction != null) {
+						transaction.rollback();
+					}
+					e.printStackTrace();
+					System.out.println("Error while saving MultiEntryTicket: " + e.getMessage());
+				} finally {
+					if (session != null) {
+						session.close();
+					}
+				}
+			}
+
 			else if (message.getMessage().equals("#show_complains")){
 				// set massage
 				message.setMessage("#show_complains_for_client");
