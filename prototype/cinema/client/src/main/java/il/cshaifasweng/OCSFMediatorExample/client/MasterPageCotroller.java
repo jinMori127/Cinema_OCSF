@@ -51,7 +51,6 @@ public class MasterPageCotroller {
     @Subscribe
     public void change_content(ContentChangeEvent event)
     {
-
         Platform.runLater(()->{
             setContent(event.getPage()+".fxml");
             create_activity_list();
@@ -115,7 +114,6 @@ public class MasterPageCotroller {
         // catalog_menu.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> setContent("Movie_editing_details.fxml"));
         create_activity_list();
         setContent("HomePage.fxml");
-
 
     }
 
@@ -186,7 +184,9 @@ public class MasterPageCotroller {
             EventBus.getDefault().post(new BeginContentChangeEnent("Catalog"));
 
         }
-
+        else if (menuItemText.equals("handle complains")) {
+            EventBus.getDefault().post(new BeginContentChangeEnent("CustomerService"));
+        }
 
     }
 

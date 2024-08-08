@@ -31,6 +31,9 @@ import java.security.PrivateKey;
 import java.util.Date;
 import java.util.List;
 import java.time.LocalDateTime;
+import java.util.Iterator;
+
+import java.util.Collections;
 
 public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
@@ -53,9 +56,6 @@ public class SimpleServer extends AbstractServer {
 		configuration.addAnnotatedClass(Reports.class);
 		configuration.addAnnotatedClass(UserPurchases.class);
 		configuration.addAnnotatedClass(Worker.class);
-
-
-
 
 		ServiceRegistry serviceRegistry = new
 				StandardServiceRegistryBuilder()
@@ -115,7 +115,6 @@ public class SimpleServer extends AbstractServer {
 		session.save(movie);
 		session.getTransaction().commit();
 		session.close();
-
 	}
 	private void update_movie (Movie movie) throws Exception {
 		Session session = sessionFactory.openSession();
@@ -303,7 +302,6 @@ public class SimpleServer extends AbstractServer {
 			session.getTransaction().rollback();
 			session.close();
 			return  search_user_purchases(id);
-
 		}
 
 
@@ -338,7 +336,6 @@ public class SimpleServer extends AbstractServer {
 		List<UserPurchases> data = session.createQuery(query).getResultList();
 		session.getTransaction().commit();
 		session.close();
-//		data.removeIf(userPurchase -> !userPurchase.get_id_user().equals(id));
 
 		return data;
 	}
@@ -399,6 +396,47 @@ public class SimpleServer extends AbstractServer {
 
 
 
+	private List<Complains> search_data(boolean do_show_not_responded) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Complains> query = builder.createQuery(Complains.class);
+		query.from(Complains.class);
+		List<Complains> data = session.createQuery(query).getResultList();
+		session.getTransaction().commit();
+		session.close();
+		if (do_show_not_responded) {
+			data.removeIf(complain -> complain.getStatus());
+		}
+		else {
+			data.removeIf(complain -> !complain.getStatus());
+		}
+		return data;
+	}
+
+	private List<Complains> update_respond(int auto_num, String respond_text, boolean phase) throws Exception {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		// Find the object with the specified auto_num
+		Complains complains = session.get(Complains.class, auto_num);
+
+		if (complains == null) {
+			session.getTransaction().rollback();
+			session.close();
+			return  search_data(phase);
+		}
+		// update the complain object
+		complains.setRespond(respond_text);
+		complains.setStatus(true);
+		session.update(complains);
+
+		// Commit the transaction
+		session.getTransaction().commit();
+		session.close();
+		List<Complains> data = search_data(phase);
+		return data;
+	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
@@ -591,6 +629,41 @@ public class SimpleServer extends AbstractServer {
 				List<Movie> movies = get_near_movies();
 				message.setMessage("#GoToHomePage");
 				message.setObject(movies);
+				client.sendToClient(message);
+			}
+			else if (message.getMessage().equals("#show_complains")){
+				// set massage
+				message.setMessage("#show_complains_for_client");
+
+				// delete the responded complains
+				List<Complains> data = search_data(true);
+
+				message.setObject(data);
+				// send to client
+				client.sendToClient(message);
+			}
+			else if (message.getMessage().equals("#show_respond")){
+				// set massage
+				message.setMessage("#show_respond_complains_for_client");
+
+				// delete the responded complains
+				List<Complains> data = search_data(false);
+
+				message.setObject(data);
+				// send to client
+				client.sendToClient(message);
+			}
+			else if (message.getMessage().equals("#submit_respond")) {
+
+				String respondText = (String)((List<Object>)message.getObject()).get(0);
+				boolean phase = (boolean) ((List<Object>)message.getObject()).get(1);
+
+				int number = (int)message.getObject2();
+				List<Complains> data = update_respond(number, respondText, phase);
+
+				message.setMessage("#submit_respond_for_client");
+				// delete the responded complains
+				message.setObject(data);
 				client.sendToClient(message);
 			}
 			else if (message.getMessage().equals("#login")) {

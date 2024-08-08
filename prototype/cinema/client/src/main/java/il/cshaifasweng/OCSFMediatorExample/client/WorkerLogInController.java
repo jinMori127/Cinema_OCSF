@@ -99,7 +99,7 @@ public class WorkerLogInController {
 
     @Subscribe
     public void onUpdateIdUserEvent(BaseEventBox event) {
-        if(event.getId()==2) {
+        if(event.getId() == BaseEventBox.get_event_id("LOGIN")) {
             Message message = event.getMessage();
             Platform.runLater(() -> {
                 switch (message.getMessage()) {
