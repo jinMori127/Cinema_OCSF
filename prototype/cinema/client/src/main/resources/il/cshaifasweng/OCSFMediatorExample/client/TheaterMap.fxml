@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.TheaterMapController">
+  <content>
+    <AnchorPane fx:id="anchore_pane" minHeight="0.0" minWidth="0.0">
+         <children>
+            <VBox fx:id="buttons_vbox" layoutX="9.0" layoutY="35.0" />
+            <Button fx:id="buy_button" layoutX="30.0" layoutY="203.0" mnemonicParsing="false" prefWidth="36.0" text="buy" />
+            <Text fx:id="ErrorMessage" fill="RED" layoutX="7.0" layoutY="29.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ErrorMessage" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Text>
+         </children></AnchorPane>
+  </content>
+</ScrollPane>
