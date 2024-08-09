@@ -34,7 +34,7 @@ public class TheaterMapController {
     @FXML
     private Text ErrorMessage;
 
-    public static int screening_id = 10;
+    public static int screening_id = 13;
     public static Screening screening = null;
     public static ArrayList<ArrayList<Integer>> places_took = new ArrayList<>();
 
@@ -101,7 +101,7 @@ public class TheaterMapController {
                 });
             }
         } else if (event.getId() == BaseEventBox.get_event_id("UPDATE_SCREENING_FOR_MOVIE")) {
-            if (screening.getMovie().getAuto_number_movie() == ((Movie)event.getMessage().getObject()).getAuto_number_movie()) {
+            if (screening.getMovie().getAuto_number_movie() == ((Movie)event.getMessage().getObject2()).getAuto_number_movie()) {
                 Message m = new Message(1000, "#get_screening_from_id");
                 m.setObject(screening_id);
                 try {
