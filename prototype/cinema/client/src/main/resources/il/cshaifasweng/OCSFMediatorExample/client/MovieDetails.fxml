@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MovieDetailsController">
-
+   <children>
+      <ImageView fx:id="image" fitHeight="150.0" fitWidth="200.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
+      <TextArea fx:id="movie_details" layoutX="228.0" layoutY="64.0" prefHeight="90.0" prefWidth="350.0" />
+      <ComboBox fx:id="branchesBox" layoutX="228.0" layoutY="164.0" onAction="#chooseBranch" prefWidth="150.0" promptText="Branches" />
+      <TableView fx:id="screening_table" layoutX="14.0" layoutY="200.0" prefHeight="200.0" prefWidth="570.0">
+        <columns>
+          <TableColumn fx:id="date_col" prefWidth="100.0" text="Date" />
+          <TableColumn fx:id="ST_col" prefWidth="200.0" text="Screening time" />
+        </columns>
+      </TableView>
+      <TextArea fx:id="movie_title" layoutX="228.0" layoutY="14.0" prefHeight="42.0" prefWidth="350.0" />
+   </children>
 </AnchorPane>
