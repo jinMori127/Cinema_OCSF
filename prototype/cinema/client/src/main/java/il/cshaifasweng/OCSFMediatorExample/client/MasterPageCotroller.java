@@ -56,14 +56,14 @@ public class MasterPageCotroller {
             create_activity_list();
 
         });
-        System.out.println(content_area.getLayoutX());
+
         Platform.runLater(()->{
             javafx.geometry.Rectangle2D screenBounds = Screen.getPrimary().getBounds();
             double screenWidth = screenBounds.getWidth();
             double screenHeight = screenBounds.getHeight();
             content_area.layoutXProperty().setValue(30);
         });
-        System.out.println(content_area.getLayoutX());
+
 
     }
     private void create_activity_list(){
