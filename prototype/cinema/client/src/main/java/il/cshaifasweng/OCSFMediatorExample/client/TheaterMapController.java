@@ -100,7 +100,7 @@ public class TheaterMapController {
 
                 });
             }
-        } else if (event.getId() == BaseEventBox.get_event_id("")) {
+        } else if (event.getId() == BaseEventBox.get_event_id("UPDATE_SCREENING_FOR_MOVIE")) {
             if (screening.getMovie().getAuto_number_movie() == ((Movie)event.getMessage().getObject()).getAuto_number_movie()) {
                 Message m = new Message(1000, "#get_screening_from_id");
                 m.setObject(screening_id);
