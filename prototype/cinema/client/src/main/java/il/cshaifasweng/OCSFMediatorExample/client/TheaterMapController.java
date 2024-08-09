@@ -34,7 +34,7 @@ public class TheaterMapController {
     @FXML
     private Text ErrorMessage;
 
-    public static int screening_id = 8;
+    public static int screening_id = 10;
     public static Screening screening = null;
     public static ArrayList<ArrayList<Integer>> places_took = new ArrayList<>();
 
@@ -67,21 +67,28 @@ public class TheaterMapController {
     public void handle(BaseEventBox event) {
         if (event.getId() == BaseEventBox.get_event_id("UPDATE_BOXES_IN_SCREENING")) {
 
+            if(event.getMessage().getObject() == null) {
 
-            Platform.runLater(() -> {
-                if(event.getMessage().getObject() == null)
-                {
+                Platform.runLater(() -> {
+
                     try {
-                        SimpleChatClient.setRoot("MovieDetails");
+                        SimpleChatClient.setRoot("HomePage");
                     } catch (IOException e) {
                         ErrorMessage.setVisible(true);
                         ErrorMessage.setText(e.getMessage());
                         return;
                     }
-                }
+
+
+                });
+            }
+            else
+            {Platform.runLater(()->{
                 screening = (Screening) event.getMessage().getObject();
                 create_the_page();
             });
+
+            }
         }
         else if (event.getId() == BaseEventBox.get_event_id("THEATER_MAP_UPDATED")) {
 
@@ -230,19 +237,21 @@ public class TheaterMapController {
     {
         if (!event.getPage().equals("PurchaseMovieTickets"))
         {
-            int [][] map = cerate_map(screening.getTheater_map());
-            for (ArrayList<Integer> list : places_took) {
-                map[list.get(0)][list.get(1)] = 0;
-            }
-            screening.setTheater_map(create_string_of_map(map));
-            Message m = new Message(10000, "#Update_theater_map");
-            m.setObject(screening);
-            try {
-                SimpleClient.getClient().sendToServer(m);
-            } catch (IOException e) {
-                ErrorMessage.setVisible(true);
-                ErrorMessage.setText(e.getMessage());
-                return;
+            if(screening !=null) {
+                int[][] map = cerate_map(screening.getTheater_map());
+                for (ArrayList<Integer> list : places_took) {
+                    map[list.get(0)][list.get(1)] = 0;
+                }
+                screening.setTheater_map(create_string_of_map(map));
+                Message m = new Message(10000, "#Update_theater_map");
+                m.setObject(screening);
+                try {
+                    SimpleClient.getClient().sendToServer(m);
+                } catch (IOException e) {
+                    ErrorMessage.setVisible(true);
+                    ErrorMessage.setText(e.getMessage());
+                    return;
+                }
             }
         }
         System.out.println(event.getPage());

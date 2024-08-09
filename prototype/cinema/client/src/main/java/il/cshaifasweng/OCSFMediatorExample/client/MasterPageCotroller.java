@@ -61,7 +61,7 @@ public class MasterPageCotroller {
             javafx.geometry.Rectangle2D screenBounds = Screen.getPrimary().getBounds();
             double screenWidth = screenBounds.getWidth();
             double screenHeight = screenBounds.getHeight();
-            content_area.layoutXProperty().setValue(30);
+            content_area.layoutXProperty().setValue(screenWidth/2);
         });
 
 
