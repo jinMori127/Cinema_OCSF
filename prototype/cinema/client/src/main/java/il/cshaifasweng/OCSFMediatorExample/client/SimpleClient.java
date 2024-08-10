@@ -104,7 +104,11 @@ public class SimpleClient extends AbstractClient {
 		else if(message.getMessage().equals("#purchase_multi_ticket_client")){
 			EventBus.getDefault().post(new BaseEventBox("SAVE_MULTI_TICKET", message));
 		}
-
+		else if (message.getMessage().equals("#reportsCreated") ||
+				message.getMessage().equals("#searchedReports") ||
+				message.getMessage().equals("#reportsDeleted")) {
+			EventBus.getDefault().post(new BaseEventBox("REPORTS", message));
+		}
 		else {
 			EventBus.getDefault().post(new BaseEventBox("WRONG_NAMEING", message));
 		}

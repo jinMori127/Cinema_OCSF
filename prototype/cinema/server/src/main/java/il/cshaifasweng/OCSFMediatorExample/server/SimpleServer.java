@@ -39,6 +39,22 @@ public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
 	private static SessionFactory sessionFactory = getSessionFactory(SimpleChatServer.password);
 
+	private static Map<Integer, Map<Integer, Map<Integer, Integer>>> multiEntryTicketSales = new HashMap<>();
+	static {
+		if (multiEntryTicketSales.isEmpty()) {
+			int[] years = {2024, 2023, 2022};
+			for (int year : years) {
+				multiEntryTicketSales.put(year, new HashMap<>());
+				for (int month = 1; month <= 12; month++) {
+					multiEntryTicketSales.get(year).put(month, new HashMap<>());
+					int daysInMonth = getDaysInMonth(month, year);
+					for (int day = 1; day <= daysInMonth; day++) {
+						multiEntryTicketSales.get(year).get(month).put(day, 0);
+					}
+				}
+			}
+		}
+	}
 
 
 	public static SessionFactory getSessionFactory(String Password) throws
@@ -482,6 +498,240 @@ public class SimpleServer extends AbstractServer {
 		e.printStackTrace();
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// reports functions
+
+	private List<Reports> create_reports(Session session) {
+		String[] branches = {"Sakhnin", "Haifa", "Nazareth", "Nhif"};
+		int[] years = {2024, 2023, 2022};
+
+		// Maps for storing complaints, purchases, and multi-entry data
+		Map<String, Map<Integer, Map<Integer, List<Integer>>>> complaintsByBranchYearMonth = new HashMap<>();
+		Map<String, Map<Integer, Map<Integer, List<Integer>>>> purchasesByBranchYearMonth = new HashMap<>();
+		Map<String, Map<Integer, Map<Integer, List<Integer>>>> multiEntryByBranchYearMonth = new HashMap<>();
+
+		// Initialize maps for each branch, year, and month
+		for (String branch : branches) {
+			complaintsByBranchYearMonth.put(branch, new HashMap<>());
+			purchasesByBranchYearMonth.put(branch, new HashMap<>());
+			multiEntryByBranchYearMonth.put(branch, new HashMap<>());
+
+			for (int year : years) {
+				for (int month = 1; month <= 12; month++) {
+					complaintsByBranchYearMonth.get(branch)
+							.computeIfAbsent(year, k -> new HashMap<>())
+							.put(month, initializeEmptyListForMonth(year, month));
+
+					purchasesByBranchYearMonth.get(branch)
+							.computeIfAbsent(year, k -> new HashMap<>())
+							.put(month, initializeEmptyListForMonth(year, month));
+
+					multiEntryByBranchYearMonth.get(branch)
+							.computeIfAbsent(year, k -> new HashMap<>())
+							.put(month, initializeEmptyListForMonth(year, month));
+				}
+			}
+		}
+
+		// Extract and aggregate complaints
+		CriteriaBuilder builder1 = session.getCriteriaBuilder();
+		CriteriaQuery<Complains> query1 = builder1.createQuery(Complains.class);
+		query1.from(Complains.class);
+		List<Complains> data_complains = session.createQuery(query1).getResultList();
+		for (Complains complains : data_complains) {
+			String complain_branch = complains.getCinema_branch();
+			Date complain_date = complains.getTime_of_complain();
+
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(complain_date);
+
+			int year = calendar.get(Calendar.YEAR);
+			int month = calendar.get(Calendar.MONTH) + 1;
+			int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+			if (complaintsByBranchYearMonth.containsKey(complain_branch)) {
+				List<Integer> dailyComplaints = complaintsByBranchYearMonth.get(complain_branch).get(year).get(month);
+				dailyComplaints.set(day - 1, dailyComplaints.get(day - 1) + 1);
+			}
+		}
+
+		// Extract and aggregate user purchases
+		CriteriaBuilder builder2 = session.getCriteriaBuilder();
+		CriteriaQuery<UserPurchases> query2 = builder2.createQuery(UserPurchases.class);
+		query2.from(UserPurchases.class);
+		List<UserPurchases> data_purchases = session.createQuery(query2).getResultList();
+		for (UserPurchases userPurchases : data_purchases) {
+			String purchases_branch = userPurchases.getScreening().getBranch();
+			Date purchases_date = userPurchases.getDate_of_purchase();
+
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(purchases_date);
+
+			int year = calendar.get(Calendar.YEAR);
+			int month = calendar.get(Calendar.MONTH) + 1;
+			int day = calendar.get(Calendar.DAY_OF_MONTH);
+			String seats = userPurchases.getSeats();
+			int num_seats = seats.isEmpty() ? 0 : seats.split(",").length;
+
+			if (purchasesByBranchYearMonth.containsKey(purchases_branch)) {
+				List<Integer> dailyPurchases = purchasesByBranchYearMonth.get(purchases_branch).get(year).get(month);
+				dailyPurchases.set(day - 1, dailyPurchases.get(day - 1) + num_seats);
+			}
+		}
+
+		// Insert the data from the static map into multiEntryByBranchYearMonth
+		for (String branch : branches) {
+			for (int year : years) {
+				for (int month = 1; month <= 12; month++) {
+					List<Integer> dailyMultiEntry = multiEntryByBranchYearMonth.get(branch).get(year).get(month);
+					Map<Integer, Integer> monthData = multiEntryTicketSales.get(year).get(month);
+
+					for (int day = 1; day <= monthData.size(); day++) {
+						int ticketsSold = monthData.get(day);
+						dailyMultiEntry.set(day - 1, dailyMultiEntry.get(day - 1) + ticketsSold); // <-- Change: Aggregating multi-entry data
+					}
+				}
+			}
+		}
+
+		List<Reports> reportsList = new ArrayList<>();
+
+		for (String branch : branches) {
+			for (int year : years) {
+				for (int month = 1; month <= 12; month++) {
+					// Generate report for the first day of each month which represent the whole month
+					Calendar reportCalendar = Calendar.getInstance();
+					reportCalendar.set(Calendar.YEAR, year);
+					reportCalendar.set(Calendar.MONTH, month - 1);
+					reportCalendar.set(Calendar.DAY_OF_MONTH, 1);
+					Date reportDate = reportCalendar.getTime();
+
+					generateReport(session, reportsList, branch, year, month, reportDate,
+							complaintsByBranchYearMonth, purchasesByBranchYearMonth,
+							multiEntryByBranchYearMonth);
+				}
+			}
+		}
+
+		return reportsList;
+	}
+
+	private void generateReport(Session session, List<Reports> reportsList, String branch, int year,
+								int month, Date reportDate,
+								Map<String, Map<Integer, Map<Integer, List<Integer>>>> complaintsByBranchYearMonth,
+								Map<String, Map<Integer, Map<Integer, List<Integer>>>> purchasesByBranchYearMonth,
+								Map<String, Map<Integer, Map<Integer, List<Integer>>>> multiEntryByBranchYearMonth) {
+
+		Reports report = new Reports(reportDate, branch);
+
+		List<Integer> dailyComplaints = complaintsByBranchYearMonth.get(branch).get(year).get(month);
+		List<Integer> dailyPurchases = purchasesByBranchYearMonth.get(branch).get(year).get(month);
+		List<Integer> dailyMultiEntry = multiEntryByBranchYearMonth.get(branch).get(year).get(month);
+
+		report.setReport_complains(dailyComplaints);
+		report.setReport_ticket_sells(dailyPurchases);
+		report.setReport_multy_entry_ticket(dailyMultiEntry);
+
+		reportsList.add(report);
+
+		try {
+			session.save(report);
+			System.out.println("Report saved for branch: " + branch + " on " + reportDate);
+		} catch (Exception e) {
+			System.err.println("Error saving report for branch: " + branch + " on " + reportDate);
+			e.printStackTrace();
+		}
+	}
+
+
+
+	private List<Integer> initializeEmptyListForMonth(int year, int month) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.YEAR, year);
+		calendar.set(Calendar.MONTH, month - 1);
+		int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+		return new ArrayList<>(Collections.nCopies(daysInMonth, 0));
+	}
+
+
+	private void search_report(Session session, Message message) {
+		String branch = (String) message.getObject();
+		Integer year = (Integer) message.getObject2();
+		Integer month = (Integer) message.getObject3();
+
+		try {
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<Reports> query = builder.createQuery(Reports.class);
+			Root<Reports> root = query.from(Reports.class);
+
+			Expression<Integer> yearExpr = builder.function("YEAR", Integer.class, root.get("report_date"));
+			Expression<Integer> monthExpr = builder.function("MONTH", Integer.class, root.get("report_date"));
+
+			Predicate branchPredicate = builder.equal(root.get("branch"), branch);
+			Predicate monthPredicate = builder.equal(monthExpr, month);
+			Predicate yearPredicate = builder.equal(yearExpr, year);
+
+			query.select(root).where(builder.and(branchPredicate, monthPredicate, yearPredicate));
+
+			List<Reports> searched_reports = session.createQuery(query).getResultList();
+
+			if (searched_reports != null && !searched_reports.isEmpty()) {
+				message.setObject(searched_reports.get(0));
+			} else {
+				message.setObject(null);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void deleteAllReports(Session session) {
+		System.out.println("Deleting all existing reports...");
+		session.createQuery("DELETE FROM Reports").executeUpdate();
+	}
+
+	private void resetAutoIncrement(Session session) {
+		System.out.println("Resetting auto-increment...");
+		session.createNativeQuery("ALTER TABLE Reports AUTO_INCREMENT = 1").executeUpdate();
+	}
+
+	// get num of days in a month
+	private static int getDaysInMonth(int month, int year) {
+		switch (month) {
+			case 2: // February
+				return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) ? 29 : 28; // Leap year check
+			case 4:
+			case 6:
+			case 9:
+			case 11: // April, June, September, November
+				return 30;
+			default: // January, March, May, July, August, October, December
+				return 31;
+		}
+	}
+
+	// Function to update the map for multi-entry tickets
+	private synchronized void updateReportsForMultiEntryTickets(int remainTickets) {
+		Calendar calendar = Calendar.getInstance();
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH) + 1;
+		int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+		multiEntryTicketSales
+				.computeIfAbsent(year, k -> new HashMap<>())
+				.computeIfAbsent(month, k -> new HashMap<>())
+				.computeIfAbsent(day, k -> 0);
+
+		int currentTickets = multiEntryTicketSales.get(year).get(month).get(day);
+		multiEntryTicketSales.get(year).get(month).put(day, currentTickets + remainTickets);
+	}
+
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		Message message = (Message) msg;
@@ -716,6 +966,7 @@ public class SimpleServer extends AbstractServer {
 						t.setId_user(idUser); // Ensure the ticket references the existing IdUser
 						session.save(t);
 					}
+					updateReportsForMultiEntryTickets(t.getRemain_tickets());	// used for reports
 
 					transaction.commit();
 
@@ -795,7 +1046,39 @@ public class SimpleServer extends AbstractServer {
 					SignOut_Worker((Worker)user);
 				}
 
+			} else if (message.getMessage().equals("#createReports")) {
+				System.out.println("got into createReports (simpleServer)");
+				Session session = sessionFactory.openSession();
+				Transaction transaction = session.beginTransaction();
+				List<Reports> respond = create_reports(session);
+				message.setObject(respond);
+				message.setMessage("#reportsCreated");
+				client.sendToClient(message);
+				session.getTransaction().commit();
+				session.close();
 			}
+			else if (message.getMessage().equals("#SearchReport")) {
+				System.out.println("got into SearchReport (simpleServer)");
+				Session session = sessionFactory.openSession();
+				Transaction transaction = session.beginTransaction();
+				search_report(session, message);
+				message.setMessage("#searchedReports");
+				client.sendToClient(message);
+				transaction.commit();
+				session.close();
+			}
+			else if (message.getMessage().equals("#deleteAllReports")) {
+				System.out.println("got into deleteAllReports (simpleServer)");
+				Session session = sessionFactory.openSession();
+				Transaction transaction = session.beginTransaction();
+				deleteAllReports(session);
+				resetAutoIncrement(session);
+				message.setMessage("#reportsDeleted");;
+				client.sendToClient(message);
+				transaction.commit();
+				session.close();
+			}
+
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} catch (Exception e) {

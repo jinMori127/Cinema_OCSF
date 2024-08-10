@@ -1,7 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.entities;
 
 import javax.persistence.*;
-import javax.swing.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,7 +12,6 @@ public class Reports implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int auto_number_report;
-
 
     private String report_ticket_sells;
     private String report_multy_entry_ticket;
@@ -29,41 +27,66 @@ public class Reports implements Serializable {
     }
 
     // constructor
-    private static String create_String_of_list(List<Integer> l)
-    {
-        String s = "";
+    private static String create_String_of_list(List<Integer> l) {
+        StringBuilder s = new StringBuilder();
         int i = 1;
-        for (Integer integer : l)
-        {
-            s += i + "::" + integer + "\n";
+        for (Integer integer : l) {
+            s.append(i).append("::").append(integer).append("\n");
+            i++;
         }
-        return s;
+        return s.toString();
     }
-    private static List<Integer> Create_List_From_String(String s)
-    {
-        List<Integer> l = new ArrayList<Integer>();
-        for (int i =1 ; i <=31 ;i++)
-        {
-            int index = s.indexOf(i + "::");
-            if (index != -1)
-            {
-                l.add(0);
-                continue;
+
+    private static List<Integer> Create_List_From_String(Object obj) {
+        List<Integer> l = new ArrayList<>();
+
+        if (obj instanceof String) {
+            String s = (String) obj;
+            String[] lines = s.split("\n");
+
+            for (String line : lines) {
+                try {
+                    String[] parts = line.split("::");
+
+                    if (parts.length != 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
+                        System.err.println("Skipping malformed line: " + line);
+                        l.add(0);
+                        continue;
+                    }
+
+                    int day = Integer.parseInt(parts[0].trim());
+                    int value = Integer.parseInt(parts[1].trim());
+
+                    while (l.size() < day) {
+                        l.add(0);
+                    }
+
+                    l.set(day - 1, value);
+                } catch (NumberFormatException e) {
+                    System.err.println("Error parsing line: " + line);
+                    e.printStackTrace();
+                    l.add(0);
+                }
             }
-            index +=3;
-            int end_index = s.indexOf("\n",index);
-            end_index--;
-            String result = s.substring(index, end_index + 1);
-            l.add(Integer.parseInt(result));
+
+            while (l.size() < 31) {
+                l.add(0);
+            }
+
+        } else if (obj instanceof List) {
+            return (List<Integer>) obj;
+        } else {
+            System.err.println("Unexpected data type: " + obj.getClass().getName());
         }
+
         return l;
     }
-    public Reports( Date report_date, String branch) {
+
+    public Reports(Date report_date, String branch) {
         this.report_date = report_date;
         this.branch = branch;
     }
 
-    // getters and setters
     public int getAuto_number_report() {
         return auto_number_report;
     }
