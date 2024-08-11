@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 import javafx.fxml.Initializable;
@@ -19,13 +18,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import javafx.scene.input.MouseEvent;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import javafx.scene.control.TextArea;
-import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.getClient;
 
 public class UserPurchasesController {
 
@@ -128,10 +123,10 @@ public class UserPurchasesController {
         EventBus.getDefault().register(this);
         Message insert_message = new Message(20,"#show_purchases");
         insert_message.setObject(curr_id);
+        cancel_purchase.setDisable(true);
 
         try {
             SimpleClient.getClient().sendToServer(insert_message);
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -139,8 +134,8 @@ public class UserPurchasesController {
         // Add double-click listener to table rows
         table_view.setOnMouseClicked((MouseEvent event) -> {
             if (event.getClickCount() == 2) {
+                cancel_purchase.setDisable(false);
                 show_purchase_information();
-
             }
         });
     }
@@ -168,11 +163,21 @@ public class UserPurchasesController {
 
                 purchase_detailed_text.setText(contentText.toString());
 
+                // checking if there is a link so to adapt the text field with it
+                TableColumn<UserPurchases, ?> link = table_view.getColumns().get(3);
+                Object cellData = link.getCellData(selectedRow);
+                String link_text = (String) cellData;
 
                 // Set warning message and make it visible
                 ErrorMessage.setVisible(true);
-                ErrorMessage.setText("Note:\nif still more than 3 hours you will get 100%\nif still between 1-3 hours you will get 50%\n" +
-                        "in Other cases you will get 0 %");
+                if(link_text.isEmpty()) {
+                    ErrorMessage.setText("Note:\nif still more than 3 hours you will get 100%\nif still between 1-3 hours you will get 50%\n" +
+                            "in Other cases you will get 0 %");
+                }
+                else {
+                    ErrorMessage.setText("Note:\nYou can return the home link till hour before it's activation and get 50%\n" +
+                            "in Other cases you will get 0 %");
+                }
             } else {
                 purchase_detailed_text.clear();
             }
@@ -203,20 +208,15 @@ public class UserPurchasesController {
             cellData = Sec_col.getCellData(selectedRow);
             Date date_screening=(Date)cellData;
 
-
-
+            TableColumn<UserPurchases, ?> link = table_view.getColumns().get(3);
+            cellData = link.getCellData(selectedRow);
+            String link_text = (String) cellData;
 
             if (date_screening.before(curr_date)) {
                 ErrorMessage.setVisible(true);
                 percent_return=0;
-
-
-
-
                 ErrorMessage.setText("Unable to cancel purchase, The screening time already passed");
-
                 return;
-
             }
 
 
@@ -234,30 +234,28 @@ public class UserPurchasesController {
                 calendar2.add(Calendar.HOUR, +1);
                 Date curr_date_1 = calendar2.getTime();
 
-
                 TableColumn<UserPurchases, ?> third_col = table_view.getColumns().get(5);
                 cellData = third_col.getCellData(selectedRow);
                 double price =(double)cellData;
 
 
-                if (curr_date_3.before(date_screening)) {
+                if (curr_date_3.before(date_screening) && link_text.isEmpty()) {
                     ErrorMessage.setVisible(true);
                     ErrorMessage.setText("Value returned 100%,Your Total Will be:"+price);
                     percent_return = 100;
-                                                      }
+                }
 
                 else if (curr_date_1.before(date_screening)) {
                     ErrorMessage.setVisible(true);
                     ErrorMessage.setText("Value returned 50%,Your Total Will be:"+(price/2));
                     percent_return = 50;
-
                 }
 
                 else {
                     ErrorMessage.setVisible(true);
                     ErrorMessage.setText("Value returned 0%,Your Total Will be:"+0);
                     percent_return = 0;
-                     }
+                }
             }
         }
 

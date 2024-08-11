@@ -22,7 +22,7 @@
             <TableColumn fx:id="payment_type_column" prefWidth="91.0" text="payment type" />
             </columns>
         </TableView>
-        <Button fx:id="delete_movie" onAction="#CancelPurchase" text="Cancel Purchase" textFill="#b71f1f" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="150.0">
+        <Button fx:id="calncel_purchase" onAction="#CancelPurchase" text="Cancel Purchase" textFill="#b71f1f" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="150.0">
             <font>
                 <Font name="System Bold" size="12.0" />
             </font>
@@ -30,6 +30,6 @@
         <TextArea fx:id="purchase_detailed_text" editable="false" layoutX="24.0" layoutY="18.0" prefHeight="134.0" prefWidth="344.0" promptText="purchase information " />
       <Text fx:id="ErrorMessage" fill="RED" layoutX="391.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="241.0" />
       <Text fx:id="WarningMessage" fill="RED" layoutX="411.0" layoutY="99.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="219.5" />
-        <Text fx:id="multi_ticket_info" fill="#489e39" AnchorPane.topAnchor="68.0" AnchorPane.rightAnchor="20.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="107.0" />
+        <Text fx:id="multi_ticket_info" fill="#489e39" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="107.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="68.0" />
     </children>
 </AnchorPane>
