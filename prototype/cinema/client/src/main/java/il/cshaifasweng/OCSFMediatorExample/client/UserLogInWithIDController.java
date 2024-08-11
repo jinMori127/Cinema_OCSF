@@ -37,6 +37,7 @@ public class UserLogInWithIDController {
     @FXML
     public void destroy() {
         EventBus.getDefault().unregister(this);
+
     }
 
     @FXML

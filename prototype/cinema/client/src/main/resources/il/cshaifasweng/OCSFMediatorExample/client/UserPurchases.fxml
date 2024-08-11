@@ -8,9 +8,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="615.0" prefWidth="781.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.UserPurchasesController">
+<AnchorPane prefHeight="615.0" prefWidth="822.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.UserPurchasesController">
     <children>
-        <TableView fx:id="table_view" prefHeight="200.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="200.0">
+        <TableView fx:id="table_view" prefHeight="415.0" prefWidth="783.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="200.0">
             <columns>
                 <TableColumn fx:id="auto_number_purchase" text="purchase ID" />
             <TableColumn fx:id="movie_name_column" prefWidth="75.0" text="Movie name" />
@@ -28,7 +28,8 @@
             </font>
         </Button>
         <TextArea fx:id="purchase_detailed_text" editable="false" layoutX="24.0" layoutY="18.0" prefHeight="134.0" prefWidth="344.0" promptText="purchase information " />
-      <Text fx:id="ErrorMessage" fill="RED" layoutX="391.0" layoutY="58.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="356.0" />
-      <Text fx:id="WarningMessage" fill="RED" layoutX="411.0" layoutY="112.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="344.0" />
+      <Text fx:id="ErrorMessage" fill="RED" layoutX="391.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="241.0" />
+      <Text fx:id="WarningMessage" fill="RED" layoutX="411.0" layoutY="99.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="219.5" />
+        <Text fx:id="multi_ticket_info" fill="#489e39" AnchorPane.topAnchor="68.0" AnchorPane.rightAnchor="20.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="107.0" />
     </children>
 </AnchorPane>
