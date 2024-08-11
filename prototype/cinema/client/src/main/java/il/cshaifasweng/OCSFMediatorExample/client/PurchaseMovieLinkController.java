@@ -199,12 +199,11 @@ public class PurchaseMovieLinkController {
         String curr_last_name = user_last_name.getText();
         String full_name = curr_first_name + " " + curr_last_name;
         String curr_email = user_email.getText();
-        String user_id_str = user_id.getText();
 
 
-        IdUser id_user = new IdUser(id_str, full_name, phone_str, curr_email);
-        MultiEntryTicket multiTicket = new MultiEntryTicket(20);
-        multiTicket.setId_user(id_user);
+        //IdUser id_user = new IdUser(id_str, full_name, phone_str, curr_email);
+       // MultiEntryTicket multiTicket = new MultiEntryTicket(20);
+        //multiTicket.setId_user(id_user);
 
 
     }
