@@ -38,7 +38,12 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new BaseEventBox("MOVIES_GOT", message));
 
 		}
-		else if (message.getMessage().equals("#UpdateMovieList")){	
+
+		else if(message.getMessage().equals("#GetScreeningDone")){
+			EventBus.getDefault().post(new BaseEventBox("GET_SCREENING_DONE", message));
+		}
+
+		else if (message.getMessage().equals("#UpdateMovieList")){
 			EventBus.getDefault().post(new BaseEventBox("UPDATE_MOVIE_LIST", message));
 		} else if (message.getMessage().equals("#ScreeningsGot")) {
 			Current_Message = message;
@@ -101,13 +106,13 @@ public class SimpleClient extends AbstractClient {
 			// Handle login related messages
 		EventBus.getDefault().post(new BaseEventBox("SERVER_ERROR_MESSAGE1", message));
 		}
-
 		else if(message.getMessage().equals("#purchase_multi_ticket_client")){
 			EventBus.getDefault().post(new BaseEventBox("SAVE_MULTI_TICKET", message));
 		}
 		else if (message.getMessage().equals("#theater_map_updated")){
 			EventBus.getDefault().post(new BaseEventBox("THEATER_MAP_UPDATED", message));
 		}
+
 
 		else {
 			EventBus.getDefault().post(new BaseEventBox("WRONG_NAMEING", message));
