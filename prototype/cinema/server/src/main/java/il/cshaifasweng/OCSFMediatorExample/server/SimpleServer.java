@@ -39,6 +39,7 @@ public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
 	private static SessionFactory sessionFactory = getSessionFactory(SimpleChatServer.password);
 
+	private Message reports_message = new Message(0, "reports_message");
 	private static Map<Integer, Map<Integer, Map<Integer, Integer>>> multiEntryTicketSales = new HashMap<>();
 	static {
 		if (multiEntryTicketSales.isEmpty()) {
@@ -305,7 +306,7 @@ public class SimpleServer extends AbstractServer {
 
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private List<UserPurchases> delete_user_purchases(int auto_num,String id) throws Exception {
+	private List<UserPurchases> delete_user_purchases(int auto_num,String id, Message message) throws Exception {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 
@@ -320,10 +321,13 @@ public class SimpleServer extends AbstractServer {
 			return  search_user_purchases(id);
 		}
 
+		reports_message.setObject(purchase);
+		reports_message.setObject2(message.getObject3());
+		reports_message.setMessage("cancelPurchase");
+		update_reports(session);
 
 		// Delete the UserPurchases object
 		session.delete(purchase);
-
 
 
 		// Commit the transaction
@@ -395,7 +399,7 @@ public class SimpleServer extends AbstractServer {
 		session.close();
 		return data;
 	}
-	
+
 	private void SignOut_IDUser(IdUser user)
 	{
 		Session session = sessionFactory.openSession();
@@ -409,7 +413,6 @@ public class SimpleServer extends AbstractServer {
 	{
 
 	}
-
 
 
 
@@ -500,7 +503,39 @@ public class SimpleServer extends AbstractServer {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// reports functions
 
-	private List<Reports> create_reports(Session session) {
+	// check if reports for these years 2024,2023, 2022 already exist
+	private boolean checkAndCreateReports(Session session) {
+		int[] years = {2024, 2023, 2022};
+
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Long> query = builder.createQuery(Long.class);
+		Root<Reports> root = query.from(Reports.class);
+		query.select(builder.count(root));
+
+		Predicate[] yearPredicates = new Predicate[years.length];
+		for (int i = 0; i < years.length; i++) {
+			Expression<Integer> yearExpr = builder.function("YEAR", Integer.class, root.get("report_date"));
+			yearPredicates[i] = builder.equal(yearExpr, years[i]);
+		}
+
+		query.where(builder.or(yearPredicates));
+
+		Long reportCount = session.createQuery(query).getSingleResult();
+
+		if (reportCount > 0) {
+			System.out.println("Reports already exist for the specified years.");
+			return false;
+		} else {
+			System.out.println("No reports found for the specified years. Proceeding with creation.");
+			return true;
+		}
+	}
+	private void create_reports(Session session) {
+		// Check if the initialized reports already exist
+		if (!checkAndCreateReports(session)) {
+			System.out.println("Reports already exist. No need to create new ones.");
+			return;
+		}
 		String[] branches = {"Sakhnin", "Haifa", "Nazareth", "Nhif"};
 		int[] years = {2024, 2023, 2022};
 
@@ -552,6 +587,7 @@ public class SimpleServer extends AbstractServer {
 				List<Integer> dailyComplaints = complaintsByBranchYearMonth.get(complain_branch).get(year).get(month);
 				dailyComplaints.set(day - 1, dailyComplaints.get(day - 1) + 1);
 			}
+
 		}
 
 		// Extract and aggregate user purchases
@@ -569,12 +605,13 @@ public class SimpleServer extends AbstractServer {
 			int year = calendar.get(Calendar.YEAR);
 			int month = calendar.get(Calendar.MONTH) + 1;
 			int day = calendar.get(Calendar.DAY_OF_MONTH);
-			String seats = userPurchases.getSeats();
-			int num_seats = seats.isEmpty() ? 0 : seats.split(",").length;
+			double payment_amount = userPurchases.getPayment_amount();
+//			String seats = userPurchases.getSeats();
+//			int num_seats = seats.isEmpty() ? 0 : seats.split(",").length;
 
 			if (purchasesByBranchYearMonth.containsKey(purchases_branch)) {
 				List<Integer> dailyPurchases = purchasesByBranchYearMonth.get(purchases_branch).get(year).get(month);
-				dailyPurchases.set(day - 1, dailyPurchases.get(day - 1) + num_seats);
+				dailyPurchases.set(day - 1, dailyPurchases.get(day - 1) + (int) payment_amount);
 			}
 		}
 
@@ -612,7 +649,6 @@ public class SimpleServer extends AbstractServer {
 			}
 		}
 
-		return reportsList;
 	}
 
 	private void generateReport(Session session, List<Reports> reportsList, String branch, int year,
@@ -727,7 +763,90 @@ public class SimpleServer extends AbstractServer {
 		multiEntryTicketSales.get(year).get(month).put(day, currentTickets + remainTickets);
 	}
 
+	private void update_reports(Session session) {
+		Calendar today = Calendar.getInstance();
+		int currentYear = today.get(Calendar.YEAR);
+		int currentMonth = today.get(Calendar.MONTH) + 1; // Months are 0-based in Calendar
+		int currentDay = today.get(Calendar.DAY_OF_MONTH);
 
+		try {
+
+			if (reports_message.getMessage().equals("purchaseMultiTicket")) {
+				System.out.println("got into update report for purchaseMultiTicket");
+				Reports report1 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Haifa");
+				Reports report2 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Nhif");
+				Reports report3 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Nazareth");
+				Reports report4 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Sakhnin");
+
+				MultiEntryTicket ticket = (MultiEntryTicket) reports_message.getObject();
+				int remain_tickets = ticket.getRemain_tickets();
+
+				List<Integer> multiEntryData1 = report1.getReport_multy_entry_ticket();
+				multiEntryData1.set(currentDay - 1, multiEntryData1.get(currentDay - 1) + remain_tickets);
+				report1.setReport_multy_entry_ticket(multiEntryData1);
+
+				List<Integer> multiEntryData2 = report2.getReport_multy_entry_ticket();
+				multiEntryData2.set(currentDay - 1, multiEntryData2.get(currentDay - 1) + remain_tickets);
+				report2.setReport_multy_entry_ticket(multiEntryData2);
+
+				List<Integer> multiEntryData3 = report3.getReport_multy_entry_ticket();
+				multiEntryData3.set(currentDay - 1, multiEntryData3.get(currentDay - 1) + remain_tickets);
+				report3.setReport_multy_entry_ticket(multiEntryData3);
+
+				List<Integer> multiEntryData4 = report4.getReport_multy_entry_ticket();
+				multiEntryData4.set(currentDay - 1, multiEntryData4.get(currentDay - 1) + remain_tickets);
+				report4.setReport_multy_entry_ticket(multiEntryData4);
+
+				session.update(report1);
+				session.update(report2);
+				session.update(report3);
+				session.update(report4);
+
+			} else if (reports_message.getMessage().equals("cancelPurchase")) {
+				System.out.println("got into update report for cancelPurchase");
+				UserPurchases purchase = (UserPurchases) reports_message.getObject();
+				double refund = (double) reports_message.getObject2();
+				Date date = purchase.getDate_of_purchase();
+				currentDay = date.getDay();
+				currentMonth = date.getMonth();
+				currentYear = date.getYear();
+				Reports report = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, purchase.getScreening().getBranch());
+				List<Integer> purchaseData = report.getReport_ticket_sells();
+				int originalPurchase = purchaseData.get(currentDay - 1);
+				purchaseData.set(currentDay - 1, originalPurchase - (int) refund);
+				report.setReport_ticket_sells(purchaseData);
+
+				session.update(report);
+
+			}
+
+			reports_message.setMessage("updatedReports");
+
+			// Save the updated report back to the database
+			session.getTransaction().commit();
+
+		} catch (Exception e) {
+			if (session.getTransaction() != null) {
+				session.getTransaction().rollback();
+			}
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+	}
+
+	private Reports getReportForCurrentDay(Session session, int year, int month, int day, String branch) {
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Reports> query = builder.createQuery(Reports.class);
+		Root<Reports> root = query.from(Reports.class);
+
+		query.select(root)
+				.where(builder.equal(root.get("branch"), branch),
+						builder.equal(builder.function("YEAR", Integer.class, root.get("report_date")), year),
+						builder.equal(builder.function("MONTH", Integer.class, root.get("report_date")), month));
+
+		return session.createQuery(query).uniqueResult();
+	}
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -871,9 +990,10 @@ public class SimpleServer extends AbstractServer {
 				int auto_num =  (int)message.getObject();
 				String id = (String)message.getObject2();
 				message.setMessage("#delete_purchases_client");
-				message.setObject(delete_user_purchases(auto_num,id));
+				message.setObject(delete_user_purchases(auto_num,id, message));
 				System.out.println(message.getMessage());
 				client.sendToClient(message);
+				client.sendToClient(reports_message);
 
 			}
 
@@ -966,12 +1086,17 @@ public class SimpleServer extends AbstractServer {
 						t.setId_user(idUser); // Ensure the ticket references the existing IdUser
 						session.save(t);
 					}
-					updateReportsForMultiEntryTickets(t.getRemain_tickets());	// used for reports
+					//updateReportsForMultiEntryTickets(t.getRemain_tickets());	// used for reports
 
+					reports_message.setObject(t);
+					reports_message.setMessage("purchaseMultiTicket");
+					update_reports(session);
 					transaction.commit();
 
 					message.setMessage("#purchase_multi_ticket_client");
 					client.sendToClient(message);
+					client.sendToClient(reports_message);
+
 
 				} catch (Exception e) {
 					if (transaction != null) {
@@ -1003,7 +1128,6 @@ public class SimpleServer extends AbstractServer {
 
 				// delete the responded complains
 				List<Complains> data = search_data(false);
-
 				message.setObject(data);
 				// send to client
 				client.sendToClient(message);
@@ -1050,8 +1174,7 @@ public class SimpleServer extends AbstractServer {
 				System.out.println("got into createReports (simpleServer)");
 				Session session = sessionFactory.openSession();
 				Transaction transaction = session.beginTransaction();
-				List<Reports> respond = create_reports(session);
-				message.setObject(respond);
+				create_reports(session);
 				message.setMessage("#reportsCreated");
 				client.sendToClient(message);
 				session.getTransaction().commit();

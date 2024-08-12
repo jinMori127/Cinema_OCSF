@@ -97,6 +97,8 @@ public class UserPurchasesController {
 
     private ObservableList<UserPurchases> purchasesList = FXCollections.observableArrayList();
 
+    private double refund;
+
     @Subscribe
     public void delete_purchases_for_user(BaseEventBox event)
     {
@@ -263,12 +265,14 @@ public class UserPurchasesController {
                 if (curr_date_3.before(date_screening)) {
                     ErrorMessage.setVisible(true);
                     ErrorMessage.setText("Value returned 100%,Your Total Will be:"+price);
+                    refund = price;
                     percent_return = 100;
                                                       }
 
                 else if (curr_date_1.before(date_screening)) {
                     ErrorMessage.setVisible(true);
                     ErrorMessage.setText("Value returned 50%,Your Total Will be:"+(price/2));
+                    refund = price / 2;
                     percent_return = 50;
 
                 }
@@ -276,6 +280,7 @@ public class UserPurchasesController {
                 else {
                     ErrorMessage.setVisible(true);
                     ErrorMessage.setText("Value returned 0%,Your Total Will be:"+0);
+                    refund = 0;
                     percent_return = 0;
                      }
             }
@@ -285,6 +290,7 @@ public class UserPurchasesController {
             Message delete_message = new Message(21,"#delete_purchases");
             delete_message.setObject(auto_num);
             delete_message.setObject2(curr_id);
+            delete_message.setObject3(refund);
             try {
                 SimpleClient.getClient().sendToServer(delete_message);
 

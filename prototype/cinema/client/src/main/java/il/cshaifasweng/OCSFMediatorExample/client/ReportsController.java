@@ -14,9 +14,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class ReportsController {
 
@@ -44,7 +42,6 @@ public class ReportsController {
     @FXML
     private TextArea report_text;
 
-    private List<Reports> reports_list;
 
     @FXML
     void initialize() {
@@ -53,10 +50,9 @@ public class ReportsController {
 
         choosed_branch.getItems().clear();
         choosed_branch.getItems().addAll("", "Sakhnin", "Haifa", "Nazareth", "Nhif");
-        choosed_month.getItems().clear();
-        choosed_month.getItems().addAll("", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
         choosed_year.getItems().clear();
         choosed_year.getItems().addAll("", "2024", "2023", "2022");
+        choosed_year.setOnAction(event -> updateMonthsBasedOnYear());
 
         report_text.setVisible(false);
         complain_chart.setVisible(false);
@@ -70,16 +66,37 @@ public class ReportsController {
         }
     }
 
+    private void updateMonthsBasedOnYear() {
+        String selectedYear = choosed_year.getValue();
+        Calendar today = Calendar.getInstance();
+        int currentYear = today.get(Calendar.YEAR);
+        int currentMonth = today.get(Calendar.MONTH) + 1;
+
+        choosed_month.getItems().clear();
+
+        if (selectedYear == null || selectedYear.isEmpty()) {
+            choosed_month.getItems().addAll("", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
+        } else {
+            int selectedYearInt = Integer.parseInt(selectedYear);
+            if (selectedYearInt < currentYear) {
+                choosed_month.getItems().addAll("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
+            } else if (selectedYearInt == currentYear) {
+                for (int i = 1; i <= currentMonth; i++) {
+                    choosed_month.getItems().add(String.valueOf(i));
+                }
+            }
+        }
+    }
+
     private void create_reports() throws IOException {
         System.out.println("got into create_reports");
-        deleteAllReports();
+        // deleteAllReports();
         Message message = new Message(BaseEventBox.get_event_id("REPORTS"), "#createReports");
         SimpleClient.getClient().sendToServer(message);
     }
 
     private void handleCreateReports(Message message) {
         System.out.println("got into handleCreateReports");
-        reports_list = (List<Reports>) message.getObject();
     }
 
     private void deleteAllReports() throws IOException {
@@ -148,7 +165,7 @@ public class ReportsController {
             complaintsSeries.setName("Number of Complaints");
 
             XYChart.Series<String, Number> purchasesSeries = new XYChart.Series<>();
-            purchasesSeries.setName("Number of purchases");
+            purchasesSeries.setName("purchases profit");
 
             XYChart.Series<String, Number> mutlientrySeries = new XYChart.Series<>();
             mutlientrySeries.setName("Number of mutli-entry tickets");
@@ -166,7 +183,7 @@ public class ReportsController {
 
                     reportContent.append("Day ").append(day).append(": ");
                     reportContent.append("Num of Complaints: ").append(numComplaints).append(", ");
-                    reportContent.append("Num of Purchases: ").append(numPurchases).append(",");
+                    reportContent.append("purchases profit: ").append(numPurchases).append(",");
                     reportContent.append("Num of Multi-Entry Tickets: ").append(numMultiEntry).append("\n");
 
                     complaintsSeries.getData().add(new XYChart.Data<>(String.valueOf(day), numComplaints));
@@ -188,7 +205,7 @@ public class ReportsController {
                 for (int day = 1; day <= daysInMonth; day++) {
                     reportContent.append("Day ").append(day).append(": ");
                     reportContent.append("Num of Complaints: 0, ");
-                    reportContent.append("Num of Purchases: 0\n");
+                    reportContent.append("purchases profit: 0\n");
                     reportContent.append("Num of Multi-Entry Tickets: 0\n");
 
                     complaintsSeries.getData().add(new XYChart.Data<>(String.valueOf(day), 0));
@@ -282,9 +299,12 @@ public class ReportsController {
                     break;
                 case "#reportsDeleted":
                     break;
+                case "updatedReports":
+                    break;
                 default:
                     break;
             }
+
         }
     }
 
