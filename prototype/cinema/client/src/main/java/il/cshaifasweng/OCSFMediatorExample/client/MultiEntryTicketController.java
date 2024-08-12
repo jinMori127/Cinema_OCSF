@@ -3,71 +3,24 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.event.ActionEvent;
-import java.time.LocalDate;
+
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
+
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import il.cshaifasweng.OCSFMediatorExample.entities.IdUser;
 import java.io.IOException;
-import static il.cshaifasweng.OCSFMediatorExample.client.MovieEditingDetailsController.go_to_screening_movie;
-import javafx.collections.ObservableList;
 
-import com.mysql.cj.protocol.x.XMessage;
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
-import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
-import il.cshaifasweng.OCSFMediatorExample.entities.Screening;
-import il.cshaifasweng.OCSFMediatorExample.entities.UserPurchases;
-import il.cshaifasweng.OCSFMediatorExample.entities.IdUser;
+
 import il.cshaifasweng.OCSFMediatorExample.entities.MultiEntryTicket;
 
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.InputMethodEvent;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.text.Text;
-import javafx.fxml.Initializable;
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.util.converter.DateStringConverter;
-import javafx.scene.input.MouseEvent;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.net.URL;
-import java.sql.Time;
-import java.util.*;
-import javafx.scene.control.TextArea;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.LocalDateTime;
-import static il.cshaifasweng.OCSFMediatorExample.client.MovieEditingDetailsController.go_to_screening_movie;
-import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.Current_Message;
-import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.getClient;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
 
 public class MultiEntryTicketController {
 
@@ -281,5 +234,21 @@ public class MultiEntryTicketController {
     @FXML
     public void initialize() {
         EventBus.getDefault().register(this);
+        if(UserLogInWithIDController.idUser != null) {
+            IdUser c_id_user = UserLogInWithIDController.idUser;
+
+            String full_name = c_id_user.getName();
+            String split_first_name = full_name;
+            String split_last_name = "";
+            if (c_id_user.getName().contains(" ")) {
+                 split_first_name = full_name.split(" ")[0];
+                 split_last_name = full_name.split(" ")[1];
+            }
+            id.setText(c_id_user.getUser_id());
+            first_name.setText(split_first_name);
+            last_name.setText(split_last_name);
+            email_col.setText(c_id_user.getEmail());
+            phone_number.setText(c_id_user.getPhone_number());
+        }
     }
 }
