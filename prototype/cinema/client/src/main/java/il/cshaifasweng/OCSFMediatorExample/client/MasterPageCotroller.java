@@ -141,8 +141,8 @@ public class MasterPageCotroller {
         MenuItem source = (MenuItem) event.getSource();
         String menuItemText = source.getText();
         if (menuItemText.equals("Home page")) {
-            //EventBus.getDefault().post(new BeginContentChangeEnent("HomePage"));
-            EventBus.getDefault().post(new BeginContentChangeEnent("TheaterMap"));
+            EventBus.getDefault().post(new BeginContentChangeEnent("HomePage"));
+            //EventBus.getDefault().post(new BeginContentChangeEnent("TheaterMap"));
         }
         else if(menuItemText.equals("id")){
             EventBus.getDefault().post(new BeginContentChangeEnent("UserLoginWithID"));

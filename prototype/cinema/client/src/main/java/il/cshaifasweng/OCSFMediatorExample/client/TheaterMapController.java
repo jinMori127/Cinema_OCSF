@@ -86,6 +86,14 @@ public class TheaterMapController {
             {Platform.runLater(()->{
                 screening = (Screening) event.getMessage().getObject();
                 create_the_page();
+                Platform.runLater(()->{
+                    buttons_vbox.layout();
+                    anchore_pane.layout();
+                    buy_button.setLayoutY(buttons_vbox.getLayoutY()+buttons_vbox.getHeight()+10);
+                    buy_button.setLayoutX(anchore_pane.getLayoutX()+anchore_pane.getWidth()/2);
+                    buy_button.layout();
+                    anchore_pane.layout();
+                });
             });
 
             }
@@ -221,14 +229,7 @@ public class TheaterMapController {
             buttons_vbox.getChildren().add(current_hobx);
         }
 
-        Platform.runLater(()->{
-            buttons_vbox.layout();
-            anchore_pane.layout();
-            buy_button.setLayoutY(buttons_vbox.getLayoutY()+buttons_vbox.getHeight()+10);
-            buy_button.setLayoutX(anchore_pane.getLayoutX()+anchore_pane.getWidth()/2);
-            buy_button.layout();
-            anchore_pane.layout();
-        });
+
 
 
     }

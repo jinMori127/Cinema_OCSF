@@ -309,7 +309,11 @@ public class EditScreeningController {
         {
             Platform.runLater(()->{
                 Screening changes_screening = (Screening) event.getMessage().getObject();
-                if(Integer.parseInt(Screening_ID.getText()) ==  changes_screening.getAuto_number_screening())
+                if(Screening_ID.getText().trim().isEmpty())
+                {
+                    return;
+                }
+                if(Integer.parseInt(Screening_ID.getText().trim()) ==  changes_screening.getAuto_number_screening())
                 {
                     theater_map.setText(changes_screening.getTheater_map());
                 }

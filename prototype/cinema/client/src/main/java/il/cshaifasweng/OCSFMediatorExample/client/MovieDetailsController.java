@@ -204,6 +204,14 @@ public class MovieDetailsController {
             public void changed(ObservableValue<? extends Screening> observable, Screening oldValue, Screening newValue) {
                 if (newValue != null) {
                     // add here the static variable change and the page switch
+                    TheaterMapController.screening_id = newValue.getAuto_number_screening();
+                    try {
+                        SimpleChatClient.setRoot("TheaterMap");
+                    } catch (IOException e) {
+                        ErrorMessage.setText(e.getMessage());
+                        ErrorMessage.setVisible(true);
+                        return;
+                    }
                 }
             }
         });
