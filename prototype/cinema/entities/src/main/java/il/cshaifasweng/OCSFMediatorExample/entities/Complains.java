@@ -2,6 +2,7 @@ package il.cshaifasweng.OCSFMediatorExample.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "complains")
@@ -15,7 +16,7 @@ public class Complains implements Serializable {
     private IdUser id_user;
 
     private String complain_text;
-    private String time_of_complain;
+    private Date time_of_complain;
     private String respond;
     private boolean  respond_status;
     private String cinema_branch;
@@ -23,7 +24,7 @@ public class Complains implements Serializable {
 
     public Complains() {}
     // Constructor
-    public Complains(IdUser id_user, String complain_text, String time_of_complain, String respond, String status, String cinema_branch) {
+    public Complains(IdUser id_user, String complain_text,Date time_of_complain, String respond, String status, String cinema_branch) {
         this.id_user = id_user;
         this.complain_text = complain_text;
         this.time_of_complain = time_of_complain;
@@ -51,10 +52,10 @@ public class Complains implements Serializable {
         this.complain_text = complain_text;
     }
 
-    public String getTime_of_complain() {
+    public Date getTime_of_complain() {
         return time_of_complain;
     }
-    public void setTime_of_complain(String time_of_complain) {
+    public void setTime_of_complain(Date time_of_complain) {
         this.time_of_complain = time_of_complain;
     }
 
@@ -78,4 +79,9 @@ public class Complains implements Serializable {
     public void setCinema_branch(String cinema_branch) {
         this.cinema_branch = cinema_branch;
     }
+
+    public String getClient_name() {
+        return id_user.getName();
+    }
+
 }

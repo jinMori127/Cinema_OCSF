@@ -31,6 +31,9 @@ import java.security.PrivateKey;
 import java.util.Date;
 import java.util.List;
 import java.time.LocalDateTime;
+import java.util.Iterator;
+
+import java.util.Collections;
 
 public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
@@ -53,9 +56,6 @@ public class SimpleServer extends AbstractServer {
 		configuration.addAnnotatedClass(Reports.class);
 		configuration.addAnnotatedClass(UserPurchases.class);
 		configuration.addAnnotatedClass(Worker.class);
-
-
-
 
 		ServiceRegistry serviceRegistry = new
 				StandardServiceRegistryBuilder()
@@ -115,7 +115,6 @@ public class SimpleServer extends AbstractServer {
 		session.save(movie);
 		session.getTransaction().commit();
 		session.close();
-
 	}
 	private void update_movie (Movie movie) throws Exception {
 		Session session = sessionFactory.openSession();
@@ -290,7 +289,7 @@ public class SimpleServer extends AbstractServer {
 
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private List<UserPurchases> delete_user_purchases(int auto_num) throws Exception {
+	private List<UserPurchases> delete_user_purchases(int auto_num,String id) throws Exception {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 
@@ -302,8 +301,7 @@ public class SimpleServer extends AbstractServer {
 		if (purchase == null) {
 			session.getTransaction().rollback();
 			session.close();
-			return  search_user_purchases("327876116");
-
+			return  search_user_purchases(id);
 		}
 
 
@@ -315,7 +313,7 @@ public class SimpleServer extends AbstractServer {
 		// Commit the transaction
 		session.getTransaction().commit();
 		session.close();
-		List<UserPurchases> data = search_user_purchases("327876116");
+		List<UserPurchases> data = search_user_purchases(id);
 
 
 
@@ -329,11 +327,15 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 		CriteriaBuilder builder = session.getCriteriaBuilder();
 		CriteriaQuery<UserPurchases> query = builder.createQuery(UserPurchases.class);
-		query.from(UserPurchases.class);
+		Root<UserPurchases> root= query.from(UserPurchases.class);
+		String queryString1 = "SELECT u FROM IdUser u WHERE u.user_id = :user_id";
+		Query<IdUser> query1 = session.createQuery(queryString1, IdUser.class);
+		query1.setParameter("user_id", id);
+		IdUser user = query1.uniqueResult();
+		query.select(root).where(builder.equal(root.get("id_user"), user));
 		List<UserPurchases> data = session.createQuery(query).getResultList();
 		session.getTransaction().commit();
 		session.close();
-//		data.removeIf(userPurchase -> !userPurchase.get_id_user().equals(id));
 
 		return data;
 	}
@@ -351,6 +353,7 @@ public class SimpleServer extends AbstractServer {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		CriteriaBuilder builder = session.getCriteriaBuilder();
+
 		CriteriaQuery<Movie> query = builder.createQuery(Movie.class);
 		Root<Movie> root =  query.from(Movie.class);
 		Predicate namePredicate = builder.like(root.get("movie_name"), "%"+movie.getMovie_name()+"%");
@@ -375,6 +378,19 @@ public class SimpleServer extends AbstractServer {
 		session.getTransaction().commit();
 		session.close();
 		return data;
+	}
+	
+	private void SignOut_IDUser(IdUser user)
+	{
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		user.setIsLoggedIn(false);
+		session.update(user);
+		session.getTransaction().commit();
+		session.close();
+	}
+	private void SignOut_Worker(Worker worker)
+	{
 
 	}
 
@@ -394,7 +410,51 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
+	private List<Complains> search_data(boolean do_show_not_responded) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Complains> query = builder.createQuery(Complains.class);
+		query.from(Complains.class);
+		List<Complains> data = session.createQuery(query).getResultList();
+		session.getTransaction().commit();
+		session.close();
+		if (do_show_not_responded) {
+			data.removeIf(complain -> complain.getStatus());
+		}
+		else {
+			data.removeIf(complain -> !complain.getStatus());
+		}
+		return data;
+	}
+
+	private List<Complains> update_respond(int auto_num, String respond_text, boolean phase) throws Exception {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		// Find the object with the specified auto_num
+		Complains complains = session.get(Complains.class, auto_num);
+
+		if (complains == null) {
+			session.getTransaction().rollback();
+			session.close();
+			return  search_data(phase);
+		}
+		// update the complain object
+		complains.setRespond(respond_text);
+		complains.setStatus(true);
+		session.update(complains);
+
+		// Commit the transaction
+		session.getTransaction().commit();
+		session.close();
+		List<Complains> data = search_data(phase);
+		return data;
+	}
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		Message message = (Message) msg;
@@ -533,8 +593,8 @@ public class SimpleServer extends AbstractServer {
 
 				message.setMessage("#show_purchases_client");
 				System.out.println(message.getMessage());
-
-				message.setObject(search_user_purchases(id));
+				List<UserPurchases> data = search_user_purchases(id);
+				message.setObject(data);
 
 				client.sendToClient(message);
 
@@ -543,8 +603,9 @@ public class SimpleServer extends AbstractServer {
 
 			else if (message.getMessage().equals("#delete_purchases")) {
 				int auto_num =  (int)message.getObject();
+				String id = (String)message.getObject2();
 				message.setMessage("#delete_purchases_client");
-				message.setObject(delete_user_purchases(auto_num));
+				message.setObject(delete_user_purchases(auto_num,id));
 				System.out.println(message.getMessage());
 				client.sendToClient(message);
 
@@ -559,6 +620,7 @@ public class SimpleServer extends AbstractServer {
 					String userName = (String) message.getObject();
 					String password = (String) message.getObject2();
 
+					// Use HQL to fetch the Worker object by user_name
 					// Use HQL to fetch the Worker object by user_name
 					Query query = session.createQuery("FROM Worker WHERE user_name = :userName");
 					query.setParameter("userName", userName);
@@ -598,6 +660,100 @@ public class SimpleServer extends AbstractServer {
 				client.sendToClient(message);
 			}
 
+			else if (message.getMessage().equals("#purchase_multi_ticket")) {
+
+				MultiEntryTicket t = (MultiEntryTicket) message.getObject();
+				IdUser idUser = t.getId_user(); // Adjust according to your getter method
+
+				Session session = null;
+				Transaction transaction = null;
+
+				try {
+					session = sessionFactory.openSession();
+					transaction = session.beginTransaction();
+
+					// Check if IdUser already exists in the database
+					CriteriaBuilder builder = session.getCriteriaBuilder();
+					CriteriaQuery<IdUser> idUserQuery = builder.createQuery(IdUser.class);
+					Root<IdUser> idUserRoot = idUserQuery.from(IdUser.class);
+					idUserQuery.select(idUserRoot).where(builder.equal(idUserRoot.get("user_id"), idUser.getUser_id()));
+					IdUser existingIdUser = session.createQuery(idUserQuery).uniqueResult();
+
+					if (existingIdUser != null) {
+						// If IdUser already exists, use the existing instance
+						idUser = existingIdUser;
+					} else {
+						// If IdUser does not exist, save it
+						session.save(idUser);
+					}
+
+					// Check if MultiEntryTicket already exists
+					CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
+					Root<MultiEntryTicket> root = query.from(MultiEntryTicket.class);
+					query.select(root).where(builder.equal(root.get("id_user"), idUser));
+					MultiEntryTicket t2 = session.createQuery(query).uniqueResult();
+
+					if (t2 != null) {
+						t2.setRemain_tickets(t2.getRemain_tickets() + t.getRemain_tickets());
+						session.update(t2);
+					} else {
+						t.setId_user(idUser); // Ensure the ticket references the existing IdUser
+						session.save(t);
+					}
+
+					transaction.commit();
+
+					message.setMessage("#purchase_multi_ticket_client");
+					client.sendToClient(message);
+
+				} catch (Exception e) {
+					if (transaction != null) {
+						transaction.rollback();
+					}
+					e.printStackTrace();
+					System.out.println("Error while saving MultiEntryTicket: " + e.getMessage());
+				} finally {
+					if (session != null) {
+						session.close();
+					}
+				}
+			}
+
+			else if (message.getMessage().equals("#show_complains")){
+				// set massage
+				message.setMessage("#show_complains_for_client");
+
+				// delete the responded complains
+				List<Complains> data = search_data(true);
+
+				message.setObject(data);
+				// send to client
+				client.sendToClient(message);
+			}
+			else if (message.getMessage().equals("#show_respond")){
+				// set massage
+				message.setMessage("#show_respond_complains_for_client");
+
+				// delete the responded complains
+				List<Complains> data = search_data(false);
+
+				message.setObject(data);
+				// send to client
+				client.sendToClient(message);
+			}
+			else if (message.getMessage().equals("#submit_respond")) {
+
+				String respondText = (String)((List<Object>)message.getObject()).get(0);
+				boolean phase = (boolean) ((List<Object>)message.getObject()).get(1);
+
+				int number = (int)message.getObject2();
+				List<Complains> data = update_respond(number, respondText, phase);
+
+				message.setMessage("#submit_respond_for_client");
+				// delete the responded complains
+				message.setObject(data);
+				client.sendToClient(message);
+			}
 			else if (message.getMessage().equals("#login")) {
 				Session session = sessionFactory.openSession();
 				Transaction transaction = session.beginTransaction();
@@ -634,6 +790,16 @@ public class SimpleServer extends AbstractServer {
 				} finally {
 					session.close();
 				}
+			}
+			else if (message.getMessage().equals("#SignOut_UserID")) {
+				Object user = message.getObject();
+				if (user instanceof IdUser) {
+					SignOut_IDUser((IdUser) user);
+				}
+				else if (user instanceof Worker) {
+					SignOut_Worker((Worker)user);
+				}
+
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
