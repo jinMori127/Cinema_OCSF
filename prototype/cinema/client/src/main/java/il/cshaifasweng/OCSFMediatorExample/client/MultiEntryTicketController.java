@@ -208,7 +208,7 @@ public class MultiEntryTicketController {
 
         String card_number = card_number_col.getText();
 
-        if (!card_number.matches("\\d{12}")) {
+        if (!card_number.matches("\\d{16}")) {
             error_message.setVisible(true);
             error_message.setText("Card number must contain exactly 12 digits");
             card_number_col.setText("");
