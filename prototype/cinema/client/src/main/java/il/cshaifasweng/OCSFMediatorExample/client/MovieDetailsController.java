@@ -115,6 +115,13 @@ public class MovieDetailsController {
     private void Lay_out_Movie_details()
     {
         if (current_movie != null) {
+            Director.setText("Directed by: ");
+            leading_actor.setText("Leading actor: ");
+            rating.setText("Rating: ");
+            catgory.setText("Category: ");
+            time.setText("Time: ");
+            price.setText("Price: ");
+            year.setText("Year: ");
             movie_title.setText(current_movie.getMovie_name());
             movie_details.setText(current_movie.getDescription_());
             //System.out.println(Director.getLayoutBounds().getWidth());
@@ -243,7 +250,7 @@ public class MovieDetailsController {
                 for (Movie m : movies) {
                     if(m.getAuto_number_movie() == current_movie.getAuto_number_movie()) {
                         current_movie = m;
-                        changeTable();
+                        Lay_out_Movie_details();
                         found = true;
                     }
                 }
