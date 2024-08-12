@@ -451,7 +451,14 @@ public class SimpleServer extends AbstractServer {
 		List<Complains> data = search_data(phase);
 		return data;
 	}
-
+	private void update_theater_map(Screening screening)
+	{
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		session.update(screening);
+		session.getTransaction().commit();
+		session.close();
+	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -753,6 +760,12 @@ public class SimpleServer extends AbstractServer {
 				// delete the responded complains
 				message.setObject(data);
 				client.sendToClient(message);
+			}
+			else if(message.getMessage().equals("#Update_theater_map")){
+				message.setMessage("#theater_map_updated");
+				update_theater_map((Screening) message.getObject());
+				sendToAllClients(message);
+
 			}
 			else if (message.getMessage().equals("#login")) {
 				Session session = sessionFactory.openSession();

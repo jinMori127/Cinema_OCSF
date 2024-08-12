@@ -269,7 +269,14 @@ public class EditScreeningController {
         int columnc = Integer.parseInt(column_number.getText());
         for(int i=0 ; i<rowc;i++) {
             for (int j = 0; j < columnc-1; j++) {
-                theater+="0, ";
+
+                if(i==2&j==3)
+                {
+                    //theater+="-1, ";
+                }
+                else {
+                    theater+="0, ";
+                }
             }
 
             theater+="0\n";
@@ -296,6 +303,16 @@ public class EditScreeningController {
         if(event.getId()==7) {
             Platform.runLater(() -> {
                 get_data(event.getMessage());
+            });
+        }
+        else if(event.getId() == BaseEventBox.get_event_id("THEATER_MAP_UPDATED"))
+        {
+            Platform.runLater(()->{
+                Screening changes_screening = (Screening) event.getMessage().getObject();
+                if(Integer.parseInt(Screening_ID.getText()) ==  changes_screening.getAuto_number_screening())
+                {
+                    theater_map.setText(changes_screening.getTheater_map());
+                }
             });
         }
     }
