@@ -394,6 +394,19 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
+	private List<Screening> getScreeningForMovie(Movie movie){
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Screening> query = builder.createQuery(Screening.class);
+		Root<Screening> root =  query.from(Screening.class);
+		Predicate namePredicate = builder.equal(root.get("movie"),movie);
+		query.select(root).where(namePredicate);
+		List<Screening> data = session.createQuery(query).getResultList();
+		session.getTransaction().commit();
+		session.close();
+		return data;
+	}
 
 
 	private List<Complains> search_data(boolean do_show_not_responded) {
@@ -438,7 +451,6 @@ public class SimpleServer extends AbstractServer {
 		return data;
 	}
 
-	///////////////////////////////////////////SALAM PART///////////////////////////////////////////////////////////////////////
 	private IdUser getOrSaveIdUser(Session session, IdUser idUser) {
 		CriteriaBuilder builder = session.getCriteriaBuilder();
 		CriteriaQuery<IdUser> idUserQuery = builder.createQuery(IdUser.class);
@@ -523,17 +535,16 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
+	private void update_theater_map(Screening screening)
+	{
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		session.update(screening);
+		session.getTransaction().commit();
+		session.close();
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-
-
-
-
-
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 	@Override
@@ -570,7 +581,18 @@ public class SimpleServer extends AbstractServer {
 				message.setMessage("#ScreeningsGot");
 				client.sendToClient(message);
 
-			} else if (message.getMessage().equals("#InsertMovie")) {
+			}
+
+			else if (message.getMessage().equals("#GetScreening")) {
+				Movie movie = (Movie) message.getObject();
+
+
+				message.setObject(getScreeningForMovie(movie));
+				message.setMessage("#GetScreeningDone");
+				client.sendToClient(message);
+			}
+
+			else if (message.getMessage().equals("#InsertMovie")) {
 				Movie movie = (Movie) message.getObject();
 				insert_movie(movie);
 				message.setObject(getAllMovies());
@@ -787,6 +809,12 @@ public class SimpleServer extends AbstractServer {
 				// delete the responded complains
 				message.setObject(data);
 				client.sendToClient(message);
+			}
+			else if(message.getMessage().equals("#Update_theater_map")){
+				message.setMessage("#theater_map_updated");
+				update_theater_map((Screening) message.getObject());
+				sendToAllClients(message);
+
 			}
 			else if (message.getMessage().equals("#login")) {
 				Session session = sessionFactory.openSession();
