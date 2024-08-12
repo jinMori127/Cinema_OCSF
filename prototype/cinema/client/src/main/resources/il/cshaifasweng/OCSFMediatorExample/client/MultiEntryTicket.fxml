@@ -5,17 +5,19 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MultiEntryTicketController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="667.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MultiEntryTicketController">
    <children>
-      <TextField fx:id="id" layoutX="207.0" layoutY="31.0" promptText="Id" />
-      <TextField fx:id="first_name" layoutX="207.0" layoutY="80.0" promptText="First name" />
-      <TextField fx:id="last_name" layoutX="207.0" layoutY="129.0" promptText="Last name" />
-      <TextField fx:id="phone_number" layoutX="207.0" layoutY="229.0" promptText="phone" />
-      <TextField fx:id="email_col" layoutX="207.0" layoutY="175.0" promptText="email" />
-      <Button fx:id="purchase" layoutX="256.0" layoutY="335.0" mnemonicParsing="false" onAction="#purchase_button" text="purchase" />
+      <TextField fx:id="id" layoutX="208.0" layoutY="76.0" promptText="Id" />
+      <TextField fx:id="first_name" layoutX="207.0" layoutY="125.0" promptText="First name" />
+      <TextField fx:id="last_name" layoutX="207.0" layoutY="170.0" promptText="Last name" />
+      <TextField fx:id="phone_number" layoutX="207.0" layoutY="271.0" promptText="phone" />
+      <TextField fx:id="email_col" layoutX="208.0" layoutY="216.0" promptText="email" />
+      <Button fx:id="purchase" layoutX="250.0" layoutY="380.0" mnemonicParsing="false" onAction="#purchase_button" text="purchase" />
       <Text fx:id="error_message" fill="RED" layoutX="483.0" layoutY="167.0" strokeType="OUTSIDE" strokeWidth="0.0" />
-      <TextField fx:id="card_number_col" layoutX="207.0" layoutY="283.0" promptText="Card number" />
+      <TextField fx:id="card_number_col" layoutX="208.0" layoutY="323.0" promptText="Card number" />
       <TextField fx:id="cvv_col" layoutX="32.0" layoutY="283.0" prefHeight="25.0" prefWidth="77.0" promptText="cvv" />
       <TextField fx:id="date_col" layoutX="457.0" layoutY="283.0" prefHeight="25.0" prefWidth="101.0" promptText="validity" />
+      <Text fx:id="success_message" fill="#2f00ff" layoutX="19.0" layoutY="130.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="101.0" />
+      <Text fx:id="price_message" fill="#0400ff" layoutX="90.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="449.0" />
    </children>
 </AnchorPane>

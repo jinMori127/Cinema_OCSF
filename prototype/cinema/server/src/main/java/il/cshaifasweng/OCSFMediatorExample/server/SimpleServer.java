@@ -1,11 +1,15 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
-
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import il.cshaifasweng.OCSFMediatorExample.server.EmailSender;
+
 import javax.persistence.criteria.Join;
+import java.time.LocalDate;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -34,6 +38,8 @@ import java.time.LocalDateTime;
 import java.util.Iterator;
 
 import java.util.Collections;
+import il.cshaifasweng.OCSFMediatorExample.entities.MultiEntryTicket;
+
 
 public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
@@ -304,20 +310,13 @@ public class SimpleServer extends AbstractServer {
 			return  search_user_purchases(id);
 		}
 
-
 		// Delete the UserPurchases object
 		session.delete(purchase);
-
-
 
 		// Commit the transaction
 		session.getTransaction().commit();
 		session.close();
 		List<UserPurchases> data = search_user_purchases(id);
-
-
-
-
 		return data;
 	}
 
@@ -421,6 +420,19 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
+	private List<Screening> getScreeningForMovie(Movie movie){
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Screening> query = builder.createQuery(Screening.class);
+		Root<Screening> root =  query.from(Screening.class);
+		Predicate namePredicate = builder.equal(root.get("movie"),movie);
+		query.select(root).where(namePredicate);
+		List<Screening> data = session.createQuery(query).getResultList();
+		session.getTransaction().commit();
+		session.close();
+		return data;
+	}
 
 
 	private List<Complains> search_data(boolean do_show_not_responded) {
@@ -465,7 +477,100 @@ public class SimpleServer extends AbstractServer {
 		return data;
 	}
 
+	private IdUser getOrSaveIdUser(Session session, IdUser idUser) {
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<IdUser> idUserQuery = builder.createQuery(IdUser.class);
+		Root<IdUser> idUserRoot = idUserQuery.from(IdUser.class);
+		idUserQuery.select(idUserRoot).where(builder.equal(idUserRoot.get("user_id"), idUser.getUser_id()));
+		IdUser existingIdUser = session.createQuery(idUserQuery).uniqueResult();
+
+		if (existingIdUser != null) {
+			return existingIdUser;
+		} else {
+			session.save(idUser);
+			return idUser;
+		}
+	}
+	private void updateOrSaveMultiEntryTicket(Session session, MultiEntryTicket t, IdUser idUser) {
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
+		Root<MultiEntryTicket> root = query.from(MultiEntryTicket.class);
+		query.select(root).where(builder.equal(root.get("id_user"), idUser));
+		MultiEntryTicket existingTicket = session.createQuery(query).uniqueResult();
+
+		if (existingTicket != null) {
+			existingTicket.setRemain_tickets(existingTicket.getRemain_tickets() + t.getRemain_tickets());
+			session.update(existingTicket);
+		} else {
+			t.setId_user(idUser);
+			session.save(t);
+		}
+	}
+	private void sendThankYouEmail(MultiEntryTicket t) {
+		EmailSender emailSender = new EmailSender();
+		String[] recipients = {t.getId_user().getEmail()};
+		String subject = "Thank You for Your Purchase at Luna Aura";
+
+		String name = t.getId_user().getName();
+		String id = t.getId_user().getUser_id();
+		LocalDate date = LocalDate.now();
+		int paymentAmount = MultiEntryTicket.INITIAL_PRICE;
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+		String formattedDate = date.format(formatter);
+
+		String body = "<html>"
+				+ "<body style='font-family: Arial, sans-serif; color: #333;'>"
+				+ "<div style='max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd;'>"
+				+ "<div style='text-align: center;'>"
+				+ "<img src='YOUR_LOGO_URL' alt='Luna Aura' style='width: 100px; margin-bottom: 20px;'/>"
+				+ "<h1 style='font-size: 24px; color: #555;'>Thank You.</h1>"
+				+ "</div>"
+				+ "<p>Hi " + name + "!</p>"
+				+ "<p>Thanks for your purchase from Luna Aura.</p>"
+				+ "<h2 style='color: #555;'>INVOICE ID: " + id + "</h2>"
+				+ "<p><em>(Please keep a copy of this receipt for your records.)</em></p>"
+				+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
+				+ "<h3 style='color: #555;'>YOUR ORDER INFORMATION:</h3>"
+				+ "<p><strong>Order ID:</strong> " + id + "<br/>"
+				+ "<strong>Order Date:</strong> " + formattedDate + "<br/>"
+				+ "<strong>Source:</strong> Luna Aura</p>"
+				+ "<h3 style='color: #555;'>HERE'S WHAT YOU ORDERED:</h3>"
+				+ "<table style='width: 100%; border-collapse: collapse;'>"
+				+ "<thead>"
+				+ "<tr>"
+				+ "<th style='border-bottom: 1px solid #ddd; padding: 10px; text-align: left;'>Description</th>"
+				+ "<th style='border-bottom: 1px solid #ddd; padding: 10px; text-align: left;'>Price</th>"
+				+ "</tr>"
+				+ "</thead>"
+				+ "<tbody>"
+				+ "<tr>"
+				+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Punch Card for Classes</td>"
+				+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>₪" + paymentAmount + "</td>"
+				+ "</tr>"
+				+ "</tbody>"
+				+ "</table>"
+				+ "<h3 style='color: #555;'>TOTAL [₪]: ₪" + paymentAmount + "</h3>"
+				+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
+				+ "<p>We appreciate your business and hope to see you again soon!</p>"
+				+ "<p>Best regards,<br/>Luna Aura Team</p>"
+				+ "</div>"
+				+ "</body>"
+				+ "</html>";
+
+		emailSender.sendEmail(recipients, subject, body);
+	}
+
+
+	private void update_theater_map(Screening screening)
+	{
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		session.update(screening);
+		session.getTransaction().commit();
+		session.close();
+	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 	@Override
@@ -502,7 +607,18 @@ public class SimpleServer extends AbstractServer {
 				message.setMessage("#ScreeningsGot");
 				client.sendToClient(message);
 
-			} else if (message.getMessage().equals("#InsertMovie")) {
+			}
+
+			else if (message.getMessage().equals("#GetScreening")) {
+				Movie movie = (Movie) message.getObject();
+
+
+				message.setObject(getScreeningForMovie(movie));
+				message.setMessage("#GetScreeningDone");
+				client.sendToClient(message);
+			}
+
+			else if (message.getMessage().equals("#InsertMovie")) {
 				Movie movie = (Movie) message.getObject();
 				insert_movie(movie);
 				message.setObject(getAllMovies());
@@ -663,65 +779,29 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(movies);
 				client.sendToClient(message);
 			}
-
 			else if (message.getMessage().equals("#purchase_multi_ticket")) {
+				try (Session session = sessionFactory.openSession()) {
+					Transaction transaction = session.beginTransaction();
 
-				MultiEntryTicket t = (MultiEntryTicket) message.getObject();
-				IdUser idUser = t.getId_user(); // Adjust according to your getter method
+					MultiEntryTicket t = (MultiEntryTicket) message.getObject();
+					IdUser idUser = getOrSaveIdUser(session, t.getId_user());
 
-				Session session = null;
-				Transaction transaction = null;
-
-				try {
-					session = sessionFactory.openSession();
-					transaction = session.beginTransaction();
-
-					// Check if IdUser already exists in the database
-					CriteriaBuilder builder = session.getCriteriaBuilder();
-					CriteriaQuery<IdUser> idUserQuery = builder.createQuery(IdUser.class);
-					Root<IdUser> idUserRoot = idUserQuery.from(IdUser.class);
-					idUserQuery.select(idUserRoot).where(builder.equal(idUserRoot.get("user_id"), idUser.getUser_id()));
-					IdUser existingIdUser = session.createQuery(idUserQuery).uniqueResult();
-
-					if (existingIdUser != null) {
-						// If IdUser already exists, use the existing instance
-						idUser = existingIdUser;
-					} else {
-						// If IdUser does not exist, save it
-						session.save(idUser);
-					}
-
-					// Check if MultiEntryTicket already exists
-					CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
-					Root<MultiEntryTicket> root = query.from(MultiEntryTicket.class);
-					query.select(root).where(builder.equal(root.get("id_user"), idUser));
-					MultiEntryTicket t2 = session.createQuery(query).uniqueResult();
-
-					if (t2 != null) {
-						t2.setRemain_tickets(t2.getRemain_tickets() + t.getRemain_tickets());
-						session.update(t2);
-					} else {
-						t.setId_user(idUser); // Ensure the ticket references the existing IdUser
-						session.save(t);
-					}
+					updateOrSaveMultiEntryTicket(session, t, idUser);
 
 					transaction.commit();
 
+					sendThankYouEmail(t);
+
 					message.setMessage("#purchase_multi_ticket_client");
+					message.setObject(MultiEntryTicket.INITIAL_PRICE);
 					client.sendToClient(message);
 
 				} catch (Exception e) {
-					if (transaction != null) {
-						transaction.rollback();
-					}
 					e.printStackTrace();
 					System.out.println("Error while saving MultiEntryTicket: " + e.getMessage());
-				} finally {
-					if (session != null) {
-						session.close();
-					}
 				}
 			}
+
 
 			else if (message.getMessage().equals("#show_complains")){
 				// set massage
@@ -757,6 +837,12 @@ public class SimpleServer extends AbstractServer {
 				// delete the responded complains
 				message.setObject(data);
 				client.sendToClient(message);
+			}
+			else if(message.getMessage().equals("#Update_theater_map")){
+				message.setMessage("#theater_map_updated");
+				update_theater_map((Screening) message.getObject());
+				sendToAllClients(message);
+
 			}
 			else if (message.getMessage().equals("#login")) {
 				Session session = sessionFactory.openSession();

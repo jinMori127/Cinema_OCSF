@@ -9,9 +9,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane fx:id="border_pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MasterPageCotroller">
+<BorderPane fx:id="border_pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MasterPageCotroller">
     <center>
-        <VBox alignment="CENTER" fillWidth="true" spacing="0" VBox.vgrow="ALWAYS">
+        <VBox alignment="CENTER" fillWidth="true" spacing="0" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS">
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="CoolNoa System" textAlignment="CENTER">
                 <font>
                     <Font name="Agency FB Bold" size="45.0" />
