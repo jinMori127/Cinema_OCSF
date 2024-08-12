@@ -17,6 +17,11 @@
 	<!-- FIXME change it to the project's website -->
 	<url>http://www.example.com</url>
 	<dependencies>
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+			<version>1.6.2</version>
+		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
