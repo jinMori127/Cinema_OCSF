@@ -143,9 +143,11 @@ public class ReportsController {
         }
     }
 
+    private Object current_report = null;
     private void handleSearchedReports(Message message) {
         Platform.runLater(() -> {
             Object responseObject = message.getObject();
+            current_report = responseObject;
             StringBuilder reportContent = new StringBuilder();
 
             String selectedBranch = choosed_branch.getValue();
@@ -300,7 +302,15 @@ public class ReportsController {
                 case "#reportsDeleted":
                     break;
                 case "updatedReports":
-                    break;
+                    List<Reports> changed_reports = (List<Reports>) message.getObject();
+                    if (current_report !=null && current_report instanceof Reports) {
+                        for (Reports report : changed_reports) {
+                            if (report.getAuto_number_report() ==((Reports) current_report).getAuto_number_report()) {
+                                message.setObject(report);
+                                handleSearchedReports(message);
+                            }
+                        }
+                    }
                 default:
                     break;
             }

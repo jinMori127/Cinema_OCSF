@@ -324,7 +324,7 @@ public class SimpleServer extends AbstractServer {
 		reports_message.setObject(purchase);
 		reports_message.setObject2(message.getObject3());
 		reports_message.setMessage("cancelPurchase");
-		update_reports(session);
+		update_reports();
 
 		// Delete the UserPurchases object
 		session.delete(purchase);
@@ -763,12 +763,13 @@ public class SimpleServer extends AbstractServer {
 		multiEntryTicketSales.get(year).get(month).put(day, currentTickets + remainTickets);
 	}
 
-	private void update_reports(Session session) {
+	private void update_reports() {
+		Session session = sessionFactory.openSession();
 		Calendar today = Calendar.getInstance();
 		int currentYear = today.get(Calendar.YEAR);
 		int currentMonth = today.get(Calendar.MONTH) + 1; // Months are 0-based in Calendar
 		int currentDay = today.get(Calendar.DAY_OF_MONTH);
-
+		List<Reports> changed_reports = new ArrayList<Reports>();
 		try {
 
 			if (reports_message.getMessage().equals("purchaseMultiTicket")) {
@@ -796,7 +797,10 @@ public class SimpleServer extends AbstractServer {
 				List<Integer> multiEntryData4 = report4.getReport_multy_entry_ticket();
 				multiEntryData4.set(currentDay - 1, multiEntryData4.get(currentDay - 1) + remain_tickets);
 				report4.setReport_multy_entry_ticket(multiEntryData4);
-
+				changed_reports.add(report1);
+				changed_reports.add(report2);
+				changed_reports.add(report3);
+				changed_reports.add(report4);
 				session.update(report1);
 				session.update(report2);
 				session.update(report3);
@@ -817,10 +821,12 @@ public class SimpleServer extends AbstractServer {
 				report.setReport_ticket_sells(purchaseData);
 
 				session.update(report);
+				changed_reports.add(report);
 
 			}
 
 			reports_message.setMessage("updatedReports");
+			reports_message.setObject(changed_reports);
 
 			// Save the updated report back to the database
 			session.getTransaction().commit();
@@ -993,7 +999,7 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(delete_user_purchases(auto_num,id, message));
 				System.out.println(message.getMessage());
 				client.sendToClient(message);
-				client.sendToClient(reports_message);
+				sendToAllClients(reports_message);
 
 			}
 
@@ -1090,12 +1096,12 @@ public class SimpleServer extends AbstractServer {
 
 					reports_message.setObject(t);
 					reports_message.setMessage("purchaseMultiTicket");
-					update_reports(session);
+					update_reports();
 					transaction.commit();
 
 					message.setMessage("#purchase_multi_ticket_client");
 					client.sendToClient(message);
-					client.sendToClient(reports_message);
+					sendToAllClients(reports_message);
 
 
 				} catch (Exception e) {
