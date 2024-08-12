@@ -49,9 +49,6 @@ public class UserPurchasesController {
     private TableColumn<UserPurchases, String> link_column;
 
     @FXML
-    private TableColumn<Screening, String> branch_column;
-
-    @FXML
     private TableColumn<UserPurchases, Date> date_column;
 
 
@@ -134,7 +131,10 @@ public class UserPurchasesController {
         // Add double-click listener to table rows
         table_view.setOnMouseClicked((MouseEvent event) -> {
             if (event.getClickCount() == 2) {
-                cancel_purchase.setDisable(false);
+                int selectedRow = table_view.getSelectionModel().getSelectedIndex();
+                if (selectedRow != -1 && table_view.getItems().get(selectedRow) != null) {
+                    cancel_purchase.setDisable(false);
+                }
                 show_purchase_information();
             }
         });
@@ -170,7 +170,7 @@ public class UserPurchasesController {
 
                 // Set warning message and make it visible
                 ErrorMessage.setVisible(true);
-                if(link_text.isEmpty()) {
+                if(link_text == null || link_text.isEmpty()) {
                     ErrorMessage.setText("Note:\nif still more than 3 hours you will get 100%\nif still between 1-3 hours you will get 50%\n" +
                             "in Other cases you will get 0 %");
                 }
@@ -239,7 +239,7 @@ public class UserPurchasesController {
                 double price =(double)cellData;
 
 
-                if (curr_date_3.before(date_screening) && link_text.isEmpty()) {
+                if (curr_date_3.before(date_screening) && (link_text == null||link_text.isEmpty())) {
                     ErrorMessage.setVisible(true);
                     ErrorMessage.setText("Value returned 100%,Your Total Will be:"+price);
                     percent_return = 100;

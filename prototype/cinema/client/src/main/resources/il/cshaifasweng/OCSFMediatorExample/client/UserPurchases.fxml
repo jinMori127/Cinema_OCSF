@@ -22,7 +22,7 @@
             <TableColumn fx:id="payment_type_column" prefWidth="91.0" text="payment type" />
             </columns>
         </TableView>
-        <Button fx:id="calncel_purchase" onAction="#CancelPurchase" text="Cancel Purchase" textFill="#b71f1f" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="150.0">
+        <Button fx:id="cancel_purchase" onAction="#CancelPurchase" text="Cancel Purchase" textFill="#b71f1f" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="150.0">
             <font>
                 <Font name="System Bold" size="12.0" />
             </font>
