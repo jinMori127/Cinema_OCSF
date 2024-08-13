@@ -5,8 +5,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Text?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.PurchaseMovieLinkController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="468.0" prefWidth="678.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.PurchaseMovieLinkController">
    <children>
       <TextField fx:id="user_id" layoutX="226.0" layoutY="14.0" promptText="id" />
       <TextField fx:id="user_first_name" layoutX="226.0" layoutY="57.0" promptText="First Name" />
@@ -14,10 +13,12 @@
       <TextField fx:id="user_email" layoutX="226.0" layoutY="154.0" promptText="Email" />
       <TextField fx:id="user_phone_number" layoutX="226.0" layoutY="206.0" promptText="Phone Number" />
       <TextField fx:id="user_card_number" layoutX="226.0" layoutY="259.0" promptText="Credit Card Number" />
-      <TextField fx:id="user_cvv_col" layoutX="68.0" layoutY="259.0" prefHeight="25.0" prefWidth="65.0" promptText="cvv" />
+      <TextField fx:id="user_cvv" layoutX="68.0" layoutY="259.0" prefHeight="25.0" prefWidth="65.0" promptText="cvv" />
       <TextField fx:id="card_date" layoutX="421.0" layoutY="259.0" promptText="Validity" />
-      <Button fx:id="purchase" layoutX="257.0" layoutY="330.0" mnemonicParsing="false" text="Purchase" textFill="#3bf508" />
-      <Text fx:id="error_message" fill="RED" layoutX="79.0" layoutY="130.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="43.0" />
+      <Button fx:id="purchase" layoutX="257.0" layoutY="330.0" mnemonicParsing="false" onAction="#purchase_button" text="Purchase" textFill="#3bf508" />
+      <Text fx:id="error_message" fill="RED" layoutX="11.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="196.0" />
       <Text fx:id="success_message" fill="#00ff09" layoutX="514.0" layoutY="138.0" strokeType="OUTSIDE" strokeWidth="0.0" />
+      <TextField fx:id="wanted_date" layoutX="34.0" layoutY="129.0" promptText="Date" />
+      <TextField fx:id="wanted_Time" layoutX="34.0" layoutY="175.0" promptText="Time" />
    </children>
 </AnchorPane>

@@ -5,8 +5,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import org.quartz.SchedulerException;
+import java.time.LocalDateTime;
 import java.util.*;
 import il.cshaifasweng.OCSFMediatorExample.server.EmailSender;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.persistence.criteria.Join;
 import java.time.LocalDate;
@@ -39,6 +43,7 @@ import java.util.Iterator;
 
 import java.util.Collections;
 import il.cshaifasweng.OCSFMediatorExample.entities.MultiEntryTicket;
+import org.quartz.SchedulerException;
 
 
 public class SimpleServer extends AbstractServer {
@@ -480,6 +485,24 @@ public class SimpleServer extends AbstractServer {
 			session.save(t);
 		}
 	}
+
+
+	private void SaveUserPurchase(Session session, UserPurchases p1, IdUser idUser) {
+		//CriteriaBuilder builder = session.getCriteriaBuilder();
+		//CriteriaQuery<UserPurchases> query = builder.createQuery(UserPurchases.class);
+		//Root<UserPurchases> root = query.from(UserPurchases.class);
+		//query.select(root).where(builder.equal(root.get("id_user"), idUser));
+		//UserPurchases existingTicket = session.createQuery(query).uniqueResult();
+
+		//if (existingTicket != null) {
+		//	existingTicket.setRemain_tickets(existingTicket.getRemain_tickets() + t.getRemain_tickets());
+		//	session.update(existingTicket);
+		//}
+		//if {
+		//	p1.setId_user(idUser);
+		//	session.save(t);
+		//}
+	}
 	private void sendThankYouEmail(MultiEntryTicket t) {
 		EmailSender emailSender = new EmailSender();
 		String[] recipients = {t.getId_user().getEmail()};
@@ -533,6 +556,135 @@ public class SimpleServer extends AbstractServer {
 
 		emailSender.sendEmail(recipients, subject, body);
 	}
+
+	private void sendThankYouEmailLink(UserPurchases p1) {
+		try {
+			// Ensure p1 and its associated IdUser are properly managed
+			if (p1 == null || p1.getId_user() == null) {
+				throw new IllegalArgumentException("UserPurchases or associated IdUser is null.");
+			}
+
+			EmailSender emailSender = new EmailSender();
+			String[] recipients = {p1.getId_user().getEmail()};
+			String subject = "Thank You for Your Purchase at Luna Aura";
+
+			String name = p1.getId_user().getName();
+			String id = p1.getId_user().getUser_id();
+			LocalDate date = LocalDate.now();
+			double paymentAmount = p1.getPayment_amount();
+
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+			String formattedDate = date.format(formatter);
+
+			// Retrieve link and wantedDate
+			String link = p1.getLink();
+			Date wantedDate = p1.getDate_of_link_activation();
+
+			// Format wantedDate
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy, HH:mm");
+			String formattedWantedDate = (wantedDate != null) ? dateFormat.format(wantedDate) : "N/A";
+
+			// Email body
+			String body = "<html>"
+					+ "<body style='font-family: Arial, sans-serif; color: #333;'>"
+					+ "<div style='max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd;'>"
+					+ "<div style='text-align: center;'>"
+					+ "<img src='YOUR_LOGO_URL' alt='Luna Aura' style='width: 100px; margin-bottom: 20px;'/>"
+					+ "<h1 style='font-size: 24px; color: #555;'>Thank You.</h1>"
+					+ "</div>"
+					+ "<p>Hi " + name + "!</p>"
+					+ "<p>Thanks for your purchase from Luna Aura.</p>"
+					+ "<h2 style='color: #555;'>INVOICE ID: " + id + "</h2>"
+					+ "<p><em>(Please keep a copy of this receipt for your records.)</em></p>"
+					+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
+					+ "<h3 style='color: #555;'>YOUR ORDER INFORMATION:</h3>"
+					+ "<p><strong>Order ID:</strong> " + id + "<br/>"
+					+ "<strong>Order Date:</strong> " + formattedDate + "<br/>"
+					+ "<strong>Source:</strong> Luna Aura<br/>"
+					+ "<strong>Link:</strong> <a href='" + link + "'>" + link + "</a><br/>"
+					+ "<strong>Wanted Date:</strong> " + formattedWantedDate + "</p>"
+					+ "<h3 style='color: #555;'>HERE'S WHAT YOU ORDERED:</h3>"
+					+ "<table style='width: 100%; border-collapse: collapse;'>"
+					+ "<thead>"
+					+ "<tr>"
+					+ "<th style='border-bottom: 1px solid #ddd; padding: 10px; text-align: left;'>Description</th>"
+					+ "<th style='border-bottom: 1px solid #ddd; padding: 10px; text-align: left;'>Price</th>"
+					+ "</tr>"
+					+ "</thead>"
+					+ "<tbody>"
+					+ "<tr>"
+					+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Link Movie</td>"
+					+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>₪" + paymentAmount + "</td>"
+					+ "</tr>"
+					+ "</tbody>"
+					+ "</table>"
+					+ "<h3 style='color: #555;'>TOTAL [₪]: ₪" + paymentAmount + "</h3>"
+					+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
+					+ "<p>We appreciate your business and hope to see you again soon!</p>"
+					+ "<p>Best regards,<br/>Luna Aura Team</p>"
+					+ "</div>"
+					+ "</body>"
+					+ "</html>";
+
+			emailSender.sendEmail(recipients, subject, body);
+
+		} catch (Exception e) {
+			// Log the error
+			System.err.println("Error sending thank you email: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	private String createEmailBody(UserPurchases p1) {
+		// Similar to the body creation you had earlier
+		// Return the email body string
+		// Note: Ensure this method is adapted to fit your requirements
+		String body = "<html>"
+				+ "<body style='font-family: Arial, sans-serif; color: #333;'>"
+				+ "<div style='max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd;'>"
+				+ "<div style='text-align: center;'>"
+				+ "<img src='YOUR_LOGO_URL' alt='Luna Aura' style='width: 100px; margin-bottom: 20px;'/>"
+				+ "<h1 style='font-size: 24px; color: #555;'>Thank You.</h1>"
+				+ "</div>"
+				+ "<p>Hi " + p1.getId_user().getName() + "!</p>"
+				+ "<p>Thanks for your purchase from Luna Aura.</p>"
+				+ "<h2 style='color: #555;'>INVOICE ID: " + p1.getId_user().getUser_id() + "</h2>"
+				+ "<p><em>(Please keep a copy of this receipt for your records.)</em></p>"
+				+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
+				+ "<h3 style='color: #555;'>YOUR ORDER INFORMATION:</h3>"
+				+ "<p><strong>Order ID:</strong> " + p1.getId_user().getUser_id() + "<br/>"
+				+ "<strong>Order Date:</strong> " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd MMMM yyyy")) + "<br/>"
+				+ "<strong>Source:</strong> Luna Aura<br/>"
+				+ "<strong>Link:</strong> <a href='" + p1.getLink() + "'>" + p1.getLink() + "</a><br/>"
+				+ "<strong>Wanted Date:</strong> " + (p1.getDate_of_link_activation() != null
+				? new SimpleDateFormat("dd MMMM yyyy, HH:mm").format(p1.getDate_of_link_activation())
+				: "N/A") + "</p>"
+				+ "<h3 style='color: #555;'>HERE'S WHAT YOU ORDERED:</h3>"
+				+ "<table style='width: 100%; border-collapse: collapse;'>"
+				+ "<thead>"
+				+ "<tr>"
+				+ "<th style='border-bottom: 1px solid #ddd; padding: 10px; text-align: left;'>Description</th>"
+				+ "<th style='border-bottom: 1px solid #ddd; padding: 10px; text-align: left;'>Price</th>"
+				+ "</tr>"
+				+ "</thead>"
+				+ "<tbody>"
+				+ "<tr>"
+				+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Link Movie</td>"
+				+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>₪" + p1.getPayment_amount() + "</td>"
+				+ "</tr>"
+				+ "</tbody>"
+				+ "</table>"
+				+ "<h3 style='color: #555;'>TOTAL [₪]: ₪" + p1.getPayment_amount() + "</h3>"
+				+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
+				+ "<p>We appreciate your business and hope to see you again soon!</p>"
+				+ "<p>Best regards,<br/>Luna Aura Team</p>"
+				+ "</div>"
+				+ "</body>"
+				+ "</html>";
+
+		return body;
+	}
+
 
 
 	private void update_theater_map(Screening screening)
@@ -751,6 +903,41 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(movies);
 				client.sendToClient(message);
 			}
+			else if (message.getMessage().equals("#purchase_movie_link")) {
+
+				try (Session session = sessionFactory.openSession()) {
+					Transaction transaction = session.beginTransaction();
+					UserPurchases p1 = (UserPurchases) message.getObject();
+
+					// Ensure IdUser is saved
+					IdUser user1 = getOrSaveIdUser(session, p1.getId_user());
+					p1.setId_user(user1); // Make sure UserPurchases has the persistent IdUser
+
+					// Save UserPurchases
+					session.save(p1);
+					transaction.commit();
+
+					sendThankYouEmailLink(p1);
+
+
+					// Schedule the email
+					LocalDateTime sendTime = LocalDateTime.now().plusMinutes(4); // Adjust as needed
+					EmailScheduler emailScheduler = new EmailScheduler();
+					emailScheduler.scheduleEmail(
+							p1.getId_user().getEmail(),
+							"Schedule the  Thank You for Your Purchase at Luna Aura",
+							createEmailBody(p1),
+							sendTime
+					);
+					message.setMessage("#purchase_movie_link_client");
+					client.sendToClient(message);
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println("Error while saving movie link: " + e.getMessage());
+				}
+			}
+
+
 			else if (message.getMessage().equals("#purchase_multi_ticket")) {
 				try (Session session = sessionFactory.openSession()) {
 					Transaction transaction = session.beginTransaction();
@@ -770,7 +957,7 @@ public class SimpleServer extends AbstractServer {
 
 				} catch (Exception e) {
 					e.printStackTrace();
-					System.out.println("Error while saving MultiEntryTicket: " + e.getMessage());
+					System.out.println("Error while purchase_multi_ticket : " + e.getMessage());
 				}
 			}
 

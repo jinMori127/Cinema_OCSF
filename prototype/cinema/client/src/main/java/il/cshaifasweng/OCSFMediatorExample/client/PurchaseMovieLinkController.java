@@ -7,6 +7,22 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
+import il.cshaifasweng.OCSFMediatorExample.entities.UserPurchases;
+import java.time.LocalTime;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
+import java.util.Date;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -19,6 +35,8 @@ import java.io.IOException;
 import javafx.collections.ObservableList;
 
 import com.mysql.cj.protocol.x.XMessage;
+import il.cshaifasweng.OCSFMediatorExample.client.MovieDetailsController;
+
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 
 
@@ -49,7 +67,15 @@ public class PurchaseMovieLinkController {
     private TextField card_date;
 
     @FXML
-    private Button purchase; // Value injected by FXMLLoader
+    private TextField wanted_date;
+
+    @FXML
+    private TextField wanted_Time;
+
+
+
+    @FXML
+    private Button purchase;
 
     @FXML
     private Text error_message;
@@ -66,13 +92,18 @@ public class PurchaseMovieLinkController {
     public void purchase_button(ActionEvent event) {
 
         if (isFieldEmpty(user_id, "Please enter your ID.")) return;
-        if (isFieldEmpty(user_first_name, "Please enter your first name.")) return;
-        if (isFieldEmpty(user_last_name, "Please enter your last name.")) return;
-        if (isFieldEmpty(user_email, "Please enter your email.")) return;
-        if (isFieldEmpty(user_phone_number, "Please enter your phone number.")) return;
-        if (isFieldEmpty(user_card_number, "Please enter your card number.")) return;
-        if (isFieldEmpty(user_cvv, "Please enter your CVV.")) return;
-        if (isFieldEmpty(card_date, "Please enter your card expiry date.")) return;
+        else if (isFieldEmpty(user_first_name, "Please enter your first name.")) return;
+        else if (isFieldEmpty(user_last_name, "Please enter your last name.")) return;
+        else if (isFieldEmpty(user_email, "Please enter your email.")) return;
+        else if (isFieldEmpty(user_phone_number, "Please enter your phone number.")) return;
+        else if (isFieldEmpty(user_card_number, "Please enter your card number.")) return;
+        else if (isFieldEmpty(user_cvv, "Please enter your CVV.")) return;
+        else if (isFieldEmpty(card_date, "Please enter your card expiry date.")) return;
+        else if (isFieldEmpty(wanted_date, "Please enter your Wanted Date.")) return;
+        else if (isFieldEmpty(wanted_Time, "Please enter your wanted Time")) return;
+
+
+
 
 
         String user_id_str = user_id.getText();
@@ -144,6 +175,38 @@ public class PurchaseMovieLinkController {
             return;
         }
 
+        ///////////////////////////////
+
+
+
+
+
+
+        // Validate wanted_date (example format: yyyy-MM-dd)
+        String wantedDateStr = wanted_date.getText();
+        LocalDate wantedDate;
+        try {
+            wantedDate = LocalDate.parse(wantedDateStr, DateTimeFormatter.ISO_LOCAL_DATE);
+        } catch (DateTimeParseException e) {
+            error_message.setVisible(true);
+            error_message.setText("Wanted Date must be in the format yyyy-MM-dd.");
+            wanted_date.setText("");
+            return;
+        }
+
+        // Validate wanted_Time (example format: HH:mm)
+        String wantedTimeStr = wanted_Time.getText();
+        LocalTime wantedTime;
+        try {
+            wantedTime = LocalTime.parse(wantedTimeStr, DateTimeFormatter.ISO_LOCAL_TIME);
+        } catch (DateTimeParseException e) {
+            error_message.setVisible(true);
+            error_message.setText("Wanted Time must be in the format HH:mm.");
+            wanted_Time.setText("");
+            return;
+        }
+
+
 
 
 
@@ -152,6 +215,35 @@ public class PurchaseMovieLinkController {
         String curr_last_name = user_last_name.getText();
         String full_name = curr_first_name + " " + curr_last_name;
         String curr_email = user_email.getText();
+
+        Movie movie1= MovieDetailsController.current_movie;
+        IdUser id_user = new IdUser(user_id_str, full_name, phone_str, curr_email);
+        LocalDateTime wantedDateTime = LocalDateTime.of(wantedDate, wantedTime);
+        Date wantedDateObj = Date.from(wantedDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        String baseUrl = "https://www.example.com";  // Replace with your actual domain
+        String movieName = "Inception";
+
+        String formattedMovieName = movieName.replaceAll("\\s+", "-").toLowerCase();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = dateFormat.format(wantedDateObj);
+        String movieLink = baseUrl + "/movies/" + formattedMovieName + "/" + formattedDate;
+
+
+        UserPurchases p1=new UserPurchases("Credit",movie1.getPrice(),id_user,wantedDateObj,movieLink);
+        Message message = new Message(25, "#purchase_movie_link");
+        message.setObject(p1);
+
+
+
+        try {
+            SimpleClient.getClient().sendToServer(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
+
 
 
         //IdUser id_user = new IdUser(id_str, full_name, phone_str, curr_email);

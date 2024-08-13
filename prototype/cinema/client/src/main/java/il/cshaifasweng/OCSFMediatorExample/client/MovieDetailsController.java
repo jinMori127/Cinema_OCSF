@@ -268,7 +268,7 @@ public class MovieDetailsController {
     @FXML
     void go_purchase(ActionEvent event) {
         try {
-            SimpleChatClient.setRoot("HomePage");
+            SimpleChatClient.setRoot("PurchaseMovieLink");
         } catch (IOException e) {
             ErrorMessage.setText(e.getMessage());
             ErrorMessage.setVisible(true);
