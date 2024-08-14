@@ -15,6 +15,8 @@ public class UserPurchases implements Serializable{
     private String payment_type;
     private double payment_amount;
 
+    private String movie_name;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "auto_number_id_user")
     private IdUser id_user;
@@ -35,6 +37,7 @@ public class UserPurchases implements Serializable{
     // constructors
     public UserPurchases() {}
 
+    // purchase Ticket constructor
     public UserPurchases(String seats, String payment_type, double payment_amount, IdUser id_user, Screening screening){
         this.seats = seats;
         this.payment_type = payment_type;
@@ -46,14 +49,17 @@ public class UserPurchases implements Serializable{
         this.link = "";
     }
 
-    public UserPurchases(String payment_type, double payment_amount, IdUser id_user, Date date_of_link_activation, String link){
+    // purchase HomeLink constructor
+    public UserPurchases(String payment_type, double payment_amount, IdUser id_user, Date date_of_link_activation, String link, String movie_name){
         this.payment_type = payment_type;
         this.payment_amount = payment_amount;
         this.id_user = id_user;
         this.date_of_link_activation = date_of_link_activation;
         this.purchase_type = "HomeLink";
         this.link = link;
+        this.movie_name = movie_name;
         this.date_of_purchase = new Date();;
+        this.seats = "";
     }
 
     // get/set methods
@@ -129,6 +135,9 @@ public class UserPurchases implements Serializable{
     }
 
     public String getMovie_name() {
-        return screening.getMovie().getMovie_name();
+        if(this.purchase_type.equals("Ticket")) {
+            return screening.getMovie().getMovie_name();
+        }
+        return movie_name;
     }
 }

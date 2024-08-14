@@ -83,6 +83,8 @@ public class UserPurchasesController {
     {
         if(event.getId()==3) {
             Platform.runLater(() -> {
+                String text_multi_ticket = "Remaining Ticket: " + event.getMessage().getObject2().toString();
+                multi_ticket_info.setText(text_multi_ticket);
                 create_user_purchases(event.getMessage());
             });
         }
@@ -105,9 +107,6 @@ public class UserPurchasesController {
 
         list = FXCollections.observableArrayList(user_list);
         table_view.setItems(list);
-
-        String text_multi_ticket = "Remaining Ticket: " + message.getObject2().toString();
-        multi_ticket_info.setText(text_multi_ticket);
     }
     public void update_list(Message message){
         create_user_purchases(message);
@@ -193,6 +192,10 @@ public class UserPurchasesController {
         ErrorMessage.setVisible(false);
 
         int selectedRow = table_view.getSelectionModel().getSelectedIndex();
+        if(selectedRow == -1)
+        {
+            return;
+        }
         int percent_return=0;
 
         int auto_num=-1;
