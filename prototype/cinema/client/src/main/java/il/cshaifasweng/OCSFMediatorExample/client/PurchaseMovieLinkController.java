@@ -5,6 +5,12 @@ import javafx.scene.text.Text;
 import javafx.event.ActionEvent;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.sql.Time;
+import java.util.Calendar;
+import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
@@ -82,6 +88,10 @@ public class PurchaseMovieLinkController {
 
     @FXML
     private Text success_message;
+
+    @FXML
+    private Text end_time;
+
 
     @FXML
     public void initialize() {
@@ -206,7 +216,36 @@ public class PurchaseMovieLinkController {
             return;
         }
 
+        LocalDateTime wantedDateTime = LocalDateTime.of(wantedDate, wantedTime);
+        Date wantedDateObj = Date.from(wantedDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        Date screeningTimeDate = MovieDetailsController.current_movie.getTime_(); // Assuming Date type
+//////////////////////////////////////////////
+        Calendar calendar = Calendar.getInstance();
 
+        // Set date from wantedDateObj
+        calendar.setTime(wantedDateObj);
+
+        // Extract time from screeningTimeDate
+        Calendar screeningCalendar = Calendar.getInstance();
+        screeningCalendar.setTime(screeningTimeDate);
+
+        // Set the time part from screeningTimeDate into calendar
+        calendar.set(Calendar.HOUR_OF_DAY, screeningCalendar.get(Calendar.HOUR_OF_DAY));
+        calendar.set(Calendar.MINUTE, screeningCalendar.get(Calendar.MINUTE));
+        calendar.set(Calendar.SECOND, screeningCalendar.get(Calendar.SECOND));
+        calendar.set(Calendar.MILLISECOND, screeningCalendar.get(Calendar.MILLISECOND));
+
+        // Create the combined Date
+        Date combinedDate = calendar.getTime();
+
+        //////////////////////////////////////////////////////
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateString = sdf.format(combinedDate);
+
+
+        end_time.setVisible(true);
+        end_time.setText(dateString);
 
 
 
@@ -218,20 +257,25 @@ public class PurchaseMovieLinkController {
 
         Movie movie1= MovieDetailsController.current_movie;
         IdUser id_user = new IdUser(user_id_str, full_name, phone_str, curr_email);
-        LocalDateTime wantedDateTime = LocalDateTime.of(wantedDate, wantedTime);
-        Date wantedDateObj = Date.from(wantedDateTime.atZone(ZoneId.systemDefault()).toInstant());
+
+
         String baseUrl = "https://www.example.com";  // Replace with your actual domain
         String movieName = "Inception";
 
         String formattedMovieName = movieName.replaceAll("\\s+", "-").toLowerCase();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedDate = dateFormat.format(wantedDateObj);
+        sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = sdf.format(wantedDateObj);
         String movieLink = baseUrl + "/movies/" + formattedMovieName + "/" + formattedDate;
 
 
         UserPurchases p1=new UserPurchases("Credit",movie1.getPrice(),id_user,wantedDateObj,movieLink);
         Message message = new Message(25, "#purchase_movie_link");
         message.setObject(p1);
+
+
+
+
+
 
 
 

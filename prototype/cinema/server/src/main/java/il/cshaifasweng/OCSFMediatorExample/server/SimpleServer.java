@@ -5,8 +5,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import org.quartz.SchedulerException;
 import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.ZoneId;
+
 import java.util.*;
 import il.cshaifasweng.OCSFMediatorExample.server.EmailSender;
 import java.text.SimpleDateFormat;
@@ -43,7 +45,6 @@ import java.util.Iterator;
 
 import java.util.Collections;
 import il.cshaifasweng.OCSFMediatorExample.entities.MultiEntryTicket;
-import org.quartz.SchedulerException;
 
 
 public class SimpleServer extends AbstractServer {
@@ -470,6 +471,8 @@ public class SimpleServer extends AbstractServer {
 			return idUser;
 		}
 	}
+
+
 	private void updateOrSaveMultiEntryTicket(Session session, MultiEntryTicket t, IdUser idUser) {
 		CriteriaBuilder builder = session.getCriteriaBuilder();
 		CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
@@ -487,22 +490,7 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
-	private void SaveUserPurchase(Session session, UserPurchases p1, IdUser idUser) {
-		//CriteriaBuilder builder = session.getCriteriaBuilder();
-		//CriteriaQuery<UserPurchases> query = builder.createQuery(UserPurchases.class);
-		//Root<UserPurchases> root = query.from(UserPurchases.class);
-		//query.select(root).where(builder.equal(root.get("id_user"), idUser));
-		//UserPurchases existingTicket = session.createQuery(query).uniqueResult();
 
-		//if (existingTicket != null) {
-		//	existingTicket.setRemain_tickets(existingTicket.getRemain_tickets() + t.getRemain_tickets());
-		//	session.update(existingTicket);
-		//}
-		//if {
-		//	p1.setId_user(idUser);
-		//	session.save(t);
-		//}
-	}
 	private void sendThankYouEmail(MultiEntryTicket t) {
 		EmailSender emailSender = new EmailSender();
 		String[] recipients = {t.getId_user().getEmail()};
@@ -635,19 +623,20 @@ public class SimpleServer extends AbstractServer {
 		}
 	}
 
-	private String createEmailBody(UserPurchases p1) {
-		// Similar to the body creation you had earlier
-		// Return the email body string
-		// Note: Ensure this method is adapted to fit your requirements
+
+	private String createReminderEmailBody(UserPurchases p1) {
+		// Calculate the remaining time until the link activation
+		long hoursUntilActivation = Duration.between(LocalDateTime.now(), p1.getDate_of_link_activation().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()).toHours();
+
 		String body = "<html>"
 				+ "<body style='font-family: Arial, sans-serif; color: #333;'>"
 				+ "<div style='max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd;'>"
 				+ "<div style='text-align: center;'>"
 				+ "<img src='YOUR_LOGO_URL' alt='Luna Aura' style='width: 100px; margin-bottom: 20px;'/>"
-				+ "<h1 style='font-size: 24px; color: #555;'>Thank You.</h1>"
+				+ "<h1 style='font-size: 24px; color: #555;'>Reminder from Luna Aura</h1>"
 				+ "</div>"
-				+ "<p>Hi " + p1.getId_user().getName() + "!</p>"
-				+ "<p>Thanks for your purchase from Luna Aura.</p>"
+				+ "<p>Hi " + p1.getId_user().getName() + ",</p>"
+				+ "<p>We wanted to remind you about your recent purchase from Luna Aura.</p>"
 				+ "<h2 style='color: #555;'>INVOICE ID: " + p1.getId_user().getUser_id() + "</h2>"
 				+ "<p><em>(Please keep a copy of this receipt for your records.)</em></p>"
 				+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
@@ -656,10 +645,11 @@ public class SimpleServer extends AbstractServer {
 				+ "<strong>Order Date:</strong> " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd MMMM yyyy")) + "<br/>"
 				+ "<strong>Source:</strong> Luna Aura<br/>"
 				+ "<strong>Link:</strong> <a href='" + p1.getLink() + "'>" + p1.getLink() + "</a><br/>"
-				+ "<strong>Wanted Date:</strong> " + (p1.getDate_of_link_activation() != null
+				+ "<strong>Link Activation Date:</strong> " + (p1.getDate_of_link_activation() != null
 				? new SimpleDateFormat("dd MMMM yyyy, HH:mm").format(p1.getDate_of_link_activation())
 				: "N/A") + "</p>"
-				+ "<h3 style='color: #555;'>HERE'S WHAT YOU ORDERED:</h3>"
+				+ "<p style='color: #FF0000;'><strong>Note:</strong> The link will start working in approximately " + hoursUntilActivation + " hour(s).</p>"
+				+ "<h3 style='color: #555;'>ORDER SUMMARY:</h3>"
 				+ "<table style='width: 100%; border-collapse: collapse;'>"
 				+ "<thead>"
 				+ "<tr>"
@@ -676,7 +666,7 @@ public class SimpleServer extends AbstractServer {
 				+ "</table>"
 				+ "<h3 style='color: #555;'>TOTAL [₪]: ₪" + p1.getPayment_amount() + "</h3>"
 				+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
-				+ "<p>We appreciate your business and hope to see you again soon!</p>"
+				+ "<p>Thank you for your attention. If you have any questions, feel free to contact us.</p>"
 				+ "<p>Best regards,<br/>Luna Aura Team</p>"
 				+ "</div>"
 				+ "</body>"
@@ -684,6 +674,7 @@ public class SimpleServer extends AbstractServer {
 
 		return body;
 	}
+
 
 
 
@@ -916,17 +907,21 @@ public class SimpleServer extends AbstractServer {
 					// Save UserPurchases
 					session.save(p1);
 					transaction.commit();
+					session.close();
+
 
 					sendThankYouEmailLink(p1);
 
 
-					// Schedule the email
-					LocalDateTime sendTime = LocalDateTime.now().plusMinutes(4); // Adjust as needed
+                    Date sendTime = p1.getDate_of_link_activation();
+
+
+
 					EmailScheduler emailScheduler = new EmailScheduler();
 					emailScheduler.scheduleEmail(
 							p1.getId_user().getEmail(),
 							"Schedule the  Thank You for Your Purchase at Luna Aura",
-							createEmailBody(p1),
+							createReminderEmailBody(p1),
 							sendTime
 					);
 					message.setMessage("#purchase_movie_link_client");
@@ -946,14 +941,13 @@ public class SimpleServer extends AbstractServer {
 					IdUser idUser = getOrSaveIdUser(session, t.getId_user());
 
 					updateOrSaveMultiEntryTicket(session, t, idUser);
-
-					transaction.commit();
-
 					sendThankYouEmail(t);
+					transaction.commit();
+					session.close();
 
 					message.setMessage("#purchase_multi_ticket_client");
-					message.setObject(MultiEntryTicket.INITIAL_PRICE);
 					client.sendToClient(message);
+
 
 				} catch (Exception e) {
 					e.printStackTrace();

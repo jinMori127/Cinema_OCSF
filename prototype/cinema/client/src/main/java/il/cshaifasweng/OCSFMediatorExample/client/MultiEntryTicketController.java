@@ -131,7 +131,6 @@ public class MultiEntryTicketController {
     public void print_success(Message message) {
         error_message.setVisible(false);
         success_message.setVisible(true);
-        int price = (int) message.getObject();
         success_message.setText("Purchaes Success");
     }
 

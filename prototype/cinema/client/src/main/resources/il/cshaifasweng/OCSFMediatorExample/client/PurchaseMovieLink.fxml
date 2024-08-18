@@ -20,5 +20,6 @@
       <Text fx:id="success_message" fill="#00ff09" layoutX="514.0" layoutY="138.0" strokeType="OUTSIDE" strokeWidth="0.0" />
       <TextField fx:id="wanted_date" layoutX="34.0" layoutY="129.0" promptText="Date" />
       <TextField fx:id="wanted_Time" layoutX="34.0" layoutY="175.0" promptText="Time" />
+      <Text fx:id="end_time" layoutX="60.0" layoutY="235.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="98.13671875" />
    </children>
 </AnchorPane>

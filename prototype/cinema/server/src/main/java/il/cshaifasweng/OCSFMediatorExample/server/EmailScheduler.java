@@ -3,13 +3,7 @@ package il.cshaifasweng.OCSFMediatorExample.server;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.Duration;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import il.cshaifasweng.OCSFMediatorExample.server.EmailSender;
-
-import java.time.LocalDateTime;
-import java.time.Duration;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -17,11 +11,28 @@ import java.util.concurrent.TimeUnit;
 public class EmailScheduler {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    public void scheduleEmail(String recipient, String subject, String body, LocalDateTime sendTime) {
+    public void scheduleEmail(String recipient, String subject, String body, Date sendTime) {
+        // Convert Date to LocalDateTime
+        LocalDateTime sendLocalDateTime = sendTime.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+
+        // Subtract one hour
+        LocalDateTime adjustedSendTime = sendLocalDateTime.minusHours(1);
+
+        // Convert adjusted LocalDateTime back to Date
+        Date adjustedSendDate = Date.from(adjustedSendTime.atZone(ZoneId.systemDefault()).toInstant());
+
         // Calculate delay
         LocalDateTime now = LocalDateTime.now();
-        Duration duration = Duration.between(now, sendTime);
+        Duration duration = Duration.between(now, adjustedSendTime);
         long delay = duration.toMillis();
+
+        // Ensure the delay is not negative (if the adjusted time is in the past)
+        if (delay < 0) {
+            delay = 0;
+            System.out.println("Adjusted time is in the past. Sending email immediately.");
+        }
 
         // Schedule the email task
         scheduler.schedule(() -> {
