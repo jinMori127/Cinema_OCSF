@@ -117,6 +117,9 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new BaseEventBox("THEATER_MAP_UPDATED", message));
 		}
 
+		else if (message.getMessage().equals("#purchase_movie_link_by_multi_ticket_client")){
+			EventBus.getDefault().post(new BaseEventBox("PURCHASE_LINK_USING_MULTI", message));
+		}
 
 		else {
 			EventBus.getDefault().post(new BaseEventBox("WRONG_NAMEING", message));

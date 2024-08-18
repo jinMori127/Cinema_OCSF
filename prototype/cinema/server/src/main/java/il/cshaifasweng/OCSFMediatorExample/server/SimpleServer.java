@@ -900,22 +900,13 @@ public class SimpleServer extends AbstractServer {
 					Transaction transaction = session.beginTransaction();
 					UserPurchases p1 = (UserPurchases) message.getObject();
 
-					// Ensure IdUser is saved
 					IdUser user1 = getOrSaveIdUser(session, p1.getId_user());
 					p1.setId_user(user1); // Make sure UserPurchases has the persistent IdUser
-
-					// Save UserPurchases
 					session.save(p1);
 					transaction.commit();
 					session.close();
-
-
 					sendThankYouEmailLink(p1);
-
-
                     Date sendTime = p1.getDate_of_link_activation();
-
-
 
 					EmailScheduler emailScheduler = new EmailScheduler();
 					emailScheduler.scheduleEmail(
@@ -931,6 +922,72 @@ public class SimpleServer extends AbstractServer {
 					System.out.println("Error while saving movie link: " + e.getMessage());
 				}
 			}
+
+			else if (message.getMessage().equals("#purchase_movie_link_by_multi_ticket")) {
+				try (Session session = sessionFactory.openSession()) {
+
+					Transaction transaction = session.beginTransaction();
+
+					UserPurchases p1 = (UserPurchases) message.getObject();
+					IdUser user1 = getOrSaveIdUser(session, p1.getId_user());
+
+					// Build the query to find a single MultiEntryTicket based on the user_id
+					CriteriaBuilder builder = session.getCriteriaBuilder();
+					CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
+					Root<MultiEntryTicket> root = query.from(MultiEntryTicket.class);
+					Join<MultiEntryTicket, IdUser> userJoin = root.join("id_user");  // Changed from "idUser" to "id_user"
+					Predicate userIdPredicate = builder.equal(userJoin.get("user_id"), user1.getUser_id());
+					query.select(root).where(userIdPredicate);
+
+					// Execute the query and get a single result
+					MultiEntryTicket ticket = session.createQuery(query).uniqueResult();
+					message.setMessage("#purchase_movie_link_by_multi_ticket_client");
+
+
+
+
+					if (ticket != null) {
+						if (ticket.getRemain_tickets()==0){
+							System.out.println("000000");
+							message.setObject("Your Multi Ticket is Empty.");
+						}
+						else {
+							p1.setId_user(user1);
+							try (Session newSession = sessionFactory.openSession()) {
+								Transaction newTransaction = newSession.beginTransaction();
+								newSession.save(p1);
+								ticket.setRemain_tickets(ticket.getRemain_tickets()-1);
+								session.update(ticket);
+								message.setObject("Purchase Success ! . Your remaing Tikect is"+ticket.getRemain_tickets());
+
+
+								newTransaction.commit();
+							}
+							sendThankYouEmailLink(p1);
+							Date sendTime = p1.getDate_of_link_activation();
+
+							EmailScheduler emailScheduler = new EmailScheduler();
+							emailScheduler.scheduleEmail(
+									p1.getId_user().getEmail(),
+									"Schedule the Thank You for Your Purchase at Luna Aura",
+									createReminderEmailBody(p1),
+									sendTime
+							);
+
+						}
+					} else {
+						System.out.println("No MultiEntryTicket found for the given user.");
+						message.setObject("No MultiEntryTicket found for the given user.");
+					}
+					client.sendToClient(message);
+					transaction.commit();
+					session.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println("Error while saving movie link: " + e.getMessage());
+				}
+			}
+
 
 
 			else if (message.getMessage().equals("#purchase_multi_ticket")) {

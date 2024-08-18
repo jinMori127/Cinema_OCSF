@@ -102,6 +102,8 @@ public class MultiEntryTicketController {
     @FXML
     private Button purchase; // Value injected by FXMLLoader
 
+
+
     @FXML
     private Text error_message;
 
