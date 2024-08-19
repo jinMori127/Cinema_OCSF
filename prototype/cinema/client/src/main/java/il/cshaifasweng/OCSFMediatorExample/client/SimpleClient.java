@@ -43,6 +43,14 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new BaseEventBox("GET_SCREENING_DONE", message));
 		}
 
+		else if (message.getMessage().equals("#DoneGettingMultiTicket")){
+			EventBus.getDefault().post(new BaseEventBox("DONE_GETTING_MULTITICKET", message));
+		}
+
+		else if (message.getMessage().equals("#FailedMT")){
+			EventBus.getDefault().post(new BaseEventBox("FAILED_MT", message));
+		}
+
 		else if (message.getMessage().equals("#UpdateMovieList")){
 			EventBus.getDefault().post(new BaseEventBox("UPDATE_MOVIE_LIST", message));
 		} else if (message.getMessage().equals("#ScreeningsGot")) {

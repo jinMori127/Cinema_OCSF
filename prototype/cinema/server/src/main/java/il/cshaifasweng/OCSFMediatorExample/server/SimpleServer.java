@@ -408,6 +408,34 @@ public class SimpleServer extends AbstractServer {
 		return data;
 	}
 
+	private IdUser getIUFromId(String id){
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<IdUser> query = builder.createQuery(IdUser.class);
+		Root<IdUser> root =  query.from(IdUser.class);
+		Predicate idPredicate = builder.equal(root.get("user_id"), id);
+		query.select(root).where(idPredicate);
+		List<IdUser> data = session.createQuery(query).getResultList();
+		session.getTransaction().commit();
+		session.close();
+		return data.get(0);
+	}
+
+
+	private List<MultiEntryTicket> getMTForID(IdUser ID){
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
+		Root<MultiEntryTicket> root =  query.from(MultiEntryTicket.class);
+		Predicate namePredicate = builder.equal(root.get("id_user"),ID);
+		query.select(root).where(namePredicate);
+		List<MultiEntryTicket> data = session.createQuery(query).getResultList();
+		session.getTransaction().commit();
+		session.close();
+		return data;
+	}
 
 	private List<Complains> search_data(boolean do_show_not_responded) {
 		Session session = sessionFactory.openSession();
@@ -700,6 +728,33 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(delete_user_purchases(auto_num,id));
 				System.out.println(message.getMessage());
 				client.sendToClient(message);
+
+			}
+
+
+			else if (message.getMessage().equals("#GetMultiTicket")) {
+				String id = (String)message.getObject();
+				IdUser idUser = getIUFromId(id);
+
+				List <MultiEntryTicket> multiEntryTicketList = getMTForID(idUser);
+
+				if (multiEntryTicketList != null) {
+					for (MultiEntryTicket multiEntryTicket : multiEntryTicketList) {
+						if (multiEntryTicket.getRemain_tickets() > 1) {
+							multiEntryTicket.setRemain_tickets(multiEntryTicket.getRemain_tickets() - 1);
+							message.setObject(multiEntryTicket);
+							message.setMessage("#DoneGettingMultiTicket");
+							client.sendToClient(message);
+							break;
+						}
+					}
+				}
+
+				else {
+					message.setMessage("#FailedMT");
+					client.sendToClient(message);
+				}
+
 
 			}
 
