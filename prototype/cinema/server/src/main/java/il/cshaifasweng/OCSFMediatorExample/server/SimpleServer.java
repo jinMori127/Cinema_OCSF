@@ -899,17 +899,16 @@ public class SimpleServer extends AbstractServer {
 				client.sendToClient(message);
 			}
 			else if (message.getMessage().equals("#purchase_movie_link")) {
-
 				try (Session session = sessionFactory.openSession()) {
 					Transaction transaction = session.beginTransaction();
 					UserPurchases p1 = (UserPurchases) message.getObject();
+					p1.setPayment_type("Credit");
 
 					IdUser user1 = getOrSaveIdUser(session, p1.getId_user());
 					p1.setId_user(user1); // Make sure UserPurchases has the persistent IdUser
 					session.save(p1);
-					transaction.commit();
-					session.close();
 					message.setMessage("#purchase_movie_link_client");
+					message.setObject("");
 					client.sendToClient(message);
 					sendThankYouEmailLink(p1);
                     Date sendTime = p1.getDate_of_link_activation();
@@ -922,8 +921,11 @@ public class SimpleServer extends AbstractServer {
 							createReminderEmailBody(p1),
 							sendTime
 					);
+					transaction.commit();
+					session.close();
 
 				}
+
 
 				catch (Exception e) {
 					e.printStackTrace();
@@ -935,8 +937,11 @@ public class SimpleServer extends AbstractServer {
 					Transaction transaction = session.beginTransaction();
 					message.setMessage("#purchase_movie_link_by_multi_ticket_client");
 
+
 					// Retrieve UserPurchases and associated IdUser
 					UserPurchases p1 = (UserPurchases) message.getObject();
+					p1.setPayment_type("Crtesea");
+
 					IdUser user1 = getOrSaveIdUser(session, p1.getId_user());
 
 					// Build the query to find a single MultiEntryTicket based on the user_id
@@ -986,6 +991,7 @@ public class SimpleServer extends AbstractServer {
 
 					// Commit transaction
 					transaction.commit();
+					session.close();
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println("Error while saving movie link: " + e.getMessage());

@@ -109,10 +109,7 @@ public class SimpleClient extends AbstractClient {
 		else if(message.getMessage().equals("#purchase_multi_ticket_client")){
 			EventBus.getDefault().post(new BaseEventBox("SAVE_MULTI_TICKET", message));
 		}
-		else if(message.getMessage().equals("#purchase_movie_link_client")){
-			EventBus.getDefault().post(new BaseEventBox("SAVE_MOVIE", message));
 
-		}
 		else if (message.getMessage().equals("#theater_map_updated")){
 			EventBus.getDefault().post(new BaseEventBox("THEATER_MAP_UPDATED", message));
 		}
@@ -122,7 +119,7 @@ public class SimpleClient extends AbstractClient {
 		}
 
 		else if (message.getMessage().equals("#purchase_movie_link_client")){
-			EventBus.getDefault().post(new BaseEventBox("PURCHASE_LINK", message));
+			EventBus.getDefault().post(new BaseEventBox("PURCHASE_LINK_N", message));
 		}
 
 		else {

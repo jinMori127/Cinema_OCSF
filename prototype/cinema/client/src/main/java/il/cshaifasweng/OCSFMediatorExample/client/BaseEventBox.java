@@ -25,7 +25,7 @@ public class BaseEventBox {
         GOT_SEARCH_MOVIE_FILTER,
         SIGN_OUT,
         PURCHASE_LINK_USING_MULTI,
-        PURCHASE_LINK,
+        PURCHASE_LINK_N,
         THEATER_MAP_UPDATED;
 
         public static EventEnum getByName(String name) {

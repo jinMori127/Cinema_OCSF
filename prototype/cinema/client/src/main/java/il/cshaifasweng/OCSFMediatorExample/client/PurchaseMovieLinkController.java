@@ -352,7 +352,7 @@ public class PurchaseMovieLinkController {
         String movieLink = baseUrl + "/movies/" + formattedMovieName + "/" + formattedDate;
 
         UserPurchases p1 = new UserPurchases("Credit", movie1.getPrice(), id_user, wantedDateObj, movieLink);
-        Message message = new Message(25, "#purchase_movie_link");
+        Message message = new Message(84, "#purchase_movie_link");
         message.setObject(p1);
 
         try {
@@ -396,7 +396,7 @@ public class PurchaseMovieLinkController {
 
     @Subscribe
     public void purchases_Link_sucess(BaseEventBox event) {
-        if (event.getId() == BaseEventBox.get_event_id("PURCHASE_LINK")) {
+        if (event.getId() == BaseEventBox.get_event_id("PURCHASE_LINK_N")) {
             Platform.runLater(() -> {
                 error_message.setVisible(false);
                 MULTI.setVisible(true);

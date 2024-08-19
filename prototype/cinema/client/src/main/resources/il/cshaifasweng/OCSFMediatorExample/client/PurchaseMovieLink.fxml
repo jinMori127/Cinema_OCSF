@@ -94,7 +94,7 @@
             </RadialGradient>
          </fill>
       </Text>
-      <Text fx:id="MULTI" fill="RED" layoutX="615.0" layoutY="483.0" strokeType="OUTSIDE" strokeWidth="0.0" text="AA" />
-      <Text layoutX="477.0" layoutY="134.0" strokeType="OUTSIDE" strokeWidth="0.0" text="The End Time is" />
+      <Text fx:id="MULTI" fill="RED" layoutX="615.0" layoutY="483.0" strokeType="OUTSIDE" strokeWidth="0.0" />
+      <Text layoutX="398.0" layoutY="134.0" strokeType="OUTSIDE" strokeWidth="0.0" text="The End Time is" />
    </children>
 </AnchorPane>
