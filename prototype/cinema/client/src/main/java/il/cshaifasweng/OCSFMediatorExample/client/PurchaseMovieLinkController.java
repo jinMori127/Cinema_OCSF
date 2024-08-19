@@ -122,6 +122,8 @@ public class PurchaseMovieLinkController {
 
     @FXML
     public void purchase_multi_func(ActionEvent event) {
+        if (!validateInputFields(false)) return;
+
         LocalDateTime wantedDateTime = LocalDateTime.of(
                 LocalDate.parse(wanted_date.getText(), DateTimeFormatter.ISO_LOCAL_DATE),
                 LocalTime.parse(wanted_Time.getText(), DateTimeFormatter.ISO_LOCAL_TIME)
@@ -187,7 +189,7 @@ public class PurchaseMovieLinkController {
 
     @FXML
     public void purchase_button(ActionEvent event) {
-        if (!validateInputFields()) return;
+        if (!validateInputFields(true)) return;
 
 
 
@@ -195,15 +197,16 @@ public class PurchaseMovieLinkController {
         processPurchase();
     }
 
-    private boolean validateInputFields() {
+    private boolean validateInputFields(boolean check_credit) {
         if (isFieldEmpty(user_id, "Please enter your ID.")) return false;
         else if (isFieldEmpty(user_first_name, "Please enter your first name.")) return false;
         else if (isFieldEmpty(user_last_name, "Please enter your last name.")) return false;
         else if (isFieldEmpty(user_email, "Please enter your email.")) return false;
         else if (isFieldEmpty(user_phone_number, "Please enter your phone number.")) return false;
-        else if (isFieldEmpty(user_card_number, "Please enter your card number.")) return false;
-        else if (isFieldEmpty(user_cvv, "Please enter your CVV.")) return false;
-        else if (isFieldEmpty(card_date, "Please enter your card expiry date.")) return false;
+
+        else if ((check_credit)&&isFieldEmpty(user_card_number, "Please enter your card number.")) return false;
+        else if ((check_credit)&&isFieldEmpty(user_cvv, "Please enter your CVV.")) return false;
+        else if ((check_credit)&&isFieldEmpty(card_date, "Please enter your card expiry date.")) return false;
         else if (isFieldEmpty(wanted_date, "Please enter your Wanted Date.")) return false;
         else if (isFieldEmpty(wanted_Time, "Please enter your wanted Time")) return false;
 
@@ -223,49 +226,53 @@ public class PurchaseMovieLinkController {
             return false;
         }
 
-        String user_card_number_str = user_card_number.getText();
-        if (!user_card_number_str.matches("\\d{12}")) {
-            error_message.setVisible(true);
-            error_message.setText("Card number must contain exactly 12 digits");
-            user_card_number.setText("");
-            return false;
-        }
+        if(check_credit) {
 
-        String user_cvv_str = user_cvv.getText();
-        if (!user_cvv_str.matches("\\d{3}")) {
-            error_message.setVisible(true);
-            error_message.setText("CVV must contain exactly 3 digits");
-            user_cvv.setText("");
-            return false;
-        }
+            String user_card_number_str = user_card_number.getText();
+            if (!user_card_number_str.matches("\\d{12}")) {
+                error_message.setVisible(true);
+                error_message.setText("Card number must contain exactly 12 digits");
+                user_card_number.setText("");
+                return false;
+            }
 
-        // Date validation
-        String date_str = card_date.getText();
-        String date_pattern = "^(0[1-9]|1[0-2])/\\d{2}$";
-        if (!date_str.matches(date_pattern)) {
-            error_message.setVisible(true);
-            error_message.setText("Date must be in the format mm/yy and mm should be a valid month (01-12)");
-            card_date.setText("");
-            return false;
-        }
+            String user_cvv_str = user_cvv.getText();
+            if (!user_cvv_str.matches("\\d{3}")) {
+                error_message.setVisible(true);
+                error_message.setText("CVV must contain exactly 3 digits");
+                user_cvv.setText("");
+                return false;
+            }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
-        YearMonth inputDate;
-        try {
-            inputDate = YearMonth.parse(date_str, formatter);
-        } catch (DateTimeParseException e) {
-            error_message.setVisible(true);
-            error_message.setText("Date parsing error. Please check the format.");
-            card_date.setText("");
-            return false;
-        }
+            // Date validation
+            String date_str = card_date.getText();
+            String date_pattern = "^(0[1-9]|1[0-2])/\\d{2}$";
+            if (!date_str.matches(date_pattern)) {
+                error_message.setVisible(true);
+                error_message.setText("Date must be in the format mm/yy and mm should be a valid month (01-12)");
+                card_date.setText("");
+                return false;
+            }
 
-        YearMonth currentMonth = YearMonth.now();
-        if (inputDate.isBefore(currentMonth)) {
-            error_message.setVisible(true);
-            error_message.setText("The expiry date cannot be in the past.");
-            card_date.setText("");
-            return false;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
+            YearMonth inputDate;
+            try {
+                inputDate = YearMonth.parse(date_str, formatter);
+            } catch (DateTimeParseException e) {
+                error_message.setVisible(true);
+                error_message.setText("Date parsing error. Please check the format.");
+                card_date.setText("");
+                return false;
+            }
+
+            YearMonth currentMonth = YearMonth.now();
+            if (inputDate.isBefore(currentMonth)) {
+                error_message.setVisible(true);
+                error_message.setText("The expiry date cannot be in the past.");
+                card_date.setText("");
+                return false;
+            }
+
         }
 
         // Validate wanted_date
@@ -375,8 +382,25 @@ public class PurchaseMovieLinkController {
     public void purchases_MULTI_sucess(BaseEventBox event) {
         if (event.getId() == BaseEventBox.get_event_id("PURCHASE_LINK_USING_MULTI")) {
             Platform.runLater(() -> {
+                print_success(event.getMessage());
+            });
+        }
+    }
+
+    public void print_success(Message message) {
+        error_message.setVisible(false);
+        MULTI.setVisible(true);
+        MULTI.setText((String)(message.getObject()));
+    }
+
+
+    @Subscribe
+    public void purchases_Link_sucess(BaseEventBox event) {
+        if (event.getId() == BaseEventBox.get_event_id("PURCHASE_LINK")) {
+            Platform.runLater(() -> {
+                error_message.setVisible(false);
                 MULTI.setVisible(true);
-                MULTI.setText((String)(event.getMessage()).getObject());
+                MULTI.setText("Purchaes Success");
             });
         }
     }

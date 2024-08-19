@@ -121,6 +121,10 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new BaseEventBox("PURCHASE_LINK_USING_MULTI", message));
 		}
 
+		else if (message.getMessage().equals("#purchase_movie_link_client")){
+			EventBus.getDefault().post(new BaseEventBox("PURCHASE_LINK", message));
+		}
+
 		else {
 			EventBus.getDefault().post(new BaseEventBox("WRONG_NAMEING", message));
 		}

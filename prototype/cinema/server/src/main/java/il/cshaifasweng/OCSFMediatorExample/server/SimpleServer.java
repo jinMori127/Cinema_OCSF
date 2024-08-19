@@ -465,6 +465,10 @@ public class SimpleServer extends AbstractServer {
 		IdUser existingIdUser = session.createQuery(idUserQuery).uniqueResult();
 
 		if (existingIdUser != null) {
+			existingIdUser.setEmail(idUser.getEmail());
+			existingIdUser.setName(idUser.getName());
+			session.update(existingIdUser);
+
 			return existingIdUser;
 		} else {
 			session.save(idUser);
@@ -905,8 +909,11 @@ public class SimpleServer extends AbstractServer {
 					session.save(p1);
 					transaction.commit();
 					session.close();
+					message.setMessage("#purchase_movie_link_client");
+					client.sendToClient(message);
 					sendThankYouEmailLink(p1);
                     Date sendTime = p1.getDate_of_link_activation();
+
 
 					EmailScheduler emailScheduler = new EmailScheduler();
 					emailScheduler.scheduleEmail(
@@ -915,19 +922,20 @@ public class SimpleServer extends AbstractServer {
 							createReminderEmailBody(p1),
 							sendTime
 					);
-					message.setMessage("#purchase_movie_link_client");
-					client.sendToClient(message);
-				} catch (Exception e) {
+
+				}
+
+				catch (Exception e) {
 					e.printStackTrace();
 					System.out.println("Error while saving movie link: " + e.getMessage());
 				}
 			}
-
 			else if (message.getMessage().equals("#purchase_movie_link_by_multi_ticket")) {
 				try (Session session = sessionFactory.openSession()) {
-
 					Transaction transaction = session.beginTransaction();
+					message.setMessage("#purchase_movie_link_by_multi_ticket_client");
 
+					// Retrieve UserPurchases and associated IdUser
 					UserPurchases p1 = (UserPurchases) message.getObject();
 					IdUser user1 = getOrSaveIdUser(session, p1.getId_user());
 
@@ -935,58 +943,55 @@ public class SimpleServer extends AbstractServer {
 					CriteriaBuilder builder = session.getCriteriaBuilder();
 					CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
 					Root<MultiEntryTicket> root = query.from(MultiEntryTicket.class);
-					Join<MultiEntryTicket, IdUser> userJoin = root.join("id_user");  // Changed from "idUser" to "id_user"
+					Join<MultiEntryTicket, IdUser> userJoin = root.join("id_user");  // Join with IdUser
 					Predicate userIdPredicate = builder.equal(userJoin.get("user_id"), user1.getUser_id());
 					query.select(root).where(userIdPredicate);
 
-					// Execute the query and get a single result
+					// Retrieve the ticket
 					MultiEntryTicket ticket = session.createQuery(query).uniqueResult();
-					message.setMessage("#purchase_movie_link_by_multi_ticket_client");
-
-
-
 
 					if (ticket != null) {
-						if (ticket.getRemain_tickets()==0){
-							System.out.println("000000");
+						if (ticket.getRemain_tickets() == 0) {
+							// No tickets left
 							message.setObject("Your Multi Ticket is Empty.");
-						}
-						else {
+							client.sendToClient(message);
+						} else {
+							// Process the purchase
 							p1.setId_user(user1);
-							try (Session newSession = sessionFactory.openSession()) {
-								Transaction newTransaction = newSession.beginTransaction();
-								newSession.save(p1);
-								ticket.setRemain_tickets(ticket.getRemain_tickets()-1);
-								session.update(ticket);
-								message.setObject("Purchase Success ! . Your remaing Tikect is"+ticket.getRemain_tickets());
+							session.save(p1);
+							ticket.setRemain_tickets(ticket.getRemain_tickets() - 1);
+							session.update(ticket);
 
+							// Send success message
+							message.setObject("Purchase Success! Your remaining ticket count is " + ticket.getRemain_tickets());
+							client.sendToClient(message);
 
-								newTransaction.commit();
-							}
+							// Schedule a thank you email
 							sendThankYouEmailLink(p1);
 							Date sendTime = p1.getDate_of_link_activation();
-
 							EmailScheduler emailScheduler = new EmailScheduler();
 							emailScheduler.scheduleEmail(
 									p1.getId_user().getEmail(),
-									"Schedule the Thank You for Your Purchase at Luna Aura",
+									"Thank You for Your Purchase at Luna Aura",
 									createReminderEmailBody(p1),
 									sendTime
 							);
-
 						}
 					} else {
+						// Handle case where no MultiEntryTicket is found
 						System.out.println("No MultiEntryTicket found for the given user.");
 						message.setObject("No MultiEntryTicket found for the given user.");
+						client.sendToClient(message);
 					}
-					client.sendToClient(message);
+
+					// Commit transaction
 					transaction.commit();
-					session.close();
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println("Error while saving movie link: " + e.getMessage());
 				}
 			}
+
 
 
 

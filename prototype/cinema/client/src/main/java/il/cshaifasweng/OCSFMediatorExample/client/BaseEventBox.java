@@ -24,6 +24,8 @@ public class BaseEventBox {
         SHOW_COMPLAINS_RESPOND,
         GOT_SEARCH_MOVIE_FILTER,
         SIGN_OUT,
+        PURCHASE_LINK_USING_MULTI,
+        PURCHASE_LINK,
         THEATER_MAP_UPDATED;
 
         public static EventEnum getByName(String name) {
