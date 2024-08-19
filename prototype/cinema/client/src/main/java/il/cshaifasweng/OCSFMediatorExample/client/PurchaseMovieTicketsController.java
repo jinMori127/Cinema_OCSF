@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.IdUser;
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import il.cshaifasweng.OCSFMediatorExample.entities.Screening;
 import javafx.application.Platform;
@@ -51,6 +52,7 @@ public class PurchaseMovieTicketsController {
 
     @FXML
     private Button use_multiTicket_butt;
+
 
     @FXML
     void multiTicket_pay(ActionEvent event) {
@@ -213,7 +215,22 @@ public class PurchaseMovieTicketsController {
     }
     @FXML
     public void initialize() {
-    EventBus.getDefault().register(this);
+
+        EventBus.getDefault().register(this);
+        if (UserLogInWithIDController.idUser != null) {
+            IdUser user= UserLogInWithIDController.idUser;
+            id.setText(user.getUser_id());
+            id.setEditable(false);
+            first_name.setText(user.getName().split(" ")[0]);
+            try {
+                last_name.setText(user.getName().split(" ")[1]);
+            }
+            catch (Exception e) {
+                last_name.setText("");
+            }
+            email.setText(user.getEmail());
+            phone_number.setText(user.getPhone_number());
+        }
     }
 
     @Subscribe
