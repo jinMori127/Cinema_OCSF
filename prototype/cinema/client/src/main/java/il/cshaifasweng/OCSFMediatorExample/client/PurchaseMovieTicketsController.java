@@ -2,6 +2,7 @@ package il.cshaifasweng.OCSFMediatorExample.client;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.IdUser;
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
+import il.cshaifasweng.OCSFMediatorExample.entities.MultiEntryTicket;
 import il.cshaifasweng.OCSFMediatorExample.entities.Screening;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -54,6 +55,8 @@ public class PurchaseMovieTicketsController {
     private Button use_multiTicket_butt;
 
 
+    List<MultiEntryTicket> multiTickets;
+
     @FXML
     void multiTicket_pay(ActionEvent event) {
 
@@ -81,20 +84,11 @@ public class PurchaseMovieTicketsController {
             phone_number.setText("");
             return;
         }
-
-        Message message = new Message (2000,"#GetMultiTicket");
-        message.setObject(id.getText());
-
-        try {
-            SimpleClient.getClient().sendToServer(message);
-        } catch (IOException e) {
-            ErrorMessage.setText(e.getMessage());
-            ErrorMessage.setVisible(true);
-            return;
-        }
-
         Screening screening = TheaterMapController.screening;
         ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
+
+        int reserved = places_took.size();
+
         int [][] map = TheaterMapController.cerate_map(screening.getTheater_map());
         for (ArrayList<Integer> list : places_took) {
             map[list.get(0)][list.get(1)] = 2;
@@ -110,7 +104,18 @@ public class PurchaseMovieTicketsController {
             return;
         }
 
+        
+        Message message = new Message (2000,"#PayMultiTicket");
+        message.setObject(id.getText());
+        message.setObject2(reserved);
 
+        try {
+            SimpleClient.getClient().sendToServer(message);
+        } catch (IOException e) {
+            ErrorMessage.setText(e.getMessage());
+            ErrorMessage.setVisible(true);
+            return;
+        }
 
     }
 
@@ -196,12 +201,15 @@ public class PurchaseMovieTicketsController {
         Screening screening = TheaterMapController.screening;
         ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
         int [][] map = TheaterMapController.cerate_map(screening.getTheater_map());
+
         for (ArrayList<Integer> list : places_took) {
             map[list.get(0)][list.get(1)] = 2;
         }
+
         screening.setTheater_map(TheaterMapController.create_string_of_map(map));
         Message m = new Message(10000, "#Update_theater_map");
         m.setObject(screening);
+
         try {
             SimpleClient.getClient().sendToServer(m);
         } catch (IOException e) {
@@ -210,7 +218,7 @@ public class PurchaseMovieTicketsController {
             return;
         }
 
-
+        // pay: seats * price
 
     }
     @FXML
@@ -257,7 +265,30 @@ public class PurchaseMovieTicketsController {
         if (eventBox.getId() == BaseEventBox.get_event_id("FAILED_MT")) {
             Platform.runLater(() -> {
                 ErrorMessage.setVisible(true);
-                ErrorMessage.setText("no entries left in your multi ticket");
+                ErrorMessage.setText("Something went wrong. please make sure that your MT is valid before wasting our precious time. " +
+                        "Now, can u get yo lil ass outta this page. Thank you Sir.");
+
+                Screening screening = TheaterMapController.screening;
+                ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
+
+                int reserved = places_took.size();
+
+                int [][] map = TheaterMapController.cerate_map(screening.getTheater_map());
+                for (ArrayList<Integer> list : places_took) {
+                    map[list.get(0)][list.get(1)] = 1;
+                }
+                screening.setTheater_map(TheaterMapController.create_string_of_map(map));
+                Message m = new Message(10000, "#Update_theater_map");
+                m.setObject(screening);
+                try {
+                    SimpleClient.getClient().sendToServer(m);
+                } catch (IOException e) {
+                    ErrorMessage.setVisible(true);
+                    ErrorMessage.setText(e.getMessage());
+                    return;
+                }
+
+
             });
         }
     }

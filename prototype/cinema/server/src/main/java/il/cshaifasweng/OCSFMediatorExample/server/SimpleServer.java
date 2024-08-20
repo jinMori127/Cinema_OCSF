@@ -437,6 +437,24 @@ public class SimpleServer extends AbstractServer {
 		return data;
 	}
 
+
+	private void updateMT(IdUser idUser, int seats_num) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
+		Root<MultiEntryTicket> root = query.from(MultiEntryTicket.class);
+		query.select(root).where(builder.equal(root.get("id_user"), idUser));
+		MultiEntryTicket existingTicket = session.createQuery(query).uniqueResult();
+
+		if (existingTicket != null) {
+			existingTicket.setRemain_tickets(existingTicket.getRemain_tickets() - seats_num );
+			session.update(existingTicket);
+		}
+
+	}
+
+
 	private List<Complains> search_data(boolean do_show_not_responded) {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
@@ -732,20 +750,30 @@ public class SimpleServer extends AbstractServer {
 			}
 
 
-			else if (message.getMessage().equals("#GetMultiTicket")) {
+			else if (message.getMessage().equals("#PayMultiTicket")) {
 				String id = (String)message.getObject();
 				IdUser idUser = getIUFromId(id);
+				int seats_num = (int) message.getObject2();
 
 				List <MultiEntryTicket> multiEntryTicketList = getMTForID(idUser);
 
 				if (multiEntryTicketList != null) {
 					for (MultiEntryTicket multiEntryTicket : multiEntryTicketList) {
-						if (multiEntryTicket.getRemain_tickets() > 1) {
-							multiEntryTicket.setRemain_tickets(multiEntryTicket.getRemain_tickets() - 1);
+						if (multiEntryTicket.getRemain_tickets() >= seats_num) {
+							multiEntryTicket.setRemain_tickets(multiEntryTicket.getRemain_tickets() - seats_num);
+
+							// update the database (function)
+							updateMT(idUser,seats_num);
+
 							message.setObject(multiEntryTicket);
 							message.setMessage("#DoneGettingMultiTicket");
 							client.sendToClient(message);
 							break;
+						}
+
+						else {
+							message.setMessage("#FailedMT");
+							client.sendToClient(message);
 						}
 					}
 				}
