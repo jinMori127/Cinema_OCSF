@@ -43,8 +43,8 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new BaseEventBox("GET_SCREENING_DONE", message));
 		}
 
-		else if (message.getMessage().equals("#DoneGettingMultiTicket")){
-			EventBus.getDefault().post(new BaseEventBox("DONE_GETTING_MULTITICKET", message));
+		else if (message.getMessage().equals("#DonePayMultiTicket")){
+			EventBus.getDefault().post(new BaseEventBox("DONE_PAY_MULTITICKET", message));
 		}
 
 		else if (message.getMessage().equals("#FailedMT")){

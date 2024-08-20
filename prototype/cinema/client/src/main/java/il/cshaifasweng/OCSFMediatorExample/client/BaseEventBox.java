@@ -25,7 +25,7 @@ public class BaseEventBox {
         GOT_SEARCH_MOVIE_FILTER,
         SIGN_OUT,
         THEATER_MAP_UPDATED,
-        DONE_GETTING_MULTITICKET,
+        DONE_PAY_MULTITICKET,
         FAILED_MT;
 
         public static EventEnum getByName(String name) {

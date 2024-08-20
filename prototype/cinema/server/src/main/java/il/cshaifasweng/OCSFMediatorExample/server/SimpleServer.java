@@ -438,20 +438,12 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
-	private void updateMT(IdUser idUser, int seats_num) {
+	private void updateMT(MultiEntryTicket multiEntryTicket) {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-		CriteriaBuilder builder = session.getCriteriaBuilder();
-		CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
-		Root<MultiEntryTicket> root = query.from(MultiEntryTicket.class);
-		query.select(root).where(builder.equal(root.get("id_user"), idUser));
-		MultiEntryTicket existingTicket = session.createQuery(query).uniqueResult();
-
-		if (existingTicket != null) {
-			existingTicket.setRemain_tickets(existingTicket.getRemain_tickets() - seats_num );
-			session.update(existingTicket);
-		}
-
+		session.update(multiEntryTicket);
+		session.getTransaction().commit();
+		session.close();
 	}
 
 
@@ -761,12 +753,11 @@ public class SimpleServer extends AbstractServer {
 					for (MultiEntryTicket multiEntryTicket : multiEntryTicketList) {
 						if (multiEntryTicket.getRemain_tickets() >= seats_num) {
 							multiEntryTicket.setRemain_tickets(multiEntryTicket.getRemain_tickets() - seats_num);
-
 							// update the database (function)
-							updateMT(idUser,seats_num);
-
-							message.setObject(multiEntryTicket);
-							message.setMessage("#DoneGettingMultiTicket");
+							updateMT(multiEntryTicket);
+							message.setMessage("#DonePayMultiTicket");
+							//to do: add to the purchases data
+							//also send an email
 							client.sendToClient(message);
 							break;
 						}

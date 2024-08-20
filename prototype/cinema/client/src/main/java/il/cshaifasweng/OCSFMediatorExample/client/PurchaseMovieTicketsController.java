@@ -86,25 +86,7 @@ public class PurchaseMovieTicketsController {
         }
         Screening screening = TheaterMapController.screening;
         ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
-
         int reserved = places_took.size();
-
-        int [][] map = TheaterMapController.cerate_map(screening.getTheater_map());
-        for (ArrayList<Integer> list : places_took) {
-            map[list.get(0)][list.get(1)] = 2;
-        }
-        screening.setTheater_map(TheaterMapController.create_string_of_map(map));
-        Message m = new Message(10000, "#Update_theater_map");
-        m.setObject(screening);
-        try {
-            SimpleClient.getClient().sendToServer(m);
-        } catch (IOException e) {
-            ErrorMessage.setVisible(true);
-            ErrorMessage.setText(e.getMessage());
-            return;
-        }
-
-        
         Message message = new Message (2000,"#PayMultiTicket");
         message.setObject(id.getText());
         message.setObject2(reserved);
@@ -116,6 +98,8 @@ public class PurchaseMovieTicketsController {
             ErrorMessage.setVisible(true);
             return;
         }
+
+
 
     }
 
@@ -219,11 +203,13 @@ public class PurchaseMovieTicketsController {
         }
 
         // pay: seats * price
+        //to do send to the server and add to the purchases entity
+        //to do: save the seats as following in the data row1::column1 , row2::column2 , ... rown::columnn
 
     }
     @FXML
     public void initialize() {
-
+        ErrorMessage.setVisible(false);
         EventBus.getDefault().register(this);
         if (UserLogInWithIDController.idUser != null) {
             IdUser user= UserLogInWithIDController.idUser;
@@ -246,8 +232,14 @@ public class PurchaseMovieTicketsController {
     {
 
         System.out.println(event.getPage());
+        if(!event.getPage().equals("#TheaterMap"))
+        {
+            TheaterMapController.places_took = null;
+            TheaterMapController.screening = null;
+        }
         EventBus.getDefault().unregister(this);
         EventBus.getDefault().post(new ContentChangeEvent(event.getPage()));
+
     }
 
     private boolean isFieldEmpty(TextField field, String errorMessage) {
@@ -265,31 +257,27 @@ public class PurchaseMovieTicketsController {
         if (eventBox.getId() == BaseEventBox.get_event_id("FAILED_MT")) {
             Platform.runLater(() -> {
                 ErrorMessage.setVisible(true);
-                ErrorMessage.setText("Something went wrong. please make sure that your MT is valid before wasting our precious time. " +
-                        "Now, can u get yo lil ass outta this page. Thank you Sir.");
-
-                Screening screening = TheaterMapController.screening;
-                ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
-
-                int reserved = places_took.size();
-
-                int [][] map = TheaterMapController.cerate_map(screening.getTheater_map());
-                for (ArrayList<Integer> list : places_took) {
-                    map[list.get(0)][list.get(1)] = 1;
-                }
-                screening.setTheater_map(TheaterMapController.create_string_of_map(map));
-                Message m = new Message(10000, "#Update_theater_map");
-                m.setObject(screening);
-                try {
-                    SimpleClient.getClient().sendToServer(m);
-                } catch (IOException e) {
-                    ErrorMessage.setVisible(true);
-                    ErrorMessage.setText(e.getMessage());
-                    return;
-                }
-
-
+                ErrorMessage.setText("You dont have enough entries in your Multicket");
             });
+        } else if (eventBox.getId() == BaseEventBox.get_event_id("DONE_PAY_MULTITICKET")) {
+            Screening screening = TheaterMapController.screening;
+            ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
+            int [][] map = TheaterMapController.cerate_map(screening.getTheater_map());
+            for (ArrayList<Integer> list : places_took) {
+                map[list.get(0)][list.get(1)] = 2;
+            }
+            screening.setTheater_map(TheaterMapController.create_string_of_map(map));
+            Message m = new Message(10000, "#Update_theater_map");
+            m.setObject(screening);
+            try {
+                SimpleClient.getClient().sendToServer(m);
+            } catch (IOException e) {
+                ErrorMessage.setVisible(true);
+                ErrorMessage.setText(e.getMessage());
+                return;
+            }
+            TheaterMapController.places_took = null;
+            TheaterMapController.screening = null;
         }
     }
 }
