@@ -447,6 +447,14 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
+	private void updateUP (UserPurchases userPurchases){
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		session.update(userPurchases);
+		session.getTransaction().commit();
+		session.close();
+	}
+
 	private List<Complains> search_data(boolean do_show_not_responded) {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
@@ -757,7 +765,13 @@ public class SimpleServer extends AbstractServer {
 							updateMT(multiEntryTicket);
 							message.setMessage("#DonePayMultiTicket");
 							//to do: add to the purchases data
+
+
 							//also send an email
+							sendThankYouEmail(multiEntryTicket);
+
+							message.setObject(idUser);
+
 							client.sendToClient(message);
 							break;
 						}
@@ -776,6 +790,13 @@ public class SimpleServer extends AbstractServer {
 
 
 			}
+
+
+			else if (message.getMessage().equals("#Update_user_purchases")) {
+				UserPurchases userPurchases = (UserPurchases) message.getObject();
+				updateUP(userPurchases);
+			}
+
 
 
 			else if (message.getMessage().equals("#LogIn_worker")) {

@@ -1,9 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
-import il.cshaifasweng.OCSFMediatorExample.entities.IdUser;
-import il.cshaifasweng.OCSFMediatorExample.entities.Message;
-import il.cshaifasweng.OCSFMediatorExample.entities.MultiEntryTicket;
-import il.cshaifasweng.OCSFMediatorExample.entities.Screening;
+import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,6 +17,7 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class PurchaseMovieTicketsController {
@@ -262,10 +260,16 @@ public class PurchaseMovieTicketsController {
         } else if (eventBox.getId() == BaseEventBox.get_event_id("DONE_PAY_MULTITICKET")) {
             Screening screening = TheaterMapController.screening;
             ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
+
+            StringBuilder seats_str = new StringBuilder();
+
             int [][] map = TheaterMapController.cerate_map(screening.getTheater_map());
+
             for (ArrayList<Integer> list : places_took) {
                 map[list.get(0)][list.get(1)] = 2;
+                seats_str.append(list.get(0)).append(" :: ").append(list.get(1)).append("\n");
             }
+
             screening.setTheater_map(TheaterMapController.create_string_of_map(map));
             Message m = new Message(10000, "#Update_theater_map");
             m.setObject(screening);
@@ -276,6 +280,26 @@ public class PurchaseMovieTicketsController {
                 ErrorMessage.setText(e.getMessage());
                 return;
             }
+
+
+            Date currentDate = new Date();
+            IdUser idUser = (IdUser) eventBox.getMessage().getObject();
+            double price = screening.getMovie().getPrice() * places_took.size();
+
+
+            UserPurchases userPurchases = new UserPurchases(seats_str.toString(), "Multi Ticket", price, idUser, screening, "Ticket", currentDate);
+            idUser.getUser_purchases().add(userPurchases);
+
+            m.setMessage("#Update_user_purchases");
+            m.setObject(userPurchases);
+            try {
+                SimpleClient.getClient().sendToServer(m);
+            } catch (IOException e) {
+                ErrorMessage.setVisible(true);
+                ErrorMessage.setText(e.getMessage());
+                return;
+            }
+
             TheaterMapController.places_took = null;
             TheaterMapController.screening = null;
         }
