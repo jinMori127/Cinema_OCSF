@@ -196,6 +196,15 @@ public class MultiEntryTicketController {
             return;
         }
 
+        String _email_str = email_col.getText();
+        String format  = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+        if (!_email_str.matches(format)) {
+            error_message.setVisible(true);
+            error_message.setText("Please enter a valid email address (e.g., user@example.com).");
+            email_col.setText("");
+            return ;
+        }
+
 
         String phone_check_number = phone_number.getText();
 

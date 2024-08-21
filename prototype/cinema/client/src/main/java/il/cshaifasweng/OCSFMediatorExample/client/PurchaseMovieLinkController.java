@@ -194,6 +194,7 @@ public class PurchaseMovieLinkController {
             error_message.setVisible(true);
             error_message.setText("Please enter a valid email address (e.g., user@example.com).");
             user_email.setText("");
+            return false;
         }
 
         if(check_credit) {
@@ -245,7 +246,6 @@ public class PurchaseMovieLinkController {
 
         }
 
-        // Validate wanted_date
         String wantedDateStr = wanted_date.getText();
         LocalDate wantedDate;
         try {
