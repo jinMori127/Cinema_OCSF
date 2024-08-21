@@ -26,7 +26,7 @@ public class BaseEventBox {
         SIGN_OUT,
         THEATER_MAP_UPDATED,
         DONE_PAY_MULTITICKET,
-        FAILED_MT;
+        FAILED_MT,SAVED_USER_PURCHASES;
 
         public static EventEnum getByName(String name) {
             try {

@@ -447,7 +447,7 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
-	private void updateUP (UserPurchases userPurchases){
+	private void saveUP (UserPurchases userPurchases){
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		session.update(userPurchases);
@@ -792,9 +792,11 @@ public class SimpleServer extends AbstractServer {
 			}
 
 
-			else if (message.getMessage().equals("#Update_user_purchases")) {
+			else if (message.getMessage().equals("#Save_user_purchases")) {
 				UserPurchases userPurchases = (UserPurchases) message.getObject();
-				updateUP(userPurchases);
+				saveUP(userPurchases);
+				message.setMessage("#Saved_user_purchases");
+				sendToAllClients(message);
 			}
 
 

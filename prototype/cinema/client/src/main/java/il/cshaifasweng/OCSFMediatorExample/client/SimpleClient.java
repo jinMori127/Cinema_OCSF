@@ -120,8 +120,10 @@ public class SimpleClient extends AbstractClient {
 		else if (message.getMessage().equals("#theater_map_updated")){
 			EventBus.getDefault().post(new BaseEventBox("THEATER_MAP_UPDATED", message));
 		}
-
-
+		else if(message.getMessage().equals("#Saved_user_purchases"))
+		{
+			EventBus.getDefault().post(new BaseEventBox("SAVED_USER_PURCHASES", message));
+		}
 		else {
 			EventBus.getDefault().post(new BaseEventBox("WRONG_NAMEING", message));
 		}

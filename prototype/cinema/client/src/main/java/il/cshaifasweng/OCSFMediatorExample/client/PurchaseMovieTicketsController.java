@@ -261,13 +261,15 @@ public class PurchaseMovieTicketsController {
             Screening screening = TheaterMapController.screening;
             ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
 
-            StringBuilder seats_str = new StringBuilder();
+            String seats_str = "";
 
             int [][] map = TheaterMapController.cerate_map(screening.getTheater_map());
 
             for (ArrayList<Integer> list : places_took) {
                 map[list.get(0)][list.get(1)] = 2;
-                seats_str.append(list.get(0)).append(" :: ").append(list.get(1)).append("\n");
+                if(list != places_took.getLast()) {
+                    seats_str += list.get(0) + "::" + list.get(1) + " , ";
+                }
             }
 
             screening.setTheater_map(TheaterMapController.create_string_of_map(map));
@@ -287,10 +289,10 @@ public class PurchaseMovieTicketsController {
             double price = screening.getMovie().getPrice() * places_took.size();
 
 
-            UserPurchases userPurchases = new UserPurchases(seats_str.toString(), "Multi Ticket", price, idUser, screening, "Ticket", currentDate);
+            UserPurchases userPurchases = new UserPurchases(seats_str, "Multi Ticket", price, idUser, screening, "Ticket", currentDate);
             idUser.getUser_purchases().add(userPurchases);
 
-            m.setMessage("#Update_user_purchases");
+            m.setMessage("#Save_user_purchases");
             m.setObject(userPurchases);
             try {
                 SimpleClient.getClient().sendToServer(m);
@@ -302,6 +304,12 @@ public class PurchaseMovieTicketsController {
 
             TheaterMapController.places_took = null;
             TheaterMapController.screening = null;
+        } else if (eventBox.getId() ==BaseEventBox.get_event_id("SAVED_USER_PURCHASES")) {
+            UserPurchases userPurchases = (UserPurchases)eventBox.getMessage().getObject();
+            if(userPurchases.getId_user().getUser_id().trim().equals(id.getText().trim())) {
+                ErrorMessage.setVisible(true);
+                ErrorMessage.setText("Thank you for you purchase, an email will be sent to you");
+            }
         }
     }
 }
