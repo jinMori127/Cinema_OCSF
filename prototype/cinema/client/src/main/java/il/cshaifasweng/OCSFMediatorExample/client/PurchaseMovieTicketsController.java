@@ -65,7 +65,7 @@ public class PurchaseMovieTicketsController {
 
     @FXML
     void multiTicket_pay(ActionEvent event) {
-
+        ErrorMessage.setVisible(false);
         if (isFieldEmpty(id, "Please enter your ID.")) return;
         if (isFieldEmpty(first_name, "Please enter your first name.")) return;
         if (isFieldEmpty(last_name, "Please enter your last name.")) return;
@@ -85,7 +85,7 @@ public class PurchaseMovieTicketsController {
         String user_phone_number_str = phone_number.getText();
 
 
-        if(!isValidEmail(email.getText(), "Invalid email."))
+        //if(!isValidEmail(email.getText(), "Invalid email."))
 
 
         if (!user_phone_number_str.matches("\\d{10}")) {
@@ -101,6 +101,13 @@ public class PurchaseMovieTicketsController {
         Message message = new Message (2000,"#PayMultiTicket");
         message.setObject(id.getText());
         message.setObject2(reserved);
+        IdUser current_id_user =new IdUser();
+        current_id_user.setIsLoggedIn(false);
+        current_id_user.setUser_id(id.getText());
+        current_id_user.setName(first_name.getText()+" "+last_name.getText());
+        current_id_user.setEmail(email.getText());
+        current_id_user.setPhone_number(phone_number.getText());
+        message.setObject3(current_id_user);
 
         try {
             SimpleClient.getClient().sendToServer(message);
@@ -117,7 +124,7 @@ public class PurchaseMovieTicketsController {
 
     @FXML
     void pay_amount(ActionEvent event) {
-
+        ErrorMessage.setVisible(false);
         if (isFieldEmpty(id, "Please enter your ID.")) return;
         if (isFieldEmpty(first_name, "Please enter your first name.")) return;
         if (isFieldEmpty(last_name, "Please enter your last name.")) return;
@@ -149,7 +156,7 @@ public class PurchaseMovieTicketsController {
 
         if (!user_card_number_str.matches("\\d{16}")) {
             ErrorMessage.setVisible(true);
-            ErrorMessage.setText("Card number must contain exactly 12 digits");
+            ErrorMessage.setText("Card number must contain exactly 16 digits");
             credit_card_number.setText("");
             return;
         }
@@ -192,32 +199,18 @@ public class PurchaseMovieTicketsController {
             return;
         }
 
-
-        Screening screening = TheaterMapController.screening;
-        ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
-        int [][] map = TheaterMapController.cerate_map(screening.getTheater_map());
-
-        for (ArrayList<Integer> list : places_took) {
-            map[list.get(0)][list.get(1)] = 2;
-        }
-
-        screening.setTheater_map(TheaterMapController.create_string_of_map(map));
-        Message m = new Message(10000, "#Update_theater_map");
-        m.setObject(screening);
-
-        try {
-            SimpleClient.getClient().sendToServer(m);
-        } catch (IOException e) {
-            ErrorMessage.setVisible(true);
-            ErrorMessage.setText(e.getMessage());
-            return;
-        }
-
         // pay: seats * price
         //to do send to the server and add to the purchases entity
-
+        IdUser current_id_user =new IdUser();
+        current_id_user.setIsLoggedIn(false);
+        current_id_user.setUser_id(id.getText());
+        current_id_user.setName(first_name.getText()+" "+last_name.getText());
+        current_id_user.setEmail(email.getText());
+        current_id_user.setPhone_number(phone_number.getText());
+        Message m = new Message(2000,"#Success_CC");
         m.setMessage("#Success_CC");
         m.setObject(id.getText());
+        m.setObject2(current_id_user);
         try {
             SimpleClient.getClient().sendToServer(m);
         } catch (IOException e) {
@@ -344,68 +337,71 @@ public class PurchaseMovieTicketsController {
             if(userPurchases.getId_user().getUser_id().trim().equals(id.getText().trim())) {
                 ErrorMessage.setVisible(true);
                 ErrorMessage.setText("Thank you for you purchase, an email will be sent to you");
+                Message m = new Message(10000, "#Send_mail");
+                m.setObject(userPurchases);
+                try {
+                    SimpleClient.getClient().sendToServer(m);
+                } catch (IOException e) {
+                    ErrorMessage.setVisible(true);
+                    ErrorMessage.setText(e.getMessage());
+                    return;
+                }
             }
 
-            Message m = new Message(10000, "#Send_mail");
-            m.setObject(userPurchases);
-            try {
-                SimpleClient.getClient().sendToServer(m);
-            } catch (IOException e) {
-                ErrorMessage.setVisible(true);
-                ErrorMessage.setText(e.getMessage());
-                return;
-            }
+
 
         }
 
         else if (eventBox.getId() == BaseEventBox.get_event_id("DONE_CC")) {
-            Screening screening = TheaterMapController.screening;
-            ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
 
-            String seats_str = "";
+                Screening screening = TheaterMapController.screening;
+                ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
 
-            int [][] map = TheaterMapController.cerate_map(screening.getTheater_map());
+                String seats_str = "";
 
-            for (ArrayList<Integer> list : places_took) {
-                map[list.get(0)][list.get(1)] = 2;
-                if(list != places_took.getLast()) {
-                    seats_str += list.get(0) + "::" + list.get(1) + " , ";
+                int[][] map = TheaterMapController.cerate_map(screening.getTheater_map());
+
+                for (ArrayList<Integer> list : places_took) {
+                    map[list.get(0)][list.get(1)] = 2;
+                    if (list != places_took.getLast()) {
+                        seats_str += list.get(0) + "::" + list.get(1) + " , ";
+                    }
                 }
-            }
 
-            screening.setTheater_map(TheaterMapController.create_string_of_map(map));
-            Message m = new Message(10000, "#Update_theater_map");
-            m.setObject(screening);
-            try {
-                SimpleClient.getClient().sendToServer(m);
-            } catch (IOException e) {
-                ErrorMessage.setVisible(true);
-                ErrorMessage.setText(e.getMessage());
-                return;
-            }
-
-
-            Date currentDate = new Date();
-            IdUser idUser = (IdUser) eventBox.getMessage().getObject();
-            double price = screening.getMovie().getPrice() * places_took.size();
+                screening.setTheater_map(TheaterMapController.create_string_of_map(map));
+                Message m = new Message(10000, "#Update_theater_map");
+                m.setObject(screening);
+                try {
+                    SimpleClient.getClient().sendToServer(m);
+                } catch (IOException e) {
+                    ErrorMessage.setVisible(true);
+                    ErrorMessage.setText(e.getMessage());
+                    return;
+                }
 
 
-            UserPurchases userPurchases = new UserPurchases(seats_str, "Multi Ticket", price, idUser, screening, "Ticket", currentDate);
+                Date currentDate = new Date();
+                IdUser idUser = (IdUser) eventBox.getMessage().getObject();
+                double price = screening.getMovie().getPrice() * places_took.size();
 
-            idUser.getUser_purchases().add(userPurchases);
 
-            m.setMessage("#Save_user_purchases");
-            m.setObject(userPurchases);
-            try {
-                SimpleClient.getClient().sendToServer(m);
-            } catch (IOException e) {
-                ErrorMessage.setVisible(true);
-                ErrorMessage.setText(e.getMessage());
-                return;
-            }
+                UserPurchases userPurchases = new UserPurchases(seats_str, "Credit Card", price, idUser, screening, "Ticket", currentDate);
 
-            TheaterMapController.places_took = null;
-            TheaterMapController.screening = null;
+                //idUser.getUser_purchases().add(userPurchases);
+
+                m.setMessage("#Save_user_purchases");
+                m.setObject(userPurchases);
+                try {
+                    SimpleClient.getClient().sendToServer(m);
+                } catch (IOException e) {
+                    ErrorMessage.setVisible(true);
+                    ErrorMessage.setText(e.getMessage());
+                    return;
+                }
+
+                TheaterMapController.places_took = null;
+                TheaterMapController.screening = null;
+
         }
 
     }

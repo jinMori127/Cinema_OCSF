@@ -419,6 +419,8 @@ public class SimpleServer extends AbstractServer {
 		List<IdUser> data = session.createQuery(query).getResultList();
 		session.getTransaction().commit();
 		session.close();
+		if (data.size() != 1)
+			return null;
 		return data.get(0);
 	}
 
@@ -535,8 +537,7 @@ public class SimpleServer extends AbstractServer {
 		String name = userPurchases.getId_user().getName();
 		String id = userPurchases.getId_user().getUser_id();
 		LocalDate date = LocalDate.now();
-		int paymentAmount = MultiEntryTicket.INITIAL_PRICE;
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
 		String formattedDate = date.format(formatter);
 
 		String body = "<html>"
@@ -552,13 +553,15 @@ public class SimpleServer extends AbstractServer {
 				+ "<p><em>(Please keep a copy of this receipt for your records.)</em></p>"
 				+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
 				+ "<h3 style='color: #555;'>YOUR ORDER INFORMATION:</h3>"
-				+ "<p><strong>Order ID:</strong> " + id + "<br/>"
+				+ "<p><strong>Order ID:</strong> " + userPurchases.getAuto_number_purchase() + "<br/>"
 				+ "<strong>Order Date:</strong> " + formattedDate + "<br/>"
 				+ "<strong>Source:</strong> Luna Aura</p>"
+				+ "<p><strong>Amout:</strong> >" + userPurchases.getPayment_amount()+ "</p>"
 				+ "<p><strong>Branch:</strong> >" + userPurchases.getScreening().getBranch() + "</p>"
 				+ "<p><strong>Movie name:</strong> " + userPurchases.getMovie_name() + "<br/>"
 				+ "<p><strong>Room number:</strong> " + userPurchases.getScreening().getRoom_number() + "<br/>"
 				+ "<p><strong>Screening Time:</strong> " + userPurchases.getScreening_time() + "<br/>"
+				+ "<p><strong>Your seats:</strong> " + userPurchases.getSeats() + "<br/>"
 				+ "<p>We appreciate your business and hope to see you again soon!</p>"
 				+ "<p>Best regards,<br/>Luna Aura Team</p>"
 				+ "</div>"
@@ -630,6 +633,14 @@ public class SimpleServer extends AbstractServer {
 		session.update(screening);
 		session.getTransaction().commit();
 		session.close();
+	}
+	private void saveUpdateIduser(IdUser idUser){
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		session.saveOrUpdate(idUser);
+		session.getTransaction().commit();
+		session.close();
+
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -794,7 +805,12 @@ public class SimpleServer extends AbstractServer {
 
 			else if (message.getMessage().equals("#PayMultiTicket")) {
 				String id = (String)message.getObject();
-				IdUser idUser = getIUFromId(id);
+				IdUser idUser = (IdUser)message.getObject3();
+				IdUser idUser_from_base = getIUFromId(id);
+				if(idUser_from_base != null) {
+					idUser_from_base.setIsLoggedIn(idUser_from_base.getIsLoggedIn());
+				}
+				saveUpdateIduser(idUser);
 				int seats_num = (int) message.getObject2();
 
 				List <MultiEntryTicket> multiEntryTicketList = getMTForID(idUser);
@@ -837,16 +853,23 @@ public class SimpleServer extends AbstractServer {
 				UserPurchases userPurchases = (UserPurchases) message.getObject();
 				saveUP(userPurchases);
 				message.setMessage("#Saved_user_purchases");
-				//sendToAllClients(message);
-				client.sendToClient(message);
+				sendToAllClients(message);
+
 			}
 
 			else if (message.getMessage().equals("#Success_CC")){
 				String id = (String)message.getObject();
-				IdUser idUser = getIUFromId(id);
+				IdUser idUser = (IdUser)message.getObject2();
+				IdUser idUser_from_base = getIUFromId(id);
+				if(idUser_from_base != null) {
+					idUser_from_base.setIsLoggedIn(idUser_from_base.getIsLoggedIn());
+				}
+				saveUpdateIduser(idUser);
 
 
 				message.setMessage("#DonePayCC");
+				message.setObject(idUser);
+				client.sendToClient(message);
 				//to do: add to the purchases data
 
 			}
