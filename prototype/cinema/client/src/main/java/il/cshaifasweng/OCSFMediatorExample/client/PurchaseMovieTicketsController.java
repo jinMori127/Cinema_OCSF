@@ -19,6 +19,8 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PurchaseMovieTicketsController {
 
@@ -53,6 +55,12 @@ public class PurchaseMovieTicketsController {
     private Button use_multiTicket_butt;
 
 
+    // Define a regular expression for email validation
+    private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+
+    // Compile the regular expression into a pattern
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
+
     List<MultiEntryTicket> multiTickets;
 
     @FXML
@@ -76,12 +84,17 @@ public class PurchaseMovieTicketsController {
 
         String user_phone_number_str = phone_number.getText();
 
+
+        if(!isValidEmail(email.getText(), "Invalid email."))
+
+
         if (!user_phone_number_str.matches("\\d{10}")) {
             ErrorMessage.setVisible(true);
             ErrorMessage.setText("Phone number must contain exactly 10 digits");
             phone_number.setText("");
             return;
         }
+
         Screening screening = TheaterMapController.screening;
         ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
         int reserved = places_took.size();
@@ -202,6 +215,17 @@ public class PurchaseMovieTicketsController {
 
         // pay: seats * price
         //to do send to the server and add to the purchases entity
+
+        m.setMessage("#Success_CC");
+        m.setObject(id.getText());
+        try {
+            SimpleClient.getClient().sendToServer(m);
+        } catch (IOException e) {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText(e.getMessage());
+            return;
+        }
+
         //to do: save the seats as following in the data row1::column1 , row2::column2 , ... rown::columnn
 
     }
@@ -246,9 +270,20 @@ public class PurchaseMovieTicketsController {
             ErrorMessage.setText(errorMessage);
             return true;
         }
+
+
+
         return false;
     }
 
+
+    private boolean isValidEmail(String email, String error_msg) {
+        // Check if the email matches the regex pattern
+        Matcher matcher = EMAIL_PATTERN.matcher(email);
+        ErrorMessage.setVisible(true);
+        ErrorMessage.setText(error_msg);
+        return matcher.matches();
+    }
 
     @Subscribe
     public void A(BaseEventBox eventBox) {
@@ -286,10 +321,10 @@ public class PurchaseMovieTicketsController {
 
             Date currentDate = new Date();
             IdUser idUser = (IdUser) eventBox.getMessage().getObject();
-            double price = screening.getMovie().getPrice() * places_took.size();
 
 
-            UserPurchases userPurchases = new UserPurchases(seats_str, "Multi Ticket", price, idUser, screening, "Ticket", currentDate);
+
+            UserPurchases userPurchases = new UserPurchases(seats_str, "Multi Ticket", 0, idUser, screening, "Ticket", currentDate);
             idUser.getUser_purchases().add(userPurchases);
 
             m.setMessage("#Save_user_purchases");
@@ -310,6 +345,68 @@ public class PurchaseMovieTicketsController {
                 ErrorMessage.setVisible(true);
                 ErrorMessage.setText("Thank you for you purchase, an email will be sent to you");
             }
+
+            Message m = new Message(10000, "#Send_mail");
+            m.setObject(userPurchases);
+            try {
+                SimpleClient.getClient().sendToServer(m);
+            } catch (IOException e) {
+                ErrorMessage.setVisible(true);
+                ErrorMessage.setText(e.getMessage());
+                return;
+            }
+
         }
+
+        else if (eventBox.getId() == BaseEventBox.get_event_id("DONE_CC")) {
+            Screening screening = TheaterMapController.screening;
+            ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
+
+            String seats_str = "";
+
+            int [][] map = TheaterMapController.cerate_map(screening.getTheater_map());
+
+            for (ArrayList<Integer> list : places_took) {
+                map[list.get(0)][list.get(1)] = 2;
+                if(list != places_took.getLast()) {
+                    seats_str += list.get(0) + "::" + list.get(1) + " , ";
+                }
+            }
+
+            screening.setTheater_map(TheaterMapController.create_string_of_map(map));
+            Message m = new Message(10000, "#Update_theater_map");
+            m.setObject(screening);
+            try {
+                SimpleClient.getClient().sendToServer(m);
+            } catch (IOException e) {
+                ErrorMessage.setVisible(true);
+                ErrorMessage.setText(e.getMessage());
+                return;
+            }
+
+
+            Date currentDate = new Date();
+            IdUser idUser = (IdUser) eventBox.getMessage().getObject();
+            double price = screening.getMovie().getPrice() * places_took.size();
+
+
+            UserPurchases userPurchases = new UserPurchases(seats_str, "Multi Ticket", price, idUser, screening, "Ticket", currentDate);
+
+            idUser.getUser_purchases().add(userPurchases);
+
+            m.setMessage("#Save_user_purchases");
+            m.setObject(userPurchases);
+            try {
+                SimpleClient.getClient().sendToServer(m);
+            } catch (IOException e) {
+                ErrorMessage.setVisible(true);
+                ErrorMessage.setText(e.getMessage());
+                return;
+            }
+
+            TheaterMapController.places_took = null;
+            TheaterMapController.screening = null;
+        }
+
     }
 }

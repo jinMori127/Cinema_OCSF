@@ -526,6 +526,48 @@ public class SimpleServer extends AbstractServer {
 			session.save(t);
 		}
 	}
+
+	private void sendEmail1(UserPurchases userPurchases){
+		EmailSender emailSender = new EmailSender();
+		String[] recipients = {userPurchases.getId_user().getEmail()};
+		String subject = "Thank You for Your Purchase at Luna Aura";
+
+		String name = userPurchases.getId_user().getName();
+		String id = userPurchases.getId_user().getUser_id();
+		LocalDate date = LocalDate.now();
+		int paymentAmount = MultiEntryTicket.INITIAL_PRICE;
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+		String formattedDate = date.format(formatter);
+
+		String body = "<html>"
+				+ "<body style='font-family: Arial, sans-serif; color: #333;'>"
+				+ "<div style='max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd;'>"
+				+ "<div style='text-align: center;'>"
+				+ "<img src='YOUR_LOGO_URL' alt='Luna Aura' style='width: 100px; margin-bottom: 20px;'/>"
+				+ "<h1 style='font-size: 24px; color: #555;'>Thank You.</h1>"
+				+ "</div>"
+				+ "<p>Hi " + name + "!</p>"
+				+ "<p>Thanks for your purchase from Luna Aura.</p>"
+				+ "<h2 style='color: #555;'>INVOICE ID: " + id + "</h2>"
+				+ "<p><em>(Please keep a copy of this receipt for your records.)</em></p>"
+				+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
+				+ "<h3 style='color: #555;'>YOUR ORDER INFORMATION:</h3>"
+				+ "<p><strong>Order ID:</strong> " + id + "<br/>"
+				+ "<strong>Order Date:</strong> " + formattedDate + "<br/>"
+				+ "<strong>Source:</strong> Luna Aura</p>"
+				+ "<p><strong>Branch:</strong> >" + userPurchases.getScreening().getBranch() + "</p>"
+				+ "<p><strong>Movie name:</strong> " + userPurchases.getMovie_name() + "<br/>"
+				+ "<p><strong>Room number:</strong> " + userPurchases.getScreening().getRoom_number() + "<br/>"
+				+ "<p><strong>Screening Time:</strong> " + userPurchases.getScreening_time() + "<br/>"
+				+ "<p>We appreciate your business and hope to see you again soon!</p>"
+				+ "<p>Best regards,<br/>Luna Aura Team</p>"
+				+ "</div>"
+				+ "</body>"
+				+ "</html>";
+
+		emailSender.sendEmail(recipients, subject, body);
+	}
+
 	private void sendThankYouEmail(MultiEntryTicket t) {
 		EmailSender emailSender = new EmailSender();
 		String[] recipients = {t.getId_user().getEmail()};
@@ -768,7 +810,6 @@ public class SimpleServer extends AbstractServer {
 
 
 							//also send an email
-							sendThankYouEmail(multiEntryTicket);
 
 							message.setObject(idUser);
 
@@ -796,9 +837,26 @@ public class SimpleServer extends AbstractServer {
 				UserPurchases userPurchases = (UserPurchases) message.getObject();
 				saveUP(userPurchases);
 				message.setMessage("#Saved_user_purchases");
-				sendToAllClients(message);
+				//sendToAllClients(message);
+				client.sendToClient(message);
 			}
 
+			else if (message.getMessage().equals("#Success_CC")){
+				String id = (String)message.getObject();
+				IdUser idUser = getIUFromId(id);
+
+
+				message.setMessage("#DonePayCC");
+				//to do: add to the purchases data
+
+			}
+
+			else if(message.getMessage().equals("#Send_mail")){
+				UserPurchases userPurchases = (UserPurchases)message.getObject();
+				sendEmail1(userPurchases);
+				message.setMessage("#Done_Sending_email");
+				client.sendToClient(message);
+			}
 
 
 			else if (message.getMessage().equals("#LogIn_worker")) {
