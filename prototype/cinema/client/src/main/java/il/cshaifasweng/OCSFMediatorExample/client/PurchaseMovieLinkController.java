@@ -188,6 +188,14 @@ public class PurchaseMovieLinkController {
             return false;
         }
 
+        String email_str = user_email.getText();
+        String format  = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+        if (!email_str.matches(format)) {
+            error_message.setVisible(true);
+            error_message.setText("Please enter a valid email address (e.g., user@example.com).");
+            user_email.setText("");
+        }
+
         if(check_credit) {
 
             String user_card_number_str = user_card_number.getText();
