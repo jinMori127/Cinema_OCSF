@@ -46,7 +46,7 @@ import java.util.Iterator;
 import java.util.Collections;
 import il.cshaifasweng.OCSFMediatorExample.entities.MultiEntryTicket;
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
 	private static SessionFactory sessionFactory = getSessionFactory(SimpleChatServer.password);
@@ -81,6 +81,9 @@ public class SimpleServer extends AbstractServer {
 		super(port);
 
 	}
+	/////////////////////////////////////////////// HELPER FUNCTIONS ////////////////////////////////////////////////////////////////////
+
+
 	private static List<Movie> get_near_movies()throws Exception
 	{
 		Session session = sessionFactory.openSession();
@@ -457,7 +460,9 @@ public class SimpleServer extends AbstractServer {
 		return data;
 	}
 
-	private IdUser getOrSaveIdUser(Session session, IdUser idUser) {
+	private IdUser getOrSaveIdUser( IdUser idUser) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
 		CriteriaBuilder builder = session.getCriteriaBuilder();
 		CriteriaQuery<IdUser> idUserQuery = builder.createQuery(IdUser.class);
 		Root<IdUser> idUserRoot = idUserQuery.from(IdUser.class);
@@ -468,16 +473,24 @@ public class SimpleServer extends AbstractServer {
 			existingIdUser.setEmail(idUser.getEmail());
 			existingIdUser.setName(idUser.getName());
 			session.update(existingIdUser);
+			session.getTransaction().commit();
+			session.close();
+
 
 			return existingIdUser;
 		} else {
 			session.save(idUser);
+			session.getTransaction().commit();
+			session.close();
 			return idUser;
 		}
+
 	}
 
 
-	private void updateOrSaveMultiEntryTicket(Session session, MultiEntryTicket t, IdUser idUser) {
+	private void updateOrSaveMultiEntryTicket( MultiEntryTicket t, IdUser idUser) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
 		CriteriaBuilder builder = session.getCriteriaBuilder();
 		CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
 		Root<MultiEntryTicket> root = query.from(MultiEntryTicket.class);
@@ -491,6 +504,8 @@ public class SimpleServer extends AbstractServer {
 			t.setId_user(idUser);
 			session.save(t);
 		}
+		session.getTransaction().commit();
+		session.close();
 	}
 
 
@@ -690,9 +705,7 @@ public class SimpleServer extends AbstractServer {
 		session.getTransaction().commit();
 		session.close();
 	}
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
+	/////////////////////////////   Handle Messages  /////////////////////////////////////////////////////////////////////////////////////
 
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
@@ -700,13 +713,17 @@ public class SimpleServer extends AbstractServer {
 		String request = message.getMessage();
 
 		try {
+			////////////// Get All Movies /////////////
 			if (message.getMessage().equals("#GetAllMovies")) {
 
 				List<Movie> movies = getAllMovies();
 				message.setObject(movies);
 				message.setMessage("#GotAllMovies");
 				client.sendToClient(message);
-			} else if (message.getMessage().equals("#SearchMovieFillter")) {
+			}
+
+			////////////// Search Movie Using Filter  /////////////
+			else if (message.getMessage().equals("#SearchMovieFillter")) {
 				Movie m = (Movie)message.getObject();
 				Map<String, String> dictionary = (Map<String, String>) message.getObject2();
 				List<Movie> answer = search_with_filter(m,Integer.parseInt(dictionary.get("year2")),dictionary.get("Sort_atribute"),dictionary.get("Sort_direction"));
@@ -714,20 +731,25 @@ public class SimpleServer extends AbstractServer {
 				message.setMessage("#GotSearchMovieFillter");
 				client.sendToClient(message);
 
-			} else if (message.getMessage().equals("#DeleteMovie")) {
+			}
+
+			////////////// Delete Movie ///////////////////////////
+			else if (message.getMessage().equals("#DeleteMovie")) {
 				Movie movie = (Movie) message.getObject();
 				remove_movie(movie);
 				message.setObject(getAllMovies());
 				message.setMessage("#UpdateMovieList");
 				sendToAllClients(message);
-			} else if (message.getMessage().equals("#GoToScreenings")) {
+			}
+
+			////////////// Go To Screening //////////////////////
+			else if (message.getMessage().equals("#GoToScreenings")) {
 				Movie movie = (Movie) message.getObject();
 				System.out.println("screening number");
 				System.out.println(movie.getScreenings().size());
 				message.setObject(movie.getScreenings());
 				message.setMessage("#ScreeningsGot");
 				client.sendToClient(message);
-
 			}
 
 			else if (message.getMessage().equals("#GetScreening")) {
@@ -748,18 +770,24 @@ public class SimpleServer extends AbstractServer {
 				Message message1 = new Message(10, "#ChangeMovieIdBox");
 				message1.setObject(movie);
 				client.sendToClient(message1);
-			} else if (message.getMessage().equals("#UpdateMovie")) {
+			}
+
+			else if (message.getMessage().equals("#UpdateMovie")) {
 				Movie movie = (Movie) message.getObject();
 				update_movie(movie);
 				message.setObject(getAllMovies());
 				message.setMessage("#UpdateMovieList");
 				sendToAllClients(message);
-			} else if (message.getMessage().equals("#SearchMovies")) {
+			}
+
+			else if (message.getMessage().equals("#SearchMovies")) {
 				String movieName = (String) message.getObject();
 				message.setObject(get_movies_by_name(movieName));
 				message.setMessage("#UpdateMovieList_Eatch");
 				client.sendToClient(message);
-			} else if (message.getMessage().equals("#AddNewScreening")) {
+			}
+
+			else if (message.getMessage().equals("#AddNewScreening")) {
 				Screening screening = (Screening) message.getObject();
 				boolean add = check_the_new_screening(screening, false);
 				if (add) {
@@ -773,17 +801,24 @@ public class SimpleServer extends AbstractServer {
 					message1.setObject(screening);
 
 					client.sendToClient(message1);
-				} else {
+				}
+
+				else {
 					message.setMessage("#ServerError");
 					message.setData("there is already a screening at this time");
 					client.sendToClient(message);
 				}
-			} else if (message.getMessage().equals("#get_screening_from_id")) {
+			}
+
+			else if (message.getMessage().equals("#get_screening_from_id")) {
 				int screening_id = (Integer) message.getObject();
 				message.setObject(get_screening(screening_id));
 				message.setMessage("#UpdateBoxesInScreening");
 				client.sendToClient(message);
-			} else if (message.getMessage().equals("#RemoveScreening")) {
+			}
+
+
+			else if (message.getMessage().equals("#RemoveScreening")) {
 				Movie movie = ((Screening) message.getObject()).getMovie();
 				Screening screening = (Screening) message.getObject();
 				remove_screening(screening);
@@ -791,7 +826,10 @@ public class SimpleServer extends AbstractServer {
 				message.setObject2(movie);
 				message.setMessage("#UpdateScreeningForMovie");
 				sendToAllClients(message);
-			} else if (message.getMessage().equals("#SearchBranchForScreening")) {
+			}
+
+
+			else if (message.getMessage().equals("#SearchBranchForScreening")) {
 				Movie movie = (Movie) message.getObject();
 				String Branch = (String) message.getObject2();
 				List<Screening> screenings = search_sreening_branch_and_movie(Branch, movie);
@@ -799,7 +837,9 @@ public class SimpleServer extends AbstractServer {
 				message.setObject2(movie);
 				message.setMessage("#UpdateScreeningForMovie_each");
 				client.sendToClient(message);
-			} else if (message.getMessage().equals("#UpdateScreening")) {
+			}
+
+			else if (message.getMessage().equals("#UpdateScreening")) {
 				Movie movie = ((Screening) message.getObject()).getMovie();
 				Screening screening = (Screening) message.getObject();
 				screening.setMovie(movie);
@@ -816,7 +856,9 @@ public class SimpleServer extends AbstractServer {
 					client.sendToClient(message);
 				}
 
-			} else if (message.getMessage().equals("#ChangeAllPrices")) {
+			}
+
+			else if (message.getMessage().equals("#ChangeAllPrices")) {
 				int new_price = (int) message.getObject();
 				update_all_prices(new_price);
 				message.setMessage("#UpdateMovieList");
@@ -859,8 +901,7 @@ public class SimpleServer extends AbstractServer {
 					String userName = (String) message.getObject();
 					String password = (String) message.getObject2();
 
-					// Use HQL to fetch the Worker object by user_name
-					// Use HQL to fetch the Worker object by user_name
+
 					Query query = session.createQuery("FROM Worker WHERE user_name = :userName");
 					query.setParameter("userName", userName);
 					Worker worker = (Worker) query.uniqueResult();
@@ -887,7 +928,9 @@ public class SimpleServer extends AbstractServer {
 					throw new RuntimeException(e);
 				}
 
-			} else if (message.getMessage().equals("#GetHomePage")) {
+			}
+
+			else if (message.getMessage().equals("#GetHomePage")) {
 				SubscribedClient connection = new SubscribedClient(client);
 				if (SubscribersList.contains(connection) == false) {
 					SubscribersList.add(connection);
@@ -898,22 +941,22 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(movies);
 				client.sendToClient(message);
 			}
+
+			//////////////////////////////////////////////////////Purchase Part /////////////////////////////////////////////////////////
 			else if (message.getMessage().equals("#purchase_movie_link")) {
-				try (Session session = sessionFactory.openSession()) {
-					Transaction transaction = session.beginTransaction();
 					UserPurchases p1 = (UserPurchases) message.getObject();
 					p1.setPayment_type("Credit");
+					IdUser user1 = getOrSaveIdUser(p1.getId_user());
 
-					IdUser user1 = getOrSaveIdUser(session, p1.getId_user());
-					p1.setId_user(user1); // Make sure UserPurchases has the persistent IdUser
+				try (Session session = sessionFactory.openSession()) {
+					Transaction transaction = session.beginTransaction();
+					p1.setId_user(user1);
 					session.save(p1);
 					message.setMessage("#purchase_movie_link_client");
 					message.setObject("");
 					client.sendToClient(message);
 					sendThankYouEmailLink(p1);
                     Date sendTime = p1.getDate_of_link_activation();
-
-
 					EmailScheduler emailScheduler = new EmailScheduler();
 					emailScheduler.scheduleEmail(
 							p1.getId_user().getEmail(),
@@ -921,6 +964,7 @@ public class SimpleServer extends AbstractServer {
 							createReminderEmailBody(p1),
 							sendTime
 					);
+
 					transaction.commit();
 					session.close();
 
@@ -933,45 +977,34 @@ public class SimpleServer extends AbstractServer {
 				}
 			}
 			else if (message.getMessage().equals("#purchase_movie_link_by_multi_ticket")) {
-				try (Session session = sessionFactory.openSession()) {
-					Transaction transaction = session.beginTransaction();
 					message.setMessage("#purchase_movie_link_by_multi_ticket_client");
-
-
-					// Retrieve UserPurchases and associated IdUser
 					UserPurchases p1 = (UserPurchases) message.getObject();
 					p1.setPayment_type("Crtesea");
+					IdUser user1 = getOrSaveIdUser(p1.getId_user());
 
-					IdUser user1 = getOrSaveIdUser(session, p1.getId_user());
+				try (Session session = sessionFactory.openSession()) {
+					Transaction transaction = session.beginTransaction();
 
-					// Build the query to find a single MultiEntryTicket based on the user_id
 					CriteriaBuilder builder = session.getCriteriaBuilder();
 					CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
 					Root<MultiEntryTicket> root = query.from(MultiEntryTicket.class);
 					Join<MultiEntryTicket, IdUser> userJoin = root.join("id_user");  // Join with IdUser
 					Predicate userIdPredicate = builder.equal(userJoin.get("user_id"), user1.getUser_id());
 					query.select(root).where(userIdPredicate);
-
-					// Retrieve the ticket
 					MultiEntryTicket ticket = session.createQuery(query).uniqueResult();
-
 					if (ticket != null) {
 						if (ticket.getRemain_tickets() == 0) {
-							// No tickets left
 							message.setObject("Your Multi Ticket is Empty.");
 							client.sendToClient(message);
 						} else {
-							// Process the purchase
 							p1.setId_user(user1);
 							session.save(p1);
 							ticket.setRemain_tickets(ticket.getRemain_tickets() - 1);
 							session.update(ticket);
 
-							// Send success message
 							message.setObject("Purchase Success! Your remaining ticket count is " + ticket.getRemain_tickets());
 							client.sendToClient(message);
 
-							// Schedule a thank you email
 							sendThankYouEmailLink(p1);
 							Date sendTime = p1.getDate_of_link_activation();
 							EmailScheduler emailScheduler = new EmailScheduler();
@@ -983,13 +1016,10 @@ public class SimpleServer extends AbstractServer {
 							);
 						}
 					} else {
-						// Handle case where no MultiEntryTicket is found
 						System.out.println("No MultiEntryTicket found for the given user.");
 						message.setObject("No MultiEntryTicket found for the given user.");
 						client.sendToClient(message);
 					}
-
-					// Commit transaction
 					transaction.commit();
 					session.close();
 				} catch (Exception e) {
@@ -1004,26 +1034,21 @@ public class SimpleServer extends AbstractServer {
 			else if (message.getMessage().equals("#purchase_multi_ticket")) {
 				try (Session session = sessionFactory.openSession()) {
 					Transaction transaction = session.beginTransaction();
-
 					MultiEntryTicket t = (MultiEntryTicket) message.getObject();
-					IdUser idUser = getOrSaveIdUser(session, t.getId_user());
-
-					updateOrSaveMultiEntryTicket(session, t, idUser);
-					sendThankYouEmail(t);
+					IdUser idUser = getOrSaveIdUser( t.getId_user());
 					transaction.commit();
 					session.close();
-
+					updateOrSaveMultiEntryTicket(t, idUser);
+					sendThankYouEmail(t);
 					message.setMessage("#purchase_multi_ticket_client");
 					client.sendToClient(message);
-
-
 				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println("Error while purchase_multi_ticket : " + e.getMessage());
 				}
 			}
 
-
+//////////////////////////////////////////////   Complains Part /////////////////////////////////////////////////////////
 			else if (message.getMessage().equals("#show_complains")){
 				// set massage
 				message.setMessage("#show_complains_for_client");
