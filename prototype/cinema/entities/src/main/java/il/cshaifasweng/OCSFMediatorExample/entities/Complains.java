@@ -24,12 +24,12 @@ public class Complains implements Serializable {
 
     public Complains() {}
     // Constructor
-    public Complains(IdUser id_user, String complain_text,Date time_of_complain, String respond, String status, String cinema_branch) {
+    public Complains(IdUser id_user, String complain_text,Date time_of_complain, String respond, boolean status, String cinema_branch) {
         this.id_user = id_user;
         this.complain_text = complain_text;
         this.time_of_complain = time_of_complain;
         this.respond = respond;
-        this.respond_status = respond_status;
+        this.respond_status = status;
         this.cinema_branch = cinema_branch;
     }
 

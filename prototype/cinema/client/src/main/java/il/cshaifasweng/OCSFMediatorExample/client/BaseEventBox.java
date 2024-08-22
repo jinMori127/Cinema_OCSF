@@ -18,6 +18,8 @@ public class BaseEventBox {
         SERVER_ERROR_MESSAGE,
         WRONG_NAMEING,
         GET_SCREENING_DONE,
+        SHOW_CM_CHANGES,
+        SHOW_USER_COMPLAINTS,
         SAVE_MULTI_TICKET,
         SHOW_COMPLAINS,
         SHOW_COMPLAINS_AND_MESSAGE,
