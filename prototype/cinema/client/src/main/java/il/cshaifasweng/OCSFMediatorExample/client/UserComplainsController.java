@@ -77,7 +77,12 @@ public class UserComplainsController {
         response_column.setCellValueFactory(new PropertyValueFactory<>("respond"));
 
         // Populate the ComboBox with branches
-        branch_combo_box.getItems().addAll("Haifa", "Nazareth", "Tel Aviv");
+        branch_combo_box.getItems().clear();
+        branch_combo_box.getItems().add("All");
+        branch_combo_box.getItems().add("Sakhnin");
+        branch_combo_box.getItems().add("Haifa");
+        branch_combo_box.getItems().add("Nazareth");
+        branch_combo_box.getItems().add("Nhif");
     }
 
     @FXML
