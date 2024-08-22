@@ -55,6 +55,8 @@ public class MultiEntryTicketController {
     @FXML
     private Button purchase; // Value injected by FXMLLoader
 
+
+
     @FXML
     private Text error_message;
 
@@ -84,7 +86,6 @@ public class MultiEntryTicketController {
     public void print_success(Message message) {
         error_message.setVisible(false);
         success_message.setVisible(true);
-        int price = (int) message.getObject();
         success_message.setText("Purchaes Success");
     }
 
@@ -146,6 +147,15 @@ public class MultiEntryTicketController {
             error_message.setText("ID must contain exactly 9 digits");
             id.setText("");
             return;
+        }
+
+        String _email_str = email_col.getText();
+        String format  = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+        if (!_email_str.matches(format)) {
+            error_message.setVisible(true);
+            error_message.setText("Please enter a valid email address (e.g., user@example.com).");
+            email_col.setText("");
+            return ;
         }
 
 

@@ -18,12 +18,16 @@ public class BaseEventBox {
         SERVER_ERROR_MESSAGE,
         WRONG_NAMEING,
         GET_SCREENING_DONE,
+        SHOW_CM_CHANGES,
+        SHOW_USER_COMPLAINTS,
         SAVE_MULTI_TICKET,
         SHOW_COMPLAINS,
         SHOW_COMPLAINS_AND_MESSAGE,
         SHOW_COMPLAINS_RESPOND,
         GOT_SEARCH_MOVIE_FILTER,
         SIGN_OUT,
+        PURCHASE_LINK_USING_MULTI,
+        PURCHASE_LINK_N,
         THEATER_MAP_UPDATED;
 
         public static EventEnum getByName(String name) {

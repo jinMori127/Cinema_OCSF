@@ -13,13 +13,13 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
-import javafx.fxml.Initializable;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import javafx.scene.input.MouseEvent;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+
 import java.util.*;
 
 public class UserPurchasesController {
