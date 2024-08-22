@@ -26,6 +26,7 @@ public class BaseEventBox {
         SHOW_COMPLAINS_RESPOND,
         GOT_SEARCH_MOVIE_FILTER,
         SIGN_OUT,
+        REPORTS,
         PURCHASE_LINK_USING_MULTI,
         PURCHASE_LINK_N,
         THEATER_MAP_UPDATED;

@@ -15,7 +15,6 @@
             <Font name="Agency FB" size="16.0" />
          </font>
       </Text>
-      <Button layoutX="276.0" layoutY="26.0" mnemonicParsing="false" onAction="#back_button" text="BACK" />
       <Text fx:id="error_message" fill="#ef0404" layoutX="41.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="123.47006225585938">
          <font>
             <Font name="System Bold" size="12.0" />
