@@ -1,14 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="il.cshaifasweng.OCSFMediatorExample.client.UserComplainsController"
-            prefHeight="400.0" prefWidth="600.0">
-
-</AnchorPane>
+<VBox alignment="CENTER" spacing="10.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.UserComplainsController">
+    <TextArea fx:id="complaint_text_area" prefHeight="134.0" prefWidth="625.0" promptText="Type your complaint here" />
+    <ComboBox fx:id="branch_combo_box" prefHeight="26.0" prefWidth="89.0" promptText="Branch" />
+    <Button onAction="#handle_submit" text="Submit" />
+    <Text fx:id="error_message" fill="#ef0404" layoutX="41.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="123.47006225585938">
+        <font>
+            <Font name="System Bold" size="12.0" />
+        </font>
+    </Text>
+    <TableView fx:id="complaints_table" prefHeight="200.0" prefWidth="300.0">
+        <columns>
+            <TableColumn fx:id="complaint_text_column" text="Complaint">
+                <cellValueFactory>
+                    <PropertyValueFactory property="complain_text" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="status_column" text="Status">
+                <cellValueFactory>
+                    <PropertyValueFactory property="respond_status" />
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="response_column" prefWidth="458.0" text="Response">
+                <cellValueFactory>
+                    <PropertyValueFactory property="respond" />
+                </cellValueFactory>
+            </TableColumn>
+        </columns>
+    </TableView>
+</VBox>

@@ -543,6 +543,54 @@ public class SimpleServer extends AbstractServer {
 		session.getTransaction().commit();
 		session.close();
 	}
+
+	private void handle_submit_complaint(Complains complaint) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		session.save(complaint);
+		session.getTransaction().commit();
+	}
+
+
+	private List<Complains> handle_get_user_complaints(String userId) throws Exception {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Complains> query = builder.createQuery(Complains.class);
+		Root<Complains> root = query.from(Complains.class);
+
+		// Join with IdUser entity and filter by user_id
+		Join<Complains, IdUser> userJoin = root.join("id_user");
+		query.select(root).where(builder.equal(userJoin.get("user_id"), userId));
+
+		List<Complains> data = session.createQuery(query).getResultList();
+
+		session.getTransaction().commit();
+		session.close();
+
+		return data;
+	}
+
+
+	private List<EditedDetails> getEditedDetails() {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<EditedDetails> query = builder.createQuery(EditedDetails.class);
+		query.from(EditedDetails.class);
+		List<EditedDetails> data = session.createQuery(query).getResultList();
+		session.getTransaction().commit();
+		session.close();
+		return data;
+	}
+	private void removeEditedDetails(EditedDetails change) throws Exception {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		session.delete(change);
+		session.getTransaction().commit();
+		session.close();
+	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -774,7 +822,45 @@ public class SimpleServer extends AbstractServer {
 				}
 			}
 
-
+			else if (message.getMessage().equals("#GetUserComplaints")) {
+				//System.out.println("get user complaints");
+				String current_id = (String) message.getObject();
+				message.setMessage("#ShowUserComplaints");
+				List<Complains> current_complaints = handle_get_user_complaints(current_id);
+				message.setObject(current_complaints);
+				client.sendToClient(message);
+				//System.out.println("sent user complaints");
+			} else if (message.getMessage().equals("#SubmitComplaint")) {
+				//System.out.println("submit user complaint");
+				Complains complaint = (Complains) message.getObject();
+				handle_submit_complaint(complaint);
+				String current_id = complaint.getId_user().getUser_id();
+				message.setMessage("#ShowUserComplaints");
+				List<Complains> updated_complaints = handle_get_user_complaints(current_id);
+				message.setObject(updated_complaints);
+				client.sendToClient(message);
+			} else if (message.getMessage().equals("#GetCMEditedDetails")) {
+				//System.out.println("get cme details");
+				List<EditedDetails> editedDetailsList = getEditedDetails();
+				message.setObject(editedDetailsList);
+				message.setMessage("#ShowCMEditedDetails");
+				client.sendToClient(message);
+			} else if (message.getMessage().equals("#UpdateMoviePrice")) {
+				EditedDetails change = (EditedDetails) message.getObject();
+				update_movie(change.getMovie());
+				removeEditedDetails(change);
+				List<EditedDetails> editedDetailsList = getEditedDetails();
+				message.setObject(editedDetailsList);
+				message.setMessage("#ShowCMEditedDetails");
+				sendToAllClients(message);
+			} else if (message.getMessage().equals("#DenyMoviePrice")) {
+				EditedDetails change = (EditedDetails) message.getObject();
+				removeEditedDetails(change);
+				List<EditedDetails> editedDetailsList = getEditedDetails();
+				message.setObject(editedDetailsList);
+				message.setMessage("#ShowCMEditedDetails");
+				sendToAllClients(message);
+			}
 			else if (message.getMessage().equals("#show_complains")){
 				// set massage
 				message.setMessage("#show_complains_for_client");
