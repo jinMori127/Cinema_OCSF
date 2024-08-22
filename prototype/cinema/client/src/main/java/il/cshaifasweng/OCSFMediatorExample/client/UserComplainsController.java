@@ -94,6 +94,7 @@ public class UserComplainsController {
         if(selected_branch == null || selected_branch.isEmpty()) {
             error_text.setVisible(true);
             error_text.setText("Please Choose a branch");
+            return;
         }
         else {
             Complains new_complaint = new Complains();
@@ -105,6 +106,7 @@ public class UserComplainsController {
             new_complaint.setCinema_branch(selected_branch);
 
             submit_complaint(new_complaint);
+            return;
         }
     }
 

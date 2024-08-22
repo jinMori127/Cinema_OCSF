@@ -549,6 +549,7 @@ public class SimpleServer extends AbstractServer {
 		session.beginTransaction();
 		session.save(complaint);
 		session.getTransaction().commit();
+		session.close();
 	}
 
 
