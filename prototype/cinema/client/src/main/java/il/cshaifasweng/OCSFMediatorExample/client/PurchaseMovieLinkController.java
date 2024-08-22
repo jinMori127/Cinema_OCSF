@@ -137,7 +137,7 @@ public class PurchaseMovieLinkController {
         String formattedDate = sdf.format(wantedDateObj);
         String movieLink = baseUrl + "/movies/" + formattedMovieName + "/" + formattedDate;
 
-        UserPurchases p1 = new UserPurchases("Credit", movie1.getPrice(), id_user, wantedDateObj, movieLink);
+        UserPurchases p1 = new UserPurchases("Crtesea", 0.0, id_user, wantedDateObj, movieLink, movie1.getMovie_name());
         Message message = new Message(35, "#purchase_movie_link_by_multi_ticket");
         message.setObject(p1);
 
@@ -321,7 +321,7 @@ public class PurchaseMovieLinkController {
         String formattedDate = sdf.format(wantedDateObj);
         String movieLink = baseUrl + "/movies/" + formattedMovieName + "/" + formattedDate;
 
-        UserPurchases p1 = new UserPurchases("Credit", movie1.getPrice(), id_user, wantedDateObj, movieLink);
+        UserPurchases p1 = new UserPurchases("Credit", movie1.getPrice(), id_user, wantedDateObj, movieLink, movie1.getMovie_name());
         Message message = new Message(84, "#purchase_movie_link");
         message.setObject(p1);
 

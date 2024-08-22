@@ -35,11 +35,6 @@ public class UserLogInWithIDController {
     }
 
     @FXML
-    public void destroy() {
-        EventBus.getDefault().unregister(this);
-    }
-
-    @FXML
     void back_button(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("MasterPage.fxml"));
