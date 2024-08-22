@@ -1,7 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
-import com.sun.javafx.stage.EmbeddedWindow;
-import il.cshaifasweng.OCSFMediatorExample.entities.Screening;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -11,7 +10,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.*;

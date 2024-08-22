@@ -1,10 +1,7 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
 import javafx.collections.ObservableList;
-
-import il.cshaifasweng.OCSFMediatorExample.entities.Message;
-import il.cshaifasweng.OCSFMediatorExample.entities.Screening;
-import il.cshaifasweng.OCSFMediatorExample.entities.UserPurchases;
+import il.cshaifasweng.OCSFMediatorExample.entities.*;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -34,6 +31,9 @@ public class UserPurchasesController {
     private TextArea purchase_detailed_text;
 
     @FXML
+    private Text multi_ticket_info;
+
+    @FXML
     private TableColumn<UserPurchases, Integer> auto_number_purchase;
 
     @FXML
@@ -49,17 +49,11 @@ public class UserPurchasesController {
     private TableColumn<UserPurchases, String> link_column;
 
     @FXML
-    private TableColumn<Screening, String> branch_column;
-
-    @FXML
     private TableColumn<UserPurchases, Date> date_column;
 
 
     @FXML
     private TableColumn<UserPurchases, String> movie_name_column;
-
-
-
 
     @FXML
     private TableColumn<UserPurchases, Date> date_screening_column;
@@ -67,7 +61,6 @@ public class UserPurchasesController {
 
     @FXML
     private Text ErrorMessage;
-
 
 
     @FXML
@@ -92,6 +85,8 @@ public class UserPurchasesController {
     {
         if(event.getId()==3) {
             Platform.runLater(() -> {
+                String text_multi_ticket = "Remaining Ticket: " + event.getMessage().getObject2().toString();
+                multi_ticket_info.setText(text_multi_ticket);
                 create_user_purchases(event.getMessage());
             });
         }
@@ -112,8 +107,6 @@ public class UserPurchasesController {
         date_column.setCellValueFactory(new PropertyValueFactory<>("date_of_purchase"));
         movie_name_column.setCellValueFactory(new PropertyValueFactory<>("movie_name"));
 
-
-
         list = FXCollections.observableArrayList(user_list);
         table_view.setItems(list);
     }
@@ -128,10 +121,10 @@ public class UserPurchasesController {
         EventBus.getDefault().register(this);
         Message insert_message = new Message(20,"#show_purchases");
         insert_message.setObject(curr_id);
+        cancel_purchase.setDisable(true);
 
         try {
             SimpleClient.getClient().sendToServer(insert_message);
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -139,8 +132,11 @@ public class UserPurchasesController {
         // Add double-click listener to table rows
         table_view.setOnMouseClicked((MouseEvent event) -> {
             if (event.getClickCount() == 2) {
+                int selectedRow = table_view.getSelectionModel().getSelectedIndex();
+                if (selectedRow != -1 && table_view.getItems().get(selectedRow) != null) {
+                    cancel_purchase.setDisable(false);
+                }
                 show_purchase_information();
-
             }
         });
     }
@@ -168,11 +164,21 @@ public class UserPurchasesController {
 
                 purchase_detailed_text.setText(contentText.toString());
 
+                // checking if there is a link so to adapt the text field with it
+                TableColumn<UserPurchases, ?> link = table_view.getColumns().get(3);
+                Object cellData = link.getCellData(selectedRow);
+                String link_text = (String) cellData;
 
                 // Set warning message and make it visible
                 ErrorMessage.setVisible(true);
-                ErrorMessage.setText("Note:\nif still more than 3 hours you will get 100%\nif still between 1-3 hours you will get 50%\n" +
-                        "in Other cases you will get 0 %");
+                if(link_text == null || link_text.isEmpty()) {
+                    ErrorMessage.setText("Note:\nif still more than 3 hours you will get 100%\nif still between 1-3 hours you will get 50%\n" +
+                            "in Other cases you will get 0 %");
+                }
+                else {
+                    ErrorMessage.setText("Note:\nYou can return the home link till hour before it's activation and get 50%\n" +
+                            "in Other cases you will get 0 %");
+                }
             } else {
                 purchase_detailed_text.clear();
             }
@@ -188,6 +194,10 @@ public class UserPurchasesController {
         ErrorMessage.setVisible(false);
 
         int selectedRow = table_view.getSelectionModel().getSelectedIndex();
+        if(selectedRow == -1)
+        {
+            return;
+        }
         int percent_return=0;
 
         int auto_num=-1;
@@ -203,20 +213,15 @@ public class UserPurchasesController {
             cellData = Sec_col.getCellData(selectedRow);
             Date date_screening=(Date)cellData;
 
-
-
+            TableColumn<UserPurchases, ?> link = table_view.getColumns().get(3);
+            cellData = link.getCellData(selectedRow);
+            String link_text = (String) cellData;
 
             if (date_screening.before(curr_date)) {
                 ErrorMessage.setVisible(true);
                 percent_return=0;
-
-
-
-
                 ErrorMessage.setText("Unable to cancel purchase, The screening time already passed");
-
                 return;
-
             }
 
 
@@ -234,25 +239,23 @@ public class UserPurchasesController {
                 calendar2.add(Calendar.HOUR, +1);
                 Date curr_date_1 = calendar2.getTime();
 
-
                 TableColumn<UserPurchases, ?> third_col = table_view.getColumns().get(5);
                 cellData = third_col.getCellData(selectedRow);
                 double price =(double)cellData;
 
 
-                if (curr_date_3.before(date_screening)) {
+                if (curr_date_3.before(date_screening) && (link_text == null||link_text.isEmpty())) {
                     ErrorMessage.setVisible(true);
                     ErrorMessage.setText("Value returned 100%,Your Total Will be:"+price);
                     refund = price;
                     percent_return = 100;
-                                                      }
+                }
 
                 else if (curr_date_1.before(date_screening)) {
                     ErrorMessage.setVisible(true);
                     ErrorMessage.setText("Value returned 50%,Your Total Will be:"+(price/2));
                     refund = price / 2;
                     percent_return = 50;
-
                 }
 
                 else {
@@ -260,7 +263,7 @@ public class UserPurchasesController {
                     ErrorMessage.setText("Value returned 0%,Your Total Will be:"+0);
                     refund = 0;
                     percent_return = 0;
-                     }
+                }
             }
         }
 
@@ -280,7 +283,6 @@ public class UserPurchasesController {
     @Subscribe
     public void change_content1(BeginContentChangeEnent event)
     {
-
         System.out.println(event.getPage());
         EventBus.getDefault().unregister(this);
         EventBus.getDefault().post(new ContentChangeEvent(event.getPage()));

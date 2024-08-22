@@ -34,11 +34,6 @@ public class UserLogInWithIDController {
         error_message.setVisible(false);
     }
 
-    @FXML
-    public void destroy() {
-        EventBus.getDefault().unregister(this);
-    }
-
 
     @FXML
     void log_in_button(ActionEvent event) {

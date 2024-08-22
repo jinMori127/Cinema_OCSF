@@ -361,6 +361,32 @@ public class SimpleServer extends AbstractServer {
 		return data;
 	}
 
+	private int get_remain_tickets(String id) {
+
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		// Retrieve the user by user ID
+		String queryString1 = "SELECT u FROM IdUser u WHERE u.user_id = :user_id";
+		Query<IdUser> query1 = session.createQuery(queryString1, IdUser.class);
+		query1.setParameter("user_id", id);
+		IdUser user = query1.uniqueResult();
+
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
+		Root<MultiEntryTicket> root = query.from(MultiEntryTicket.class);
+		query.select(root).where(builder.equal(root.get("id_user"), user));
+
+		MultiEntryTicket ticket = session.createQuery(query).uniqueResult();
+
+		session.getTransaction().commit();
+		session.close();
+
+		if (ticket != null) {
+			return ticket.getRemain_tickets();
+		}
+		return 0;
+	}
 	private void delete_purchase(UserPurchases purchase) throws Exception {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
@@ -1347,7 +1373,9 @@ public class SimpleServer extends AbstractServer {
 				message.setMessage("#show_purchases_client");
 				System.out.println(message.getMessage());
 				List<UserPurchases> data = search_user_purchases(id);
+				int remain_multi_tickets = get_remain_tickets(id);
 				message.setObject(data);
+				message.setObject2(remain_multi_tickets);
 
 				client.sendToClient(message);
 
@@ -1416,10 +1444,10 @@ public class SimpleServer extends AbstractServer {
 			}
 
 			//////////////////////////////////////////////////////Purchase Part /////////////////////////////////////////////////////////
-            else if (message.getMessage().equals("#purchase_movie_link")) {
-				UserPurchases p1 = (UserPurchases) message.getObject();
-				p1.setPayment_type("Credit");
-				IdUser user1 = getOrSaveIdUser(p1.getId_user());
+
+		else if (message.getMessage().equals("#purchase_movie_link")) {
+					UserPurchases p1 = (UserPurchases) message.getObject();
+					IdUser user1 = getOrSaveIdUser(p1.getId_user());
 
 			try (Session session = sessionFactory.openSession()) {
 				Transaction transaction = session.beginTransaction();
@@ -1453,7 +1481,6 @@ public class SimpleServer extends AbstractServer {
 			else if (message.getMessage().equals("#purchase_movie_link_by_multi_ticket")) {
 					message.setMessage("#purchase_movie_link_by_multi_ticket_client");
 					UserPurchases p1 = (UserPurchases) message.getObject();
-					p1.setPayment_type("Crtesea");
 					IdUser user1 = getOrSaveIdUser(p1.getId_user());
 
 				try (Session session = sessionFactory.openSession()) {
