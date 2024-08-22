@@ -122,7 +122,7 @@ public class UserComplainsController {
 
     @Subscribe
     public void handle_show_user_complaints_event(BaseEventBox event) {
-        if(event.getId()==16) {
+        if(event.getId() == BaseEventBox.get_event_id("SHOW_USER_COMPLAINTS")) {
             Platform.runLater(() ->{
                 List<Complains> complaintsList = (List<Complains>) event.getMessage().getObject();
                 ObservableList<Complains> complaints = FXCollections.observableArrayList(complaintsList);
