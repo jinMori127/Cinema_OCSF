@@ -1,43 +1,30 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import il.cshaifasweng.OCSFMediatorExample.server.EmailSender;
 
 import javax.persistence.criteria.Join;
-import java.time.LocalDate;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
-import com.mysql.cj.xdevapi.Client;
 import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.AbstractServer;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.ConnectionToClient;
 import il.cshaifasweng.OCSFMediatorExample.server.ocsf.SubscribedClient;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 
 import javax.persistence.criteria.*;
 import java.io.IOException;
-import java.io.Serializable;
-import java.security.PrivateKey;
 import java.util.Date;
 import java.util.List;
-import java.time.LocalDateTime;
-import java.util.Iterator;
 
-import java.util.Collections;
 import il.cshaifasweng.OCSFMediatorExample.entities.MultiEntryTicket;
 
 
@@ -417,27 +404,65 @@ public class SimpleServer extends AbstractServer {
 		Predicate idPredicate = builder.equal(root.get("user_id"), id);
 		query.select(root).where(idPredicate);
 		List<IdUser> data = session.createQuery(query).getResultList();
+
+
 		session.getTransaction().commit();
 		session.close();
+
 		if (data.size() != 1)
 			return null;
 		return data.get(0);
 	}
 
 
-	private List<MultiEntryTicket> getMTForID(IdUser ID){
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		CriteriaBuilder builder = session.getCriteriaBuilder();
-		CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
-		Root<MultiEntryTicket> root =  query.from(MultiEntryTicket.class);
-		Predicate namePredicate = builder.equal(root.get("id_user"),ID);
-		query.select(root).where(namePredicate);
-		List<MultiEntryTicket> data = session.createQuery(query).getResultList();
-		session.getTransaction().commit();
-		session.close();
+	private List<MultiEntryTicket> getMTForID(IdUser ID) {
+		List<MultiEntryTicket> data = new ArrayList<>();
+		System.out.println("MT func 1");
+
+		// Try-with-resources ensures session is closed automatically.
+		try (Session session = sessionFactory.openSession()) {
+			session.beginTransaction();
+
+			// Using CriteriaBuilder for constructing the query
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
+			Root<MultiEntryTicket> root = query.from(MultiEntryTicket.class);
+
+			System.out.println("MT func 2");
+
+
+			// Adding the predicate condition
+			Predicate namePredicate = builder.equal(root.get("id_user"), ID);
+
+			System.out.println("MT func 3");
+
+
+			query.select(root).where(namePredicate);
+
+			System.out.println("MT func 4");
+
+			// Execute query and get the result
+			data = session.createQuery(query).getResultList();
+
+			System.out.println("MT func 5");
+
+			// Flush session before commit
+			session.flush();
+
+			// Commit transaction
+			session.getTransaction().commit();
+
+			System.out.println("MT func 6");
+			System.out.println(data.get(0).getId_user().getUser_id());
+
+			session.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		return data;
 	}
+
 
 
 	private void updateMT(MultiEntryTicket multiEntryTicket) {
@@ -452,7 +477,17 @@ public class SimpleServer extends AbstractServer {
 	private void saveUP (UserPurchases userPurchases){
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-		session.update(userPurchases);
+
+		IdUser user1 = getOrSaveIdUser(session,userPurchases.getId_user());
+		userPurchases.setId_user(user1);
+		// get userId from dataBase
+		// set that userId to be userPur
+		// then save
+
+		if (!session.contains(userPurchases)) {
+			session.saveOrUpdate(userPurchases);  // This will either save or update depending on the state
+		}
+		else session.update(userPurchases);
 		session.getTransaction().commit();
 		session.close();
 	}
@@ -637,11 +672,44 @@ public class SimpleServer extends AbstractServer {
 	private void saveUpdateIduser(IdUser idUser){
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-		session.saveOrUpdate(idUser);
+
+		if (!session.contains(idUser)) {
+			session.saveOrUpdate(idUser);  // This will either save or update depending on the state
+		}
+		else session.update(idUser);
 		session.getTransaction().commit();
 		session.close();
 
 	}
+
+
+	private IdUser getOrSaveIdUser( IdUser idUser) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<IdUser> idUserQuery = builder.createQuery(IdUser.class);
+		Root<IdUser> idUserRoot = idUserQuery.from(IdUser.class);
+		idUserQuery.select(idUserRoot).where(builder.equal(idUserRoot.get("user_id"), idUser.getUser_id()));
+		IdUser existingIdUser = session.createQuery(idUserQuery).uniqueResult();
+
+		if (existingIdUser != null) {
+			existingIdUser.setEmail(idUser.getEmail());
+			existingIdUser.setName(idUser.getName());
+			session.update(existingIdUser);
+			session.getTransaction().commit();
+			session.close();
+
+
+			return existingIdUser;
+		} else {
+			session.save(idUser);
+			session.getTransaction().commit();
+			session.close();
+			return idUser;
+		}
+
+	}
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -804,19 +872,45 @@ public class SimpleServer extends AbstractServer {
 
 
 			else if (message.getMessage().equals("#PayMultiTicket")) {
-				String id = (String)message.getObject();
-				IdUser idUser = (IdUser)message.getObject3();
-				IdUser idUser_from_base = getIUFromId(id);
-				if(idUser_from_base != null) {
-					idUser_from_base.setIsLoggedIn(idUser_from_base.getIsLoggedIn());
-				}
-				saveUpdateIduser(idUser);
-				int seats_num = (int) message.getObject2();
+				System.out.println("We are now in the server yo ");
 
-				List <MultiEntryTicket> multiEntryTicketList = getMTForID(idUser);
+				String id = (String)message.getObject();
+				System.out.println(id);
+
+				IdUser idUser = (IdUser)message.getObject3();
+				System.out.println(idUser.getUser_id());
+
+				IdUser idUser_from_base = getIUFromId(id);
+
+				if(idUser_from_base != null) {
+					idUser.setIsLoggedIn(idUser_from_base.getIsLoggedIn());
+					idUser.setAuto_number_id_user(idUser_from_base.getAuto_number_id_users());
+				}
+				else{
+					message.setMessage("#FailedMT");
+					System.out.println("Errorrrrrrrrrrrrrr");
+					client.sendToClient(message);
+					return;
+				}
+
+				//check if found:
+				saveUpdateIduser(idUser);
+
+				idUser_from_base = idUser;
+
+
+
+				int seats_num = (int) message.getObject2();
+				System.out.println("Seats number: " + seats_num);
+
+				List <MultiEntryTicket> multiEntryTicketList = getMTForID(idUser_from_base);
 
 				if (multiEntryTicketList != null) {
 					for (MultiEntryTicket multiEntryTicket : multiEntryTicketList) {
+
+						System.out.println(multiEntryTicket.getId_user().getUser_id());
+						System.out.println("remaining tickets: " +multiEntryTicket.getRemain_tickets());
+
 						if (multiEntryTicket.getRemain_tickets() >= seats_num) {
 							multiEntryTicket.setRemain_tickets(multiEntryTicket.getRemain_tickets() - seats_num);
 							// update the database (function)
@@ -835,6 +929,7 @@ public class SimpleServer extends AbstractServer {
 
 						else {
 							message.setMessage("#FailedMT");
+							System.out.println("Errorrrrrrrrrrrrrr");
 							client.sendToClient(message);
 						}
 					}
@@ -842,6 +937,7 @@ public class SimpleServer extends AbstractServer {
 
 				else {
 					message.setMessage("#FailedMT");
+					System.out.println("Errorrrrrrrrrrrrrr");
 					client.sendToClient(message);
 				}
 
@@ -851,18 +947,28 @@ public class SimpleServer extends AbstractServer {
 
 			else if (message.getMessage().equals("#Save_user_purchases")) {
 				UserPurchases userPurchases = (UserPurchases) message.getObject();
-				saveUP(userPurchases);
-				message.setMessage("#Saved_user_purchases");
-				sendToAllClients(message);
+				System.out.println(userPurchases.getId_user().getUser_id());
 
+				IdUser idUser = userPurchases.getId_user();
+
+				System.out.println(userPurchases.getSeats());
+
+				saveUP(userPurchases);
+
+				System.out.println("ggggggggggggggggggggggggggggggggggggggggg");
+
+				message.setMessage("#SavedUserPurchases");
+				//sendToAllClients(message);
+				client.sendToClient(message);
 			}
 
 			else if (message.getMessage().equals("#Success_CC")){
 				String id = (String)message.getObject();
 				IdUser idUser = (IdUser)message.getObject2();
 				IdUser idUser_from_base = getIUFromId(id);
-				if(idUser_from_base != null) {
-					idUser_from_base.setIsLoggedIn(idUser_from_base.getIsLoggedIn());
+				if(idUser_from_base != null ) {
+					idUser.setIsLoggedIn(idUser_from_base.getIsLoggedIn());
+					idUser.setAuto_number_id_user(idUser_from_base.getAuto_number_id_users());
 				}
 				saveUpdateIduser(idUser);
 

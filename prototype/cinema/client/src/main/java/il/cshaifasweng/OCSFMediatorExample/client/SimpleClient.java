@@ -44,7 +44,13 @@ public class SimpleClient extends AbstractClient {
 		}
 
 		else if (message.getMessage().equals("#DonePayMultiTicket")){
+			System.out.println("We are in DonePayMultiTicket eventbox yo ");
 			EventBus.getDefault().post(new BaseEventBox("DONE_PAY_MULTITICKET", message));
+		}
+
+		else if(message.getMessage().equals("#SavedUserPurchases")){
+			System.out.println("We are in Saved_user_purchases eventbox yo ");
+			EventBus.getDefault().post(new BaseEventBox("SAVED_USER_PURCHASES", message));
 		}
 
 		else if (message.getMessage().equals("#FailedMT")){

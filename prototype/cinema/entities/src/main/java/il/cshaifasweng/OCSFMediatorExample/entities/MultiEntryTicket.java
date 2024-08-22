@@ -50,5 +50,4 @@ public class MultiEntryTicket implements Serializable{
 
 
 
-
 }

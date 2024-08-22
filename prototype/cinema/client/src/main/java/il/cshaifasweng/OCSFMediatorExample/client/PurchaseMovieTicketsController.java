@@ -65,6 +65,7 @@ public class PurchaseMovieTicketsController {
 
     @FXML
     void multiTicket_pay(ActionEvent event) {
+        System.out.println("Welcome to the KING's page");
         ErrorMessage.setVisible(false);
         if (isFieldEmpty(id, "Please enter your ID.")) return;
         if (isFieldEmpty(first_name, "Please enter your first name.")) return;
@@ -96,9 +97,14 @@ public class PurchaseMovieTicketsController {
         }
 
         Screening screening = TheaterMapController.screening;
+        System.out.println("Movie name: " + screening.getMovie());
+
         ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
         int reserved = places_took.size();
-        Message message = new Message (2000,"#PayMultiTicket");
+        System.out.println("reserved seats:" + reserved);
+
+
+        Message message = new Message (1563,"#PayMultiTicket");
         message.setObject(id.getText());
         message.setObject2(reserved);
         IdUser current_id_user =new IdUser();
@@ -116,8 +122,6 @@ public class PurchaseMovieTicketsController {
             ErrorMessage.setVisible(true);
             return;
         }
-
-
 
     }
 
@@ -207,7 +211,7 @@ public class PurchaseMovieTicketsController {
         current_id_user.setName(first_name.getText()+" "+last_name.getText());
         current_id_user.setEmail(email.getText());
         current_id_user.setPhone_number(phone_number.getText());
-        Message m = new Message(2000,"#Success_CC");
+        Message m = new Message(1893,"#Success_CC");
         m.setMessage("#Success_CC");
         m.setObject(id.getText());
         m.setObject2(current_id_user);
@@ -280,28 +284,39 @@ public class PurchaseMovieTicketsController {
 
     @Subscribe
     public void A(BaseEventBox eventBox) {
+
+        System.out.println("We now in A function in controller yo ");
+
         if (eventBox.getId() == BaseEventBox.get_event_id("FAILED_MT")) {
             Platform.runLater(() -> {
                 ErrorMessage.setVisible(true);
                 ErrorMessage.setText("You dont have enough entries in your Multicket");
+
+                System.out.println("We now in A function in controller yo  Faileeeeeeeeeeeeddddddd case");
+
             });
         } else if (eventBox.getId() == BaseEventBox.get_event_id("DONE_PAY_MULTITICKET")) {
+
+            System.out.println("We now in A function in controller yo  Dooooooooooonnnnnneeeeeeeee case");
+
             Screening screening = TheaterMapController.screening;
             ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
 
-            String seats_str = "";
+            StringBuilder seats_str = new StringBuilder();
 
             int [][] map = TheaterMapController.cerate_map(screening.getTheater_map());
 
             for (ArrayList<Integer> list : places_took) {
                 map[list.get(0)][list.get(1)] = 2;
-                if(list != places_took.getLast()) {
-                    seats_str += list.get(0) + "::" + list.get(1) + " , ";
-                }
+
+                seats_str.append(list.get(0)).append("::").append(list.get(1)).append(" , ");
+
             }
 
+            System.out.println("Update theater map");
+
             screening.setTheater_map(TheaterMapController.create_string_of_map(map));
-            Message m = new Message(10000, "#Update_theater_map");
+            Message m = new Message(1986, "#Update_theater_map");
             m.setObject(screening);
             try {
                 SimpleClient.getClient().sendToServer(m);
@@ -312,13 +327,17 @@ public class PurchaseMovieTicketsController {
             }
 
 
+            System.out.println("after update theater map");
+
             Date currentDate = new Date();
             IdUser idUser = (IdUser) eventBox.getMessage().getObject();
 
 
 
-            UserPurchases userPurchases = new UserPurchases(seats_str, "Multi Ticket", 0, idUser, screening, "Ticket", currentDate);
-            idUser.getUser_purchases().add(userPurchases);
+            UserPurchases userPurchases = new UserPurchases(seats_str.toString(), "Multi Ticket", 0, idUser, screening, "Ticket", currentDate);
+
+
+            System.out.println("Saaaaaavvvee user purchase");
 
             m.setMessage("#Save_user_purchases");
             m.setObject(userPurchases);
@@ -330,42 +349,30 @@ public class PurchaseMovieTicketsController {
                 return;
             }
 
+            System.out.println("afteeeeerrr Saaaaaavvvee user purchase");
+
             TheaterMapController.places_took = null;
             TheaterMapController.screening = null;
-        } else if (eventBox.getId() ==BaseEventBox.get_event_id("SAVED_USER_PURCHASES")) {
-            UserPurchases userPurchases = (UserPurchases)eventBox.getMessage().getObject();
-            if(userPurchases.getId_user().getUser_id().trim().equals(id.getText().trim())) {
-                ErrorMessage.setVisible(true);
-                ErrorMessage.setText("Thank you for you purchase, an email will be sent to you");
-                Message m = new Message(10000, "#Send_mail");
-                m.setObject(userPurchases);
-                try {
-                    SimpleClient.getClient().sendToServer(m);
-                } catch (IOException e) {
-                    ErrorMessage.setVisible(true);
-                    ErrorMessage.setText(e.getMessage());
-                    return;
-                }
-            }
-
-
 
         }
 
         else if (eventBox.getId() == BaseEventBox.get_event_id("DONE_CC")) {
 
+
+                System.out.println("We now in A function in controller yo  Donnnneeeeeee CCCCCCCCCCCCC case");
+
                 Screening screening = TheaterMapController.screening;
                 ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
 
-                String seats_str = "";
+                StringBuilder seats_str = new StringBuilder();
 
                 int[][] map = TheaterMapController.cerate_map(screening.getTheater_map());
 
                 for (ArrayList<Integer> list : places_took) {
                     map[list.get(0)][list.get(1)] = 2;
-                    if (list != places_took.getLast()) {
-                        seats_str += list.get(0) + "::" + list.get(1) + " , ";
-                    }
+
+                    System.out.println(list.get(0) + ", " + list.get(1));
+                        seats_str.append(list.get(0)).append("::").append(list.get(1)).append(" , ");
                 }
 
                 screening.setTheater_map(TheaterMapController.create_string_of_map(map));
@@ -385,9 +392,9 @@ public class PurchaseMovieTicketsController {
                 double price = screening.getMovie().getPrice() * places_took.size();
 
 
-                UserPurchases userPurchases = new UserPurchases(seats_str, "Credit Card", price, idUser, screening, "Ticket", currentDate);
+                UserPurchases userPurchases = new UserPurchases(seats_str.toString(), "Credit Card", price, idUser, screening, "Ticket", currentDate);
 
-                //idUser.getUser_purchases().add(userPurchases);
+                System.out.println(seats_str.toString());
 
                 m.setMessage("#Save_user_purchases");
                 m.setObject(userPurchases);
@@ -401,6 +408,35 @@ public class PurchaseMovieTicketsController {
 
                 TheaterMapController.places_took = null;
                 TheaterMapController.screening = null;
+
+        }
+
+    }
+
+    @Subscribe
+    public void B(BaseEventBox eventBox) {
+        System.out.println("We now in B function in controller yo ");
+
+        if (eventBox.getId() == BaseEventBox.get_event_id("SAVED_USER_PURCHASES")) {
+
+            System.out.println("We now in A function in controller yo  Savveeeeeeeeeeeeeeeedddddd case");
+
+            UserPurchases userPurchases = (UserPurchases)eventBox.getMessage().getObject();
+            if(userPurchases.getId_user().getUser_id().trim().equals(id.getText().trim())) {
+                ErrorMessage.setVisible(true);
+                ErrorMessage.setText("Thank you for you purchase, an email will be sent to you");
+                Message m = new Message(1785, "#Send_mail");
+                m.setObject(userPurchases);
+                try {
+                    SimpleClient.getClient().sendToServer(m);
+                } catch (IOException e) {
+                    ErrorMessage.setVisible(true);
+                    ErrorMessage.setText(e.getMessage());
+                    return;
+                }
+            }
+
+
 
         }
 
