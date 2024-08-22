@@ -59,6 +59,7 @@ public class UserPurchases implements Serializable{
         Date _date = new Date();
         this.date_of_purchase=_date;
 
+
     }
 
     // get/set methods

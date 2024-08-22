@@ -645,7 +645,20 @@ public class SimpleServer extends AbstractServer {
 
 	private String createReminderEmailBody(UserPurchases p1) {
 		// Calculate the remaining time until the link activation
-		long hoursUntilActivation = Duration.between(LocalDateTime.now(), p1.getDate_of_link_activation().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()).toHours();
+		Duration timeUntilActivation = Duration.between(LocalDateTime.now(),
+				p1.getDate_of_link_activation().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+
+		long hoursUntilActivation = timeUntilActivation.toHours();
+		long minutesUntilActivation = timeUntilActivation.toMinutes() % 60;
+
+		String timeRemainingMessage;
+		if (hoursUntilActivation > 1) {
+			timeRemainingMessage = hoursUntilActivation + " hour(s)";
+		} else if (hoursUntilActivation == 1) {
+			timeRemainingMessage = "1 hour";
+		} else {
+			timeRemainingMessage = minutesUntilActivation + " minute(s)";
+		}
 
 		String body = "<html>"
 				+ "<body style='font-family: Arial, sans-serif; color: #333;'>"
@@ -667,7 +680,8 @@ public class SimpleServer extends AbstractServer {
 				+ "<strong>Link Activation Date:</strong> " + (p1.getDate_of_link_activation() != null
 				? new SimpleDateFormat("dd MMMM yyyy, HH:mm").format(p1.getDate_of_link_activation())
 				: "N/A") + "</p>"
-				+ "<p style='color: #FF0000;'><strong>Note:</strong> The link will start working in approximately " + hoursUntilActivation + " hour(s).</p>"
+				+ "<p style='color: #FF0000;'><strong>Note:</strong> The link will start working in approximately "
+				+ timeRemainingMessage + ".</p>"
 				+ "<h3 style='color: #555;'>ORDER SUMMARY:</h3>"
 				+ "<table style='width: 100%; border-collapse: collapse;'>"
 				+ "<thead>"
@@ -693,7 +707,6 @@ public class SimpleServer extends AbstractServer {
 
 		return body;
 	}
-
 
 
 
