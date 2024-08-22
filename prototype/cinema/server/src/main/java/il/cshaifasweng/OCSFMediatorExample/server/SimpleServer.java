@@ -947,16 +947,9 @@ public class SimpleServer extends AbstractServer {
 
 			else if (message.getMessage().equals("#Save_user_purchases")) {
 				UserPurchases userPurchases = (UserPurchases) message.getObject();
-				System.out.println(userPurchases.getId_user().getUser_id());
-
 				IdUser idUser = userPurchases.getId_user();
-
 				System.out.println(userPurchases.getSeats());
-
 				saveUP(userPurchases);
-
-				System.out.println("ggggggggggggggggggggggggggggggggggggggggg");
-
 				message.setMessage("#SavedUserPurchases");
 				//sendToAllClients(message);
 				client.sendToClient(message);

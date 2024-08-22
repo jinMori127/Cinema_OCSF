@@ -54,19 +54,18 @@ public class PurchaseMovieTicketsController {
     @FXML
     private Button use_multiTicket_butt;
 
-
-    // Define a regular expression for email validation
-    private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-
-    // Compile the regular expression into a pattern
-    private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
-
     List<MultiEntryTicket> multiTickets;
 
     @FXML
     void multiTicket_pay(ActionEvent event) {
-        System.out.println("Welcome to the KING's page");
         ErrorMessage.setVisible(false);
+        Screening screening = TheaterMapController.screening;
+        if(screening == null)
+        {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("You have already purchased");
+            return;
+        }
         if (isFieldEmpty(id, "Please enter your ID.")) return;
         if (isFieldEmpty(first_name, "Please enter your first name.")) return;
         if (isFieldEmpty(last_name, "Please enter your last name.")) return;
@@ -86,7 +85,13 @@ public class PurchaseMovieTicketsController {
         String user_phone_number_str = phone_number.getText();
 
 
-        //if(!isValidEmail(email.getText(), "Invalid email."))
+        String _email_str = email.getText();
+        String format  = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+        if (!_email_str.matches(format)) {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("Please enter a valid email address (e.g., user@example.com).");
+            return ;
+        }
 
 
         if (!user_phone_number_str.matches("\\d{10}")) {
@@ -95,14 +100,8 @@ public class PurchaseMovieTicketsController {
             phone_number.setText("");
             return;
         }
-
-        Screening screening = TheaterMapController.screening;
-        System.out.println("Movie name: " + screening.getMovie());
-
         ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
         int reserved = places_took.size();
-        System.out.println("reserved seats:" + reserved);
-
 
         Message message = new Message (1563,"#PayMultiTicket");
         message.setObject(id.getText());
@@ -129,6 +128,13 @@ public class PurchaseMovieTicketsController {
     @FXML
     void pay_amount(ActionEvent event) {
         ErrorMessage.setVisible(false);
+        Screening screening = TheaterMapController.screening;
+        if(screening == null)
+        {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("You have already purchased");
+            return;
+        }
         if (isFieldEmpty(id, "Please enter your ID.")) return;
         if (isFieldEmpty(first_name, "Please enter your first name.")) return;
         if (isFieldEmpty(last_name, "Please enter your last name.")) return;
@@ -146,6 +152,14 @@ public class PurchaseMovieTicketsController {
             return;
         }
 
+
+        String _email_str = email.getText();
+        String format  = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+        if (!_email_str.matches(format)) {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("Please enter a valid email address (e.g., user@example.com).");
+            return ;
+        }
 
         String user_phone_number_str = phone_number.getText();
 
@@ -182,7 +196,8 @@ public class PurchaseMovieTicketsController {
             ErrorMessage.setText("Date must be in the format mm/yy and mm should be a valid month (01-12)");
             date.setText("");
             return;
-        }        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
         YearMonth inputDate;
         try {
             inputDate = YearMonth.parse(date_str, formatter);
@@ -253,7 +268,7 @@ public class PurchaseMovieTicketsController {
         System.out.println(event.getPage());
         if(!event.getPage().equals("#TheaterMap"))
         {
-            TheaterMapController.places_took = null;
+            TheaterMapController.places_took.clear();
             TheaterMapController.screening = null;
         }
         EventBus.getDefault().unregister(this);
@@ -273,15 +288,6 @@ public class PurchaseMovieTicketsController {
         return false;
     }
 
-
-    private boolean isValidEmail(String email, String error_msg) {
-        // Check if the email matches the regex pattern
-        Matcher matcher = EMAIL_PATTERN.matcher(email);
-        ErrorMessage.setVisible(true);
-        ErrorMessage.setText(error_msg);
-        return matcher.matches();
-    }
-
     @Subscribe
     public void A(BaseEventBox eventBox) {
 
@@ -292,29 +298,27 @@ public class PurchaseMovieTicketsController {
                 ErrorMessage.setVisible(true);
                 ErrorMessage.setText("You dont have enough entries in your Multicket");
 
-                System.out.println("We now in A function in controller yo  Faileeeeeeeeeeeeddddddd case");
-
             });
         } else if (eventBox.getId() == BaseEventBox.get_event_id("DONE_PAY_MULTITICKET")) {
 
-            System.out.println("We now in A function in controller yo  Dooooooooooonnnnnneeeeeeeee case");
 
             Screening screening = TheaterMapController.screening;
             ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
 
-            StringBuilder seats_str = new StringBuilder();
+            String seats_str = "";
 
             int [][] map = TheaterMapController.cerate_map(screening.getTheater_map());
 
             for (ArrayList<Integer> list : places_took) {
                 map[list.get(0)][list.get(1)] = 2;
-
-                seats_str.append(list.get(0)).append("::").append(list.get(1)).append(" , ");
+                if (list!= places_took.getLast()) {
+                    seats_str += list.get(0) + "::" + list.get(1) + " , ";
+                }
+                else {
+                    seats_str += list.get(0) + "::" + list.get(1);
+                }
 
             }
-
-            System.out.println("Update theater map");
-
             screening.setTheater_map(TheaterMapController.create_string_of_map(map));
             Message m = new Message(1986, "#Update_theater_map");
             m.setObject(screening);
@@ -335,10 +339,7 @@ public class PurchaseMovieTicketsController {
 
 
             UserPurchases userPurchases = new UserPurchases(seats_str.toString(), "Multi Ticket", 0, idUser, screening, "Ticket", currentDate);
-
-
-            System.out.println("Saaaaaavvvee user purchase");
-
+            userPurchases.setSeats(seats_str);
             m.setMessage("#Save_user_purchases");
             m.setObject(userPurchases);
             try {
@@ -348,31 +349,26 @@ public class PurchaseMovieTicketsController {
                 ErrorMessage.setText(e.getMessage());
                 return;
             }
-
-            System.out.println("afteeeeerrr Saaaaaavvvee user purchase");
-
-            TheaterMapController.places_took = null;
+            TheaterMapController.places_took.clear();
             TheaterMapController.screening = null;
 
         }
 
         else if (eventBox.getId() == BaseEventBox.get_event_id("DONE_CC")) {
 
-
-                System.out.println("We now in A function in controller yo  Donnnneeeeeee CCCCCCCCCCCCC case");
-
                 Screening screening = TheaterMapController.screening;
                 ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
-
-                StringBuilder seats_str = new StringBuilder();
-
+                String seats_str = "";
                 int[][] map = TheaterMapController.cerate_map(screening.getTheater_map());
-
+                System.out.println("length "+ places_took.size());
                 for (ArrayList<Integer> list : places_took) {
                     map[list.get(0)][list.get(1)] = 2;
-
-                    System.out.println(list.get(0) + ", " + list.get(1));
-                        seats_str.append(list.get(0)).append("::").append(list.get(1)).append(" , ");
+                    if (list!= places_took.getLast()) {
+                        seats_str += list.get(0) + "::" + list.get(1) + " , ";
+                    }
+                    else {
+                        seats_str += list.get(0) + "::" + list.get(1);
+                    }
                 }
 
                 screening.setTheater_map(TheaterMapController.create_string_of_map(map));
@@ -393,8 +389,7 @@ public class PurchaseMovieTicketsController {
 
 
                 UserPurchases userPurchases = new UserPurchases(seats_str.toString(), "Credit Card", price, idUser, screening, "Ticket", currentDate);
-
-                System.out.println(seats_str.toString());
+                userPurchases.setSeats(seats_str);
 
                 m.setMessage("#Save_user_purchases");
                 m.setObject(userPurchases);
@@ -406,20 +401,22 @@ public class PurchaseMovieTicketsController {
                     return;
                 }
 
-                TheaterMapController.places_took = null;
+                TheaterMapController.places_took.clear();
                 TheaterMapController.screening = null;
 
+        }
+        else if (eventBox.getId() == BaseEventBox.get_event_id("THEATER_MAP_UPDATED")) {
+            Screening current_screening = (Screening) eventBox.getMessage().getObject();
+            if (current_screening.getAuto_number_screening() == TheaterMapController.screening.getAuto_number_screening()) {
+                TheaterMapController.screening = (Screening) eventBox.getMessage().getObject();
+            }
         }
 
     }
 
     @Subscribe
     public void B(BaseEventBox eventBox) {
-        System.out.println("We now in B function in controller yo ");
-
         if (eventBox.getId() == BaseEventBox.get_event_id("SAVED_USER_PURCHASES")) {
-
-            System.out.println("We now in A function in controller yo  Savveeeeeeeeeeeeeeeedddddd case");
 
             UserPurchases userPurchases = (UserPurchases)eventBox.getMessage().getObject();
             if(userPurchases.getId_user().getUser_id().trim().equals(id.getText().trim())) {
@@ -435,9 +432,6 @@ public class PurchaseMovieTicketsController {
                     return;
                 }
             }
-
-
-
         }
 
     }
