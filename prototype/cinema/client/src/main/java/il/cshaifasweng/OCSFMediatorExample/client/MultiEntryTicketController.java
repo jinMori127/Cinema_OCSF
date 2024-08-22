@@ -15,6 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import il.cshaifasweng.OCSFMediatorExample.entities.MultiEntryTicket;
 import il.cshaifasweng.OCSFMediatorExample.entities.IdUser;
 import java.io.IOException;
 import static il.cshaifasweng.OCSFMediatorExample.client.MovieEditingDetailsController.go_to_screening_movie;
@@ -71,6 +72,9 @@ import java.time.temporal.ChronoUnit;
 
 public class MultiEntryTicketController {
 
+   // private static final int INITIAL_REMAIN_TICKETS = 20;
+    //private static final int INITIAL_PRICE = 200;
+
     @FXML
     private TextField id;
 
@@ -98,8 +102,17 @@ public class MultiEntryTicketController {
     @FXML
     private Button purchase; // Value injected by FXMLLoader
 
+
+
     @FXML
     private Text error_message;
+
+    @FXML
+    private Text success_message;
+
+    @FXML
+    private Text price_message;
+
 
     @Subscribe
     public void purchases_sucess(BaseEventBox event) {
@@ -111,19 +124,21 @@ public class MultiEntryTicketController {
     }
 
     @Subscribe
-    public void change_content1(BeginContentChangeEnent event)
-    {
+    public void change_content1(BeginContentChangeEnent event) {
         System.out.println(event.getPage());
         EventBus.getDefault().unregister(this);
         EventBus.getDefault().post(new ContentChangeEvent(event.getPage()));
     }
 
     public void print_success(Message message) {
-        error_message.setVisible(true);
-        error_message.setText("Purchaes Success.");    }
+        error_message.setVisible(false);
+        success_message.setVisible(true);
+        success_message.setText("Purchaes Success");
+    }
 
     @FXML
     public void purchase_button(ActionEvent event) {
+        success_message.setVisible(false);
 
         if (id.getText().isEmpty()) {
             error_message.setVisible(true);
@@ -181,6 +196,15 @@ public class MultiEntryTicketController {
             return;
         }
 
+        String _email_str = email_col.getText();
+        String format  = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+        if (!_email_str.matches(format)) {
+            error_message.setVisible(true);
+            error_message.setText("Please enter a valid email address (e.g., user@example.com).");
+            email_col.setText("");
+            return ;
+        }
+
 
         String phone_check_number = phone_number.getText();
 
@@ -192,10 +216,9 @@ public class MultiEntryTicketController {
         }
 
 
-
         String card_number = card_number_col.getText();
 
-        if (!card_number.matches("\\d{12}")) {
+        if (!card_number.matches("\\d{16}")) {
             error_message.setVisible(true);
             error_message.setText("Card number must contain exactly 12 digits");
             card_number_col.setText("");
@@ -210,7 +233,8 @@ public class MultiEntryTicketController {
             error_message.setText("Date must be in the format mm/yy and mm should be a valid month (01-12)");
             date_col.setText("");
             return;
-        }        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
         YearMonth inputDate;
         try {
             inputDate = YearMonth.parse(date_str, formatter);
@@ -251,12 +275,13 @@ public class MultiEntryTicketController {
         String curr_email = email_col.getText();
 
         IdUser id_user = new IdUser(id_str, full_name, phone_str, curr_email);
-        MultiEntryTicket multiTicket = new MultiEntryTicket(20);
+        MultiEntryTicket multiTicket = new MultiEntryTicket();
+
         multiTicket.setId_user(id_user);
 
         Message message = new Message(25, "#purchase_multi_ticket");
         message.setObject(multiTicket);
-       clearFields();
+        clearFields();
 
         try {
             SimpleClient.getClient().sendToServer(message);
@@ -280,6 +305,13 @@ public class MultiEntryTicketController {
 
     @FXML
     public void initialize() {
+        price_message.setVisible(true);
+        price_message.setText(
+                "Number of tickets in Crtesea: " + MultiEntryTicket.INITIAL_REMAIN_TICKETS +
+                        ". The price of Crtesea is: " + MultiEntryTicket.INITIAL_PRICE
+        );
+
         EventBus.getDefault().register(this);
     }
+
 }

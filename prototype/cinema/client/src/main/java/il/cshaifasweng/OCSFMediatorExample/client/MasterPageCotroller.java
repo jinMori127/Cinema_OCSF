@@ -56,14 +56,14 @@ public class MasterPageCotroller {
             create_activity_list();
 
         });
-        System.out.println(content_area.getLayoutX());
+
         Platform.runLater(()->{
             javafx.geometry.Rectangle2D screenBounds = Screen.getPrimary().getBounds();
             double screenWidth = screenBounds.getWidth();
             double screenHeight = screenBounds.getHeight();
-            content_area.layoutXProperty().setValue(30);
+            content_area.layoutXProperty().setValue(screenWidth/2);
         });
-        System.out.println(content_area.getLayoutX());
+
 
     }
     private void create_activity_list(){
@@ -142,6 +142,7 @@ public class MasterPageCotroller {
         String menuItemText = source.getText();
         if (menuItemText.equals("Home page")) {
             EventBus.getDefault().post(new BeginContentChangeEnent("HomePage"));
+            //EventBus.getDefault().post(new BeginContentChangeEnent("TheaterMap"));
         }
         else if(menuItemText.equals("id")){
             EventBus.getDefault().post(new BeginContentChangeEnent("UserLoginWithID"));

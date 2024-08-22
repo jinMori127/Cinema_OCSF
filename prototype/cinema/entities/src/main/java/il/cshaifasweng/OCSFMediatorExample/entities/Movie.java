@@ -47,6 +47,7 @@ public class Movie implements Serializable {
         this.description_ = description_;
         this.time_ = time_;
         this.year_ = year_;
+        this.price=0;
 
     }
 
@@ -146,5 +147,13 @@ public class Movie implements Serializable {
     public int getPrice(){return price;}
     public void setDirector(String director){this.director = director;}
     public String getDirector(){return director;}
+
+    public String toString(){
+        return "Movie Description: " + description_ + "\n" +
+                "Main Actors: " + main_actors + "\n" +
+                "Rating: " + rating + " / 10" + "\n" +
+                "Category: " + category + "\n" +
+                "Production Year: " + year_ + "\n";
+    }
 
 }

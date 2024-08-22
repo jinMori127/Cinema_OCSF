@@ -1,9 +1,10 @@
 package il.cshaifasweng.OCSFMediatorExample.entities;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.text.SimpleDateFormat;
 
 @Entity
 @Table(name = "UserPurchases")
@@ -29,29 +30,36 @@ public class UserPurchases implements Serializable{
     @Temporal(TemporalType.TIMESTAMP)
     private Date date_of_purchase;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date date_of_link_activation;
+
     // constructors
     public UserPurchases() {
     }
 
-    public UserPurchases(String seats, String payment_type, double payment_amount, IdUser id_user,Screening screening, String purchase_type, Date date_of_purchase){
+    public UserPurchases(String seats, String payment_type, double payment_amount, IdUser id_user, Screening screening){
         this.seats = seats;
         this.payment_type = payment_type;
         this.payment_amount = payment_amount;
         this.id_user = id_user;
         this.screening = screening;
-        this.purchase_type = purchase_type;
-        this.date_of_purchase = date_of_purchase;
+        this.purchase_type = "Ticket";
+        Date _date = new Date();
+        this.date_of_purchase=_date;
+        this.link = "";
     }
 
-    public UserPurchases(String seats, String payment_type, double payment_amount, IdUser id_user,Screening screening, String purchase_type, String link, Date date_of_purchase){
-        this.seats = seats;
+    public UserPurchases( String payment_type, double payment_amount, IdUser id_user, Date date_of_link_purchase, String link){
         this.payment_type = payment_type;
         this.payment_amount = payment_amount;
         this.id_user = id_user;
-        this.screening = screening;
-        this.purchase_type = purchase_type;
+        this.date_of_link_activation = date_of_link_purchase;
+        this.purchase_type = "HomeLink";
         this.link = link;
-        this.date_of_purchase = date_of_purchase;
+        Date _date = new Date();
+        this.date_of_purchase=_date;
+
+
     }
 
     // get/set methods
@@ -103,12 +111,22 @@ public class UserPurchases implements Serializable{
     }
     public Date getDate_of_purchase() { return date_of_purchase; }
     public void setDate_of_purchase(Date date_of_purchase) {this.date_of_purchase = date_of_purchase;}
+
     public Date getScreening_time() {
-        return screening.getDate_time();
+        if(this.purchase_type.equals("Ticket")) {
+            return screening.getDate_time();
+        }
+        return date_of_link_activation;
     }
 
     public String getMovie_name() {
         return screening.getMovie().getMovie_name();
     }
 
+    public Date getDate_of_link_activation() {
+        return date_of_link_activation;
+    }
+    public void setDate_of_link_activation(Date date_of_link_activation) {
+        this.date_of_link_activation = date_of_link_activation;
+    }
 }
