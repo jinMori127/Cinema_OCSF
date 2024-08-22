@@ -89,6 +89,12 @@ public class SimpleClient extends AbstractClient {
 				message.getMessage().equals("#loginWorkerFailedPass")){
 			EventBus.getDefault().post(new BaseEventBox("LOGIN", message));
 		}
+		else if(message.getMessage().equals("#ShowUserComplaints")){
+			EventBus.getDefault().post(new BaseEventBox("SHOW_USER_COMPLAINTS", message));
+		}
+		else if(message.getMessage().equals("#ShowCMEditedDetails")){
+			EventBus.getDefault().post(new BaseEventBox("SHOW_CM_CHANGES", message));
+		}
 		else if (message.getMessage().equals("#show_complains_for_client")) {
 			EventBus.getDefault().post(new BaseEventBox("SHOW_COMPLAINS", message));
 		}
