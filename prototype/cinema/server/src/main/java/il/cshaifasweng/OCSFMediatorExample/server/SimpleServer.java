@@ -1037,7 +1037,6 @@ public class SimpleServer extends AbstractServer {
 			//////////////////////////////////////////////////////Purchase Part /////////////////////////////////////////////////////////
 			else if (message.getMessage().equals("#purchase_movie_link")) {
 					UserPurchases p1 = (UserPurchases) message.getObject();
-					p1.setPayment_type("Credit");
 					IdUser user1 = getOrSaveIdUser(p1.getId_user());
 
 				try (Session session = sessionFactory.openSession()) {
@@ -1071,7 +1070,6 @@ public class SimpleServer extends AbstractServer {
 			else if (message.getMessage().equals("#purchase_movie_link_by_multi_ticket")) {
 					message.setMessage("#purchase_movie_link_by_multi_ticket_client");
 					UserPurchases p1 = (UserPurchases) message.getObject();
-					p1.setPayment_type("Crtesea");
 					IdUser user1 = getOrSaveIdUser(p1.getId_user());
 
 				try (Session session = sessionFactory.openSession()) {
