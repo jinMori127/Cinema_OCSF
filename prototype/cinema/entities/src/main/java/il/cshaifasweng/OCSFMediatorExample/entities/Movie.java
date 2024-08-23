@@ -47,7 +47,6 @@ public class Movie implements Serializable {
         this.description_ = description_;
         this.time_ = time_;
         this.year_ = year_;
-
     }
 
     public Movie() {
@@ -154,5 +153,4 @@ public class Movie implements Serializable {
                 "Category: " + category + "\n" +
                 "Production Year: " + year_ + "\n";
     }
-
 }

@@ -34,20 +34,7 @@ public class UserLogInWithIDController {
         error_message.setVisible(false);
     }
 
-    @FXML
-    public void destroy() {
-        EventBus.getDefault().unregister(this);
-    }
 
-    @FXML
-    void back_button(ActionEvent event) {
-        try {
-            SimpleChatClient.setRoot("HomePage");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 
     @FXML
     void log_in_button(ActionEvent event) {

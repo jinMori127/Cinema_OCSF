@@ -88,7 +88,7 @@ public class MasterPageCotroller {
         if (worker != null) {
             Defalult_menu.setVisible(true);
             sing_out_menu.setVisible(true);
-            if(worker.getRole().equals("Manager"))
+            if(worker.getRole().equals("Manager") || worker.getRole().equals("manager"))
             {
                 manger_menu.setVisible(true);
             }
@@ -191,6 +191,9 @@ public class MasterPageCotroller {
         }
         else if (menuItemText.equals("handle complains")) {
             EventBus.getDefault().post(new BeginContentChangeEnent("CustomerService"));
+        }
+        else if (menuItemText.equals("Reports")) {
+            EventBus.getDefault().post(new BeginContentChangeEnent("Reports"));
         }
 
     }

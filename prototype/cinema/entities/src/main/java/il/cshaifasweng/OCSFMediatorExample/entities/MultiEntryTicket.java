@@ -7,7 +7,6 @@ import java.util.*;
 @Entity
 @Table(name = "MultiEntryTicket")
 public class MultiEntryTicket implements Serializable{
-    //constants
     public static final int INITIAL_REMAIN_TICKETS = 20;
     public static final int INITIAL_PRICE = 200;
 
@@ -26,7 +25,6 @@ public class MultiEntryTicket implements Serializable{
     public MultiEntryTicket(){
         this.id_user = new IdUser();
         this.remain_tickets = INITIAL_REMAIN_TICKETS;
-
     }
 
     // get/set methods

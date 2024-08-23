@@ -111,6 +111,12 @@ public class SimpleClient extends AbstractClient {
 				message.getMessage().equals("#loginWorkerFailedPass")){
 			EventBus.getDefault().post(new BaseEventBox("LOGIN", message));
 		}
+		else if(message.getMessage().equals("#ShowUserComplaints")){
+			EventBus.getDefault().post(new BaseEventBox("SHOW_USER_COMPLAINTS", message));
+		}
+		else if(message.getMessage().equals("#ShowCMEditedDetails")){
+			EventBus.getDefault().post(new BaseEventBox("SHOW_CM_CHANGES", message));
+		}
 		else if (message.getMessage().equals("#show_complains_for_client")) {
 			EventBus.getDefault().post(new BaseEventBox("SHOW_COMPLAINS", message));
 		}
@@ -131,6 +137,13 @@ public class SimpleClient extends AbstractClient {
 		else if(message.getMessage().equals("#purchase_multi_ticket_client")){
 			EventBus.getDefault().post(new BaseEventBox("SAVE_MULTI_TICKET", message));
 		}
+		else if (message.getMessage().equals("#reportsCreated") ||
+				message.getMessage().equals("#searchedReports") ||
+				message.getMessage().equals("#reportsDeleted") ||
+				message.getMessage().equals("updatedReports")) {
+			EventBus.getDefault().post(new BaseEventBox("REPORTS", message));
+		}
+
 		else if (message.getMessage().equals("#theater_map_updated")){
 			EventBus.getDefault().post(new BaseEventBox("THEATER_MAP_UPDATED", message));
 		}
@@ -138,6 +151,15 @@ public class SimpleClient extends AbstractClient {
 		{
 			EventBus.getDefault().post(new BaseEventBox("SAVED_USER_PURCHASES", message));
 		}
+
+		else if (message.getMessage().equals("#purchase_movie_link_by_multi_ticket_client")){
+			EventBus.getDefault().post(new BaseEventBox("PURCHASE_LINK_USING_MULTI", message));
+		}
+
+		else if (message.getMessage().equals("#purchase_movie_link_client")){
+			EventBus.getDefault().post(new BaseEventBox("PURCHASE_LINK_N", message));
+		}
+
 		else {
 			EventBus.getDefault().post(new BaseEventBox("WRONG_NAMEING", message));
 		}
