@@ -77,9 +77,8 @@ public class Message implements Serializable {
     }
     public void setObject2(Object object2) {this.object2 = object2;}
 
-    public Object getObject3() {
-        return object3;
-    }
+    public  Object getObject3() {return object3;}
+
     public void setObject3(Object object3) {this.object3 = object3;}
 
 }

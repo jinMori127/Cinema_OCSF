@@ -43,6 +43,28 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new BaseEventBox("GET_SCREENING_DONE", message));
 		}
 
+		else if (message.getMessage().equals("#DonePayMultiTicket")){
+			System.out.println("We are in DonePayMultiTicket eventbox yo ");
+			EventBus.getDefault().post(new BaseEventBox("DONE_PAY_MULTITICKET", message));
+		}
+
+		else if(message.getMessage().equals("#SavedUserPurchases")){
+			System.out.println("We are in Saved_user_purchases eventbox yo ");
+			EventBus.getDefault().post(new BaseEventBox("SAVED_USER_PURCHASES", message));
+		}
+
+		else if (message.getMessage().equals("#FailedMT")){
+			EventBus.getDefault().post(new BaseEventBox("FAILED_MT", message));
+		}
+
+		else if(message.getMessage().equals("#DonePayCC")){
+			EventBus.getDefault().post(new BaseEventBox("DONE_CC", message));
+		}
+
+		else if (message.getMessage().equals("#Done_Sending_email")){
+			EventBus.getDefault().post(new BaseEventBox("DONE_SENDING_EMAIL", message));
+		}
+
 		else if (message.getMessage().equals("#UpdateMovieList")){
 			EventBus.getDefault().post(new BaseEventBox("UPDATE_MOVIE_LIST", message));
 		} else if (message.getMessage().equals("#ScreeningsGot")) {
@@ -124,6 +146,10 @@ public class SimpleClient extends AbstractClient {
 
 		else if (message.getMessage().equals("#theater_map_updated")){
 			EventBus.getDefault().post(new BaseEventBox("THEATER_MAP_UPDATED", message));
+		}
+		else if(message.getMessage().equals("#Saved_user_purchases"))
+		{
+			EventBus.getDefault().post(new BaseEventBox("SAVED_USER_PURCHASES", message));
 		}
 
 		else if (message.getMessage().equals("#purchase_movie_link_by_multi_ticket_client")){

@@ -26,6 +26,12 @@ public class BaseEventBox {
         SHOW_COMPLAINS_RESPOND,
         GOT_SEARCH_MOVIE_FILTER,
         SIGN_OUT,
+
+        DONE_PAY_MULTITICKET,
+        FAILED_MT,
+        SAVED_USER_PURCHASES,
+        DONE_CC,
+        DONE_SENDING_EMAIL,
         REPORTS,
         PURCHASE_LINK_USING_MULTI,
         PURCHASE_LINK_N,

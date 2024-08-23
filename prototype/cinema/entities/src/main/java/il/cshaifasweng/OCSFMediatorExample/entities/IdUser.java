@@ -107,5 +107,9 @@ public class IdUser implements Serializable {
     public void setComplains(List<Complains> complains) {
         this.complains = complains;
     }
+
+    public void setAuto_number_id_user(int id){
+        this.auto_number_id_user = id;
+    }
 }
 

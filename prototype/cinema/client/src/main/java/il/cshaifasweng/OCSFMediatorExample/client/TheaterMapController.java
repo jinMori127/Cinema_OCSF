@@ -99,8 +99,8 @@ public class TheaterMapController {
             }
         }
         else if (event.getId() == BaseEventBox.get_event_id("THEATER_MAP_UPDATED")) {
-
-            if (screening.getAuto_number_screening() == screening_id) {
+            Screening current_screening = (Screening) event.getMessage().getObject();
+            if (current_screening.getAuto_number_screening() == screening_id) {
                 Platform.runLater(() -> {
                     screening = (Screening) event.getMessage().getObject();
 
@@ -208,6 +208,7 @@ public class TheaterMapController {
                 else if (map[row][col] == 1) {
                     button.setStyle("-fx-background-color: yellow;");
                     button.setDisable(true);
+
                     for (ArrayList<Integer> list : places_took) {
 
                         if (list.get(0) == row && list.get(1) == col) {
@@ -254,6 +255,7 @@ public class TheaterMapController {
                     return;
                 }
             }
+            places_took.clear();
         }
         System.out.println(event.getPage());
         EventBus.getDefault().unregister(this);
