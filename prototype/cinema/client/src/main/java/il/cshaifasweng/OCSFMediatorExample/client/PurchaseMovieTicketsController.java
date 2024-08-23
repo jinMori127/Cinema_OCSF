@@ -337,8 +337,7 @@ public class PurchaseMovieTicketsController {
             IdUser idUser = (IdUser) eventBox.getMessage().getObject();
 
 
-
-            UserPurchases userPurchases = new UserPurchases(seats_str.toString(), "Multi Ticket", 0, idUser, screening, "Ticket", currentDate);
+            UserPurchases userPurchases = new UserPurchases(seats_str.toString(), "Multi Ticket", 0.0, idUser, screening);
             userPurchases.setSeats(seats_str);
             m.setMessage("#Save_user_purchases");
             m.setObject(userPurchases);
@@ -386,9 +385,8 @@ public class PurchaseMovieTicketsController {
                 Date currentDate = new Date();
                 IdUser idUser = (IdUser) eventBox.getMessage().getObject();
                 double price = screening.getMovie().getPrice() * places_took.size();
-
-
-                UserPurchases userPurchases = new UserPurchases(seats_str.toString(), "Credit Card", price, idUser, screening, "Ticket", currentDate);
+                
+                UserPurchases userPurchases = new UserPurchases(seats_str.toString(), "Credit Card", price, idUser, screening);
                 userPurchases.setSeats(seats_str);
 
                 m.setMessage("#Save_user_purchases");
