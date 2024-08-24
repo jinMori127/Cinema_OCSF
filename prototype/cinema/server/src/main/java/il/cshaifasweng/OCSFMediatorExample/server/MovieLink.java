@@ -26,10 +26,11 @@ public class MovieLink implements HttpHandler{
         LocalTime currentTime = LocalTime.now();
         LocalDate currentDate = LocalDate.now();
 
+
         String response;
 
         if (currentDate.equals(startDate)) {
-            if (currentTime.isAfter(startTime) && currentTime.isBefore(endTime)) {
+            if (currentTime.isAfter(startTime) && (currentTime.isBefore(endTime) || endTime.isBefore(startTime)) ) {
                 exchange.getResponseHeaders().set("Location", movieUrl);
                 exchange.sendResponseHeaders(302, 0);
             } else {
