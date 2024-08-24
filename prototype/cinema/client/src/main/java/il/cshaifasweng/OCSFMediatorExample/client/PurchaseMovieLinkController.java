@@ -138,6 +138,7 @@ public class PurchaseMovieLinkController {
         String movieLink = baseUrl + "/movies/" + formattedMovieName + "/" + formattedDate;
 
         UserPurchases p1 = new UserPurchases("Crtesea", 0.0, id_user, wantedDateObj, "", movie1.getMovie_name());
+        p1.setLink(HostController.current_host);
         Message message = new Message(35, "#purchase_movie_link_by_multi_ticket");
         message.setObject(p1);
 
@@ -152,10 +153,6 @@ public class PurchaseMovieLinkController {
     @FXML
     public void purchase_button(ActionEvent event) {
         if (!validateInputFields(true)) return;
-
-
-
-
         processPurchase();
     }
 
@@ -322,6 +319,7 @@ public class PurchaseMovieLinkController {
         String movieLink = baseUrl + "/movies/" + formattedMovieName + "/" + formattedDate;
 
         UserPurchases p1 = new UserPurchases("Credit", movie1.getPrice(), id_user, wantedDateObj, movieLink, movie1.getMovie_name());
+        p1.setLink(HostController.current_host);
         Message message = new Message(84, "#purchase_movie_link");
         message.setObject(p1);
 
