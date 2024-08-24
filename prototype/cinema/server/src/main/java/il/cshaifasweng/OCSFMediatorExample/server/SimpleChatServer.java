@@ -13,6 +13,7 @@ public class SimpleChatServer
 	
 	private static SimpleServer server;
     public static String password;
+    public static String host;
     public static void main( String[] args ) throws IOException
     {
         Scanner scanner = new Scanner(System.in);
@@ -22,6 +23,8 @@ public class SimpleChatServer
 
         // Read the input string
         password = scanner.nextLine();
+        System.out.print("Enter a host: \n");
+        host = scanner.nextLine();
         scanner.close();
         Path currentPath = Paths.get("");
         String currentWorkingDir = currentPath.toAbsolutePath().toString();

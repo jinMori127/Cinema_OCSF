@@ -15,6 +15,7 @@ import java.io.IOException;
 import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.client;
 
 public class HostController {
+    static String current_host = "localhost";
 
     @FXML
     private TextField hostTextField;
@@ -25,6 +26,7 @@ public class HostController {
     @FXML
     public void submit_func(javafx.event.ActionEvent actionEvent) {
         String host = hostTextField.getText();
+        current_host = host;
         int portg = Integer.parseInt(portTextField.getText());
         client =  new SimpleClient(host,portg);
         try{

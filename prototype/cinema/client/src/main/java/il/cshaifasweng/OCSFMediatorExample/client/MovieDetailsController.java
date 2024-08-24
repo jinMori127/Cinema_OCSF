@@ -202,7 +202,18 @@ public class MovieDetailsController {
             }
         }
         else {
-            real_screenings = screenings;
+            // if there is no time assinged we will show the today screenings
+            for (Screening s : screenings) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+                String date_str = dateFormat.format(new Date());
+
+                String s_date = dateFormat.format(s.getDate_time());
+
+                if (date_str.equals(s_date)) {
+                    real_screenings.add(s);
+                }
+            }
         }
         //screening_table.setItems(FXCollections.observableArrayList(screenings));
 
@@ -211,6 +222,14 @@ public class MovieDetailsController {
             public void changed(ObservableValue<? extends Screening> observable, Screening oldValue, Screening newValue) {
                 if (newValue != null) {
                     // add here the static variable change and the page switch
+                    Date time_of_screening = newValue.getDate_time();
+                    Date currentTime = new Date();
+
+                    if (time_of_screening.before(currentTime)) {
+                        ErrorMessage.setText("This screening has already passed. Please choose another one.");
+                        ErrorMessage.setVisible(true);
+                        return;
+                    }
                     TheaterMapController.screening_id = newValue.getAuto_number_screening();
                     try {
                         SimpleChatClient.setRoot("TheaterMap");
