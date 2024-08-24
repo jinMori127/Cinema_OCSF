@@ -13,7 +13,7 @@
 
 <ScrollPane prefHeight="800.0" prefWidth="1250.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.ReportsController">
     <content>
-        <AnchorPane prefHeight="1500.0" prefWidth="1150.0"> <!-- Increased height to 1500 -->
+        <AnchorPane prefHeight="2000.0" prefWidth="1150.0"> <!-- Increased height to 1500 -->
             <children>
                 <Text layoutX="263.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Monthly Reports " textAlignment="CENTER" wrappingWidth="159.48956298828125">
                     <font>
@@ -34,7 +34,7 @@
                         <Font name="System Bold" size="12.0" />
                     </font>
                 </Button>
-                <StackedBarChart fx:id="complain_chart" layoutX="550.0" layoutY="149.0" prefHeight="299.0" prefWidth="666.0">
+                <StackedBarChart fx:id="complain_chart" layoutX="550.0" layoutY="150.0" prefHeight="300.0" prefWidth="650.0">
                     <xAxis>
                         <CategoryAxis prefHeight="28.0" prefWidth="600.0" side="BOTTOM" />
                     </xAxis>
@@ -42,7 +42,7 @@
                         <NumberAxis side="LEFT" />
                     </yAxis>
                 </StackedBarChart>
-                <StackedBarChart fx:id="purchases_chart" layoutX="550.0" layoutY="464.0" prefHeight="299.0" prefWidth="656.0">
+                <StackedBarChart fx:id="purchases_chart" layoutX="550.0" layoutY="500.0" prefHeight="300.0" prefWidth="650.0">
                     <xAxis>
                         <CategoryAxis prefHeight="28.0" prefWidth="600.0" side="BOTTOM" />
                     </xAxis>
@@ -50,7 +50,15 @@
                         <NumberAxis side="LEFT" />
                     </yAxis>
                 </StackedBarChart>
-                <StackedBarChart fx:id="multientry_chart" layoutX="550.0" layoutY="783.0" prefHeight="295.0" prefWidth="655.0">
+                <StackedBarChart fx:id="link_purchases_chart" layoutX="550.0" layoutY="1200.0" prefHeight="300.0" prefWidth="650.0">
+                    <xAxis>
+                        <CategoryAxis prefHeight="28.0" prefWidth="600.0" side="BOTTOM" />
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis side="LEFT" />
+                    </yAxis>
+                </StackedBarChart>
+                <StackedBarChart fx:id="multientry_chart" layoutX="550.0" layoutY="850.0" prefHeight="300.0" prefWidth="650.0">
                     <xAxis>
                         <CategoryAxis prefHeight="28.0" prefWidth="600.0" side="BOTTOM" />
                     </xAxis>

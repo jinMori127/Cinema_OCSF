@@ -14,7 +14,8 @@ public class Reports implements Serializable {
     private int auto_number_report;
 
     private String report_ticket_sells;
-    private String report_multy_entry_ticket;
+    private String report_link_tickets_sells;
+    private String report_multi_entry_ticket;
     private String report_complains;
 
     @Temporal(TemporalType.DATE)
@@ -99,12 +100,20 @@ public class Reports implements Serializable {
         this.report_ticket_sells = create_String_of_list(report_ticket_sells);
     }
 
-    public List<Integer> getReport_multy_entry_ticket() {
-        return Create_List_From_String(report_multy_entry_ticket);
+    public List<Integer> getReport_link_tickets_sells() {
+        return Create_List_From_String(report_link_tickets_sells);
     }
 
-    public void setReport_multy_entry_ticket(List<Integer> report_multy_entry_ticket) {
-        this.report_multy_entry_ticket = create_String_of_list(report_multy_entry_ticket);
+    public void setReport_link_tickets_sells(List<Integer> report_link_tickets_sells) {
+        this.report_link_tickets_sells = create_String_of_list(report_link_tickets_sells);
+    }
+
+    public List<Integer> getReport_multi_entry_ticket() {
+        return Create_List_From_String(report_multi_entry_ticket);
+    }
+
+    public void setReport_multi_entry_ticket(List<Integer> report_multi_entry_ticket) {
+        this.report_multi_entry_ticket = create_String_of_list(report_multi_entry_ticket);
     }
 
     public List<Integer> getReport_complains() {

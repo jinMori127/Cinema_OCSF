@@ -139,6 +139,7 @@ public class SimpleClient extends AbstractClient {
 		}
 		else if (message.getMessage().equals("#reportsCreated") ||
 				message.getMessage().equals("#searchedReports") ||
+				message.getMessage().equals("#searchedReportsForAllBranches") ||
 				message.getMessage().equals("#reportsDeleted") ||
 				message.getMessage().equals("updatedReports")) {
 			EventBus.getDefault().post(new BaseEventBox("REPORTS", message));

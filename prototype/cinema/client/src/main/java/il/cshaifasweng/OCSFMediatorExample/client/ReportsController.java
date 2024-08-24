@@ -31,6 +31,9 @@ public class ReportsController {
     private StackedBarChart<String, Number> purchases_chart;
 
     @FXML
+    private StackedBarChart<String, Number> link_purchases_chart;
+
+    @FXML
     private ComboBox<String> choosed_branch;
 
     @FXML
@@ -49,7 +52,7 @@ public class ReportsController {
         Error_Message.setVisible(false);
 
         choosed_branch.getItems().clear();
-        choosed_branch.getItems().addAll("", "Sakhnin", "Haifa", "Nazareth", "Nhif");
+        choosed_branch.getItems().addAll("", "AllBranches" ,"Sakhnin", "Haifa", "Nazareth", "Nhif");
         choosed_year.getItems().clear();
         choosed_year.getItems().addAll("", "2024", "2023", "2022");
         choosed_year.setOnAction(event -> updateMonthsBasedOnYear());
@@ -58,6 +61,7 @@ public class ReportsController {
         complain_chart.setVisible(false);
         multientry_chart.setVisible(false);
         purchases_chart.setVisible(false);
+        link_purchases_chart.setVisible(false);
 
         try {
             create_reports();
@@ -117,6 +121,7 @@ public class ReportsController {
             complain_chart.setVisible(false);
             multientry_chart.setVisible(false);
             purchases_chart.setVisible(false);
+            link_purchases_chart.setVisible(false);
             return;
         }
         if (selectedBranch.isEmpty() || selectedMonth.isEmpty() || selectedYear.isEmpty()) {
@@ -126,21 +131,36 @@ public class ReportsController {
             complain_chart.setVisible(false);
             multientry_chart.setVisible(false);
             purchases_chart.setVisible(false);
+            link_purchases_chart.setVisible(false);
             return;
         } else {
             Error_Message.setVisible(false);
             report_text.setVisible(true);
         }
 
-        Message message = new Message(BaseEventBox.get_event_id("REPORTS"), "#SearchReport");
-        message.setObject(selectedBranch);
-        message.setObject2(Integer.parseInt(selectedYear));
-        message.setObject3(Integer.parseInt(selectedMonth));
-        try {
-            SimpleClient.getClient().sendToServer(message);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (selectedBranch.equals("AllBranches")){
+            Message message = new Message(BaseEventBox.get_event_id("REPORTS"), "#SearchReportForAllBranches");
+            message.setObject(selectedBranch);
+            message.setObject2(Integer.parseInt(selectedYear));
+            message.setObject3(Integer.parseInt(selectedMonth));
+            try {
+                SimpleClient.getClient().sendToServer(message);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+        else{
+            Message message = new Message(BaseEventBox.get_event_id("REPORTS"), "#SearchReport");
+            message.setObject(selectedBranch);
+            message.setObject2(Integer.parseInt(selectedYear));
+            message.setObject3(Integer.parseInt(selectedMonth));
+            try {
+                SimpleClient.getClient().sendToServer(message);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 
     private Object current_report = null;
@@ -162,6 +182,9 @@ public class ReportsController {
             complain_chart.getData().clear();
             purchases_chart.getData().clear();
             multientry_chart.getData().clear();
+            link_purchases_chart.getData().clear();
+            multientry_chart.setVisible(false);
+            link_purchases_chart.setVisible(false);
 
             XYChart.Series<String, Number> complaintsSeries = new XYChart.Series<>();
             complaintsSeries.setName("Number of Complaints");
@@ -169,36 +192,27 @@ public class ReportsController {
             XYChart.Series<String, Number> purchasesSeries = new XYChart.Series<>();
             purchasesSeries.setName("purchases profit");
 
-            XYChart.Series<String, Number> mutlientrySeries = new XYChart.Series<>();
-            mutlientrySeries.setName("Number of mutli-entry tickets");
-
             if (responseObject instanceof Reports) {
                 Reports report = (Reports) responseObject;
                 List<Integer> dailyComplaints = parseReportData(report.getReport_complains(), Integer.parseInt(selectedMonth), Integer.parseInt(selectedYear));
                 List<Integer> dailyPurchases = parseReportData(report.getReport_ticket_sells(), Integer.parseInt(selectedMonth), Integer.parseInt(selectedYear));
-                List<Integer> dailyMultiEntry = parseReportData(report.getReport_multy_entry_ticket(), Integer.parseInt(selectedMonth), Integer.parseInt(selectedYear));
 
                 for (int day = 1; day <= dailyComplaints.size(); day++) {
                     int numComplaints = dailyComplaints.get(day - 1);
                     int numPurchases = dailyPurchases.get(day - 1);
-                    int numMultiEntry = dailyMultiEntry.get(day - 1);
 
                     reportContent.append("Day ").append(day).append(": ");
                     reportContent.append("Num of Complaints: ").append(numComplaints).append(", ");
-                    reportContent.append("purchases profit: ").append(numPurchases).append(",");
-                    reportContent.append("Num of Multi-Entry Tickets: ").append(numMultiEntry).append("\n");
+                    reportContent.append("purchases profit: ").append(numPurchases).append(".\n");
 
                     complaintsSeries.getData().add(new XYChart.Data<>(String.valueOf(day), numComplaints));
                     purchasesSeries.getData().add(new XYChart.Data<>(String.valueOf(day), numPurchases));
-                    mutlientrySeries.getData().add(new XYChart.Data<>(String.valueOf(day), numMultiEntry));
                 }
 
                 complain_chart.getData().add(complaintsSeries);
                 purchases_chart.getData().add(purchasesSeries);
-                multientry_chart.getData().add(mutlientrySeries);
 
                 complain_chart.setVisible(true);
-                multientry_chart.setVisible(true);
                 purchases_chart.setVisible(true);
 
             } else if (responseObject instanceof String) {
@@ -208,19 +222,15 @@ public class ReportsController {
                     reportContent.append("Day ").append(day).append(": ");
                     reportContent.append("Num of Complaints: 0, ");
                     reportContent.append("purchases profit: 0\n");
-                    reportContent.append("Num of Multi-Entry Tickets: 0\n");
 
                     complaintsSeries.getData().add(new XYChart.Data<>(String.valueOf(day), 0));
                     purchasesSeries.getData().add(new XYChart.Data<>(String.valueOf(day), 0));
-                    mutlientrySeries.getData().add(new XYChart.Data<>(String.valueOf(day), 0));
                 }
 
                 complain_chart.getData().add(complaintsSeries);
                 purchases_chart.getData().add(purchasesSeries);
-                multientry_chart.getData().add(mutlientrySeries);
 
                 complain_chart.setVisible(true);
-                multientry_chart.setVisible(true);
                 purchases_chart.setVisible(true);
 
             } else {
@@ -230,6 +240,94 @@ public class ReportsController {
             report_text.setText(reportContent.toString());
         });
     }
+
+    private void handleSearchedReportsForAllBranches(Message message) {
+        Platform.runLater(() -> {
+            Object responseObject = message.getObject();
+            if (!(responseObject instanceof List)) {
+                report_text.setText("Unexpected response from server.");
+                return;
+            }
+
+            List<Reports> reportsList = (List<Reports>) responseObject;
+            StringBuilder reportContent = new StringBuilder();
+
+            String selectedMonth = choosed_month.getValue();
+            String selectedYear = choosed_year.getValue();
+
+            reportContent.append("Report for All Branches:\n");
+            reportContent.append("Month: ").append(selectedMonth).append(", ");
+            reportContent.append("Year: ").append(selectedYear).append("\n\n");
+
+            complain_chart.getData().clear();
+            purchases_chart.getData().clear();
+            multientry_chart.getData().clear();
+            link_purchases_chart.getData().clear();
+
+            XYChart.Series<String, Number> complaintsSeries = new XYChart.Series<>();
+            complaintsSeries.setName("Number of Complaints");
+
+            XYChart.Series<String, Number> purchasesSeries = new XYChart.Series<>();
+            purchasesSeries.setName("purchases profit");
+
+            XYChart.Series<String, Number> linkPurchasesSeries = new XYChart.Series<>();
+            linkPurchasesSeries.setName("link purchases profit");
+
+            XYChart.Series<String, Number> mutlientrySeries = new XYChart.Series<>();
+            mutlientrySeries.setName("mutli-entry tickets profit");
+
+            int daysInMonth = getDaysInMonth(Integer.parseInt(selectedMonth), Integer.parseInt(selectedYear));
+            int[] totalComplaints = new int[daysInMonth];
+            int[] totalPurchases = new int[daysInMonth];
+            int[] totalLinkPurchases = new int[daysInMonth];
+            int[] totalMultiEntry = new int[daysInMonth];
+
+            for (Reports report : reportsList) {
+                List<Integer> dailyComplaints = parseReportData(report.getReport_complains(), Integer.parseInt(selectedMonth), Integer.parseInt(selectedYear));
+                List<Integer> dailyPurchases = parseReportData(report.getReport_ticket_sells(), Integer.parseInt(selectedMonth), Integer.parseInt(selectedYear));
+                List<Integer> dailyLinkPurchases = parseReportData(report.getReport_link_tickets_sells(), Integer.parseInt(selectedMonth), Integer.parseInt(selectedYear));
+                List<Integer> dailyMultiEntry = parseReportData(report.getReport_multi_entry_ticket(), Integer.parseInt(selectedMonth), Integer.parseInt(selectedYear));
+
+                for (int day = 0; day < daysInMonth; day++) {
+                    totalComplaints[day] += dailyComplaints.get(day);
+                    totalPurchases[day] += dailyPurchases.get(day);
+                    totalLinkPurchases[day] += dailyLinkPurchases.get(day);
+                    totalMultiEntry[day] += dailyMultiEntry.get(day);
+                }
+            }
+
+            for (int day = 0; day < daysInMonth; day++) {
+                totalLinkPurchases[day] = totalLinkPurchases[day] / 4;
+                totalMultiEntry[day] = totalMultiEntry[day] / 4;
+            }
+
+            for (int day = 1; day <= daysInMonth; day++) {
+                reportContent.append("Day ").append(day).append(": ");
+                reportContent.append("Num of Complaints: ").append(totalComplaints[day - 1]).append(", ");
+                reportContent.append("purchases profit: ").append(totalPurchases[day - 1]).append(",");
+                reportContent.append("Multi-Entry Tickets profit: ").append(totalMultiEntry[day - 1]).append("\n");
+                reportContent.append("link purchases profit: ").append(totalLinkPurchases[day - 1]).append("\n");
+
+                complaintsSeries.getData().add(new XYChart.Data<>(String.valueOf(day), totalComplaints[day - 1]));
+                purchasesSeries.getData().add(new XYChart.Data<>(String.valueOf(day), totalPurchases[day - 1]));
+                mutlientrySeries.getData().add(new XYChart.Data<>(String.valueOf(day), totalMultiEntry[day - 1]));
+                linkPurchasesSeries.getData().add(new XYChart.Data<>(String.valueOf(day), totalLinkPurchases[day - 1]));
+            }
+
+            complain_chart.getData().add(complaintsSeries);
+            purchases_chart.getData().add(purchasesSeries);
+            multientry_chart.getData().add(mutlientrySeries);
+            link_purchases_chart.getData().add(linkPurchasesSeries);
+
+            complain_chart.setVisible(true);
+            multientry_chart.setVisible(true);
+            purchases_chart.setVisible(true);
+            link_purchases_chart.setVisible(true);
+
+            report_text.setText(reportContent.toString());
+        });
+    }
+
 
     private List<Integer> parseReportData(Object data, int selectedMonth, int selectedYear) {
         List<Integer> list = new ArrayList<>();
@@ -288,6 +386,7 @@ public class ReportsController {
         }
     }
 
+
     @Subscribe
     public void implementations(BaseEventBox event) {
         if (event.getId() == BaseEventBox.get_event_id("REPORTS")) {
@@ -298,6 +397,9 @@ public class ReportsController {
                     break;
                 case "#searchedReports":
                     handleSearchedReports(message);
+                    break;
+                case "#searchedReportsForAllBranches":
+                    handleSearchedReportsForAllBranches(message);
                     break;
                 case "#reportsDeleted":
                     break;

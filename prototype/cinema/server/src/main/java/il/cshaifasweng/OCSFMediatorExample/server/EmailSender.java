@@ -6,7 +6,7 @@ import javax.mail.internet.*;
 
 public class EmailSender {
     private static final String EMAIL = "LunaAura.cinema@gmail.com";
-    private static final String PASSWORD = "btyp nfvj lkkw arjq"; // Ensure to handle passwords securely
+    private static final String PASSWORD = "sxym ghxu reni jyki"; // Ensure to handle passwords securely
 
     public void sendEmail(String[] recipients, String subject, String body) {
         // Set up the SMTP server properties
