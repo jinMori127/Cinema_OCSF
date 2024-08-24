@@ -11,9 +11,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MovieEditingDetailsController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.MovieEditingDetailsController">
    <children>
-      <AnchorPane layoutX="3.0" layoutY="-1.0" prefHeight="75.0" prefWidth="800.0" style="-fx-background-color: white;">
+      <AnchorPane layoutX="3.0" layoutY="-1.0" prefHeight="75.0" prefWidth="914.0" style="-fx-background-color: white;">
          <children>
             <Text fx:id="ErrorMessage" fill="#d70e0e" layoutX="61.0" layoutY="42.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" visible="false" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                <font>
@@ -27,7 +27,7 @@
             <VBox fx:id="Vbox_movies" prefHeight="2673.0" prefWidth="787.0" />
          </content>
       </ScrollPane>
-      <AnchorPane layoutY="70.0" prefHeight="177.0" prefWidth="800.0">
+      <AnchorPane layoutY="70.0" prefHeight="177.0" prefWidth="914.0">
          <children>
             <Text layoutX="24.0" layoutY="68.0" strokeType="OUTSIDE" strokeWidth="0.0" text="title:" wrappingWidth="42.02227783203125" />
             <Text layoutX="25.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="leading actor:" />
@@ -58,6 +58,8 @@
             <Button layoutX="681.0" layoutY="16.0" mnemonicParsing="false" onAction="#change_all_prices" text="change all prices" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
             <Text layoutX="676.0" layoutY="69.0" strokeType="OUTSIDE" strokeWidth="0.0" text="rating:" />
             <TextField fx:id="rating" layoutX="712.0" layoutY="53.0" prefHeight="26.0" prefWidth="72.0" />
+            <Text layoutX="718.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="link" wrappingWidth="33.708984375" />
+            <TextField fx:id="movie_link" layoutX="748.0" layoutY="85.0" prefHeight="25.0" prefWidth="141.0" />
          </children>
       </AnchorPane>
    </children>
