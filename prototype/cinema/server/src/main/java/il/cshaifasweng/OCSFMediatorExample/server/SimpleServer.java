@@ -8,6 +8,10 @@ import java.time.Duration;
 import java.time.ZoneId;
 
 import java.util.*;
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpExchange;
+import java.net.InetSocketAddress;
 
 import il.cshaifasweng.OCSFMediatorExample.server.EmailSender;
 import java.text.SimpleDateFormat;
@@ -28,6 +32,9 @@ import org.hibernate.service.ServiceRegistry;
 
 import javax.persistence.criteria.*;
 import java.io.IOException;
+import java.time.LocalTime;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import java.io.Serializable;
 import java.security.PrivateKey;
 import java.time.LocalDateTime;
@@ -36,6 +43,10 @@ import java.time.LocalDateTime;
 public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
 	private static SessionFactory sessionFactory = getSessionFactory(SimpleChatServer.password);
+
+	// this variable for handle the link
+	private HttpServer httpServer;
+	private static final AtomicInteger linkCounter = new AtomicInteger(1);
 
 	private Message reports_message = new Message(0, "reports_message");
 	private static Map<Integer, Map<Integer, Map<Integer, Integer>>> multiEntryTicketSales = new HashMap<>();
@@ -82,7 +93,24 @@ public class SimpleServer extends AbstractServer {
 
 	public SimpleServer(int port) {
 		super(port);
+		try {
+			initHttpServer();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
+	private void initHttpServer() throws IOException {
+		httpServer = HttpServer.create(new InetSocketAddress(8080), 0);
+
+//		// Add contexts for different movies
+//		httpServer.createContext("/movie1", new MovieLink("https://chatgpt.com/", LocalTime.of(9, 0), LocalTime.of(12, 0)));
+//		httpServer.createContext("/movie2", new MovieLink("https://chatgpt.com/", LocalTime.of(13, 0), LocalTime.of(16, 0)));
+//		httpServer.createContext("/movie3", new MovieLink("https://example.com/movie3", LocalTime.of(17, 0), LocalTime.of(20, 0)));
+
+		httpServer.setExecutor(null); // Use default executor
+		httpServer.start();
+		System.out.println("HTTP server is running on http://localhost:8080/");
 	}
 	/////////////////////////////////////////////// HELPER FUNCTIONS ////////////////////////////////////////////////////////////////////
 
@@ -755,6 +783,21 @@ public class SimpleServer extends AbstractServer {
 			String formattedDate = date.format(formatter);
 
 			// Retrieve link and wantedDate
+			String movie_name = p1.getMovie_name();
+			String original_link="";
+			List<Movie> data = get_movies_by_name(movie_name);
+			for (Movie m : data) {
+				if(m.getMovie_name().equals(movie_name)) {
+					original_link = m.getMovie_link();
+				}
+			}
+			if(original_link.isEmpty()){return;}
+
+			int uniqueNumber = linkCounter.getAndIncrement();
+
+			httpServer.createContext("/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber, new MovieLink(original_link, LocalTime.of(9, 0), LocalTime.of(12, 0)));
+
+			p1.setLink("http://localhost:8080/"+"/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber);
 			String link = p1.getLink();
 			Date wantedDate = p1.getDate_of_link_activation();
 

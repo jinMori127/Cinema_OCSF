@@ -36,10 +36,12 @@ public class Movie implements Serializable {
     private String director;
     private double rating;
 
+    private String movie_link;
+
     @OneToMany(mappedBy = "movie",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Screening> screenings = new ArrayList<Screening>();;
 
-    public Movie(int auto_number_movie, String movie_name, String main_actors, String category, String description_, Date time_, int year_) {
+    public Movie(int auto_number_movie, String movie_name, String main_actors, String category, String description_, Date time_, int year_, String movie_link) {
         this.auto_number_movie = auto_number_movie;
         this.movie_name = movie_name;
         this.main_actors = main_actors;
@@ -47,6 +49,7 @@ public class Movie implements Serializable {
         this.description_ = description_;
         this.time_ = time_;
         this.year_ = year_;
+        this.movie_link = movie_link;
     }
 
     public Movie() {
@@ -145,6 +148,9 @@ public class Movie implements Serializable {
     public int getPrice(){return price;}
     public void setDirector(String director){this.director = director;}
     public String getDirector(){return director;}
+
+    public String getMovie_link() {return movie_link;}
+    public void setMovie_link(String movie_link) {this.movie_link = movie_link;}
 
     public String toString(){
         return "Movie Description: " + description_ + "\n" +
