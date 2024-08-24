@@ -6,36 +6,46 @@ import java.time.LocalTime;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
+import java.time.LocalDate;
 
 public class MovieLink implements HttpHandler{
-        private final String movieUrl;
-        private final LocalTime startTime;
-        private final LocalTime endTime;
+    private final LocalDate startDate;
+    private final LocalTime startTime;
+    private final LocalTime endTime;
+    private final String movieUrl;
 
-        public MovieLink(String movieUrl, LocalTime startTime, LocalTime endTime) {
-            this.movieUrl = movieUrl;
-            this.startTime = startTime;
-            this.endTime = endTime;
-        }
+    public MovieLink(LocalDate startDate, LocalTime startTime, LocalTime endTime, String movieUrl) {
+        this.startDate = startDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.movieUrl = movieUrl;
+    }
 
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            LocalTime currentTime = LocalTime.now();
-            String response;
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        LocalTime currentTime = LocalTime.now();
+        LocalDate currentDate = LocalDate.now();
 
-            // Check if current time is within the allowed range
+        String response;
+
+        if (currentDate.equals(startDate)) {
             if (currentTime.isAfter(startTime) && currentTime.isBefore(endTime)) {
-                // Redirect to the movie URL
                 exchange.getResponseHeaders().set("Location", movieUrl);
                 exchange.sendResponseHeaders(302, 0);
             } else {
-                // Serve a message that the link is not available
-                response = "This link is only available between " + startTime + " and " + endTime + ".";
+                response = "This link is only available between " + startTime + " and " + endTime + " on " + startDate + ".";
                 exchange.sendResponseHeaders(200, response.length());
-                OutputStream os = exchange.getResponseBody();
+                try (OutputStream os = exchange.getResponseBody()) {
+                    os.write(response.getBytes());
+                }
+            }
+        } else {
+            response = "This link is only available on " + startDate + " between " + startTime + " and " + endTime + ".";
+            exchange.sendResponseHeaders(200, response.length());
+            try (OutputStream os = exchange.getResponseBody()) {
                 os.write(response.getBytes());
-                os.close();
             }
         }
+    }
     }
 

@@ -785,19 +785,45 @@ public class SimpleServer extends AbstractServer {
 			// Retrieve link and wantedDate
 			String movie_name = p1.getMovie_name();
 			String original_link="";
-			List<Movie> data = get_movies_by_name(movie_name);
+			Date durationDate = null;
+					List<Movie> data = get_movies_by_name(movie_name);
 			for (Movie m : data) {
 				if(m.getMovie_name().equals(movie_name)) {
 					original_link = m.getMovie_link();
+					 durationDate = m.getTime_();
 				}
 			}
-			if(original_link.isEmpty()){return;}
+			if(original_link.isEmpty() || durationDate == null){return;}
 
 			int uniqueNumber = linkCounter.getAndIncrement();
 
-			httpServer.createContext("/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber, new MovieLink(original_link, LocalTime.of(9, 0), LocalTime.of(12, 0)));
+			// extract the  begin and  start hour
+			Date movie_active_date = p1.getDate_of_link_activation();
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(movie_active_date);
 
-			p1.setLink("http://localhost:8080/"+"/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber);
+			// Extract hour and minute from wantedDateObj
+			int wantedHour = calendar.get(Calendar.HOUR_OF_DAY);
+			int wantedMinute = calendar.get(Calendar.MINUTE);
+
+			Calendar durationCal = Calendar.getInstance();
+			durationCal.setTime(durationDate);
+			int durationHours = durationCal.get(Calendar.HOUR_OF_DAY);
+			int durationMinutes = durationCal.get(Calendar.MINUTE);
+
+			calendar.add(Calendar.HOUR_OF_DAY, durationHours);
+			calendar.add(Calendar.MINUTE, durationMinutes);
+
+			// Get the end hour and minute
+			int endHour = calendar.get(Calendar.HOUR_OF_DAY);
+			int endMinute = calendar.get(Calendar.MINUTE);
+
+			Instant instant = movie_active_date.toInstant(); // Convert Date to Instant
+			LocalDate startDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+
+			httpServer.createContext("/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber, new MovieLink(startDate, LocalTime.of(wantedHour, wantedMinute), LocalTime.of(endHour, endMinute),original_link));
+
+			p1.setLink("http://localhost:8080/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber);
 			String link = p1.getLink();
 			Date wantedDate = p1.getDate_of_link_activation();
 
