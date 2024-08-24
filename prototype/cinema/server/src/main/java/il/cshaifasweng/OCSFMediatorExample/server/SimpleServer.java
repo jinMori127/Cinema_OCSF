@@ -110,7 +110,7 @@ public class SimpleServer extends AbstractServer {
 
 		httpServer.setExecutor(null); // Use default executor
 		httpServer.start();
-		System.out.println("HTTP server is running on http://localhost:8080/");
+		System.out.println("HTTP server is running on http://"+SimpleChatServer.host+":8080/");
 	}
 	/////////////////////////////////////////////// HELPER FUNCTIONS ////////////////////////////////////////////////////////////////////
 
@@ -771,7 +771,6 @@ public class SimpleServer extends AbstractServer {
 			}
 
 			EmailSender emailSender = new EmailSender();
-			String host = p1.getLink() ;
 			String[] recipients = {p1.getId_user().getEmail()};
 			String subject = "Thank You for Your Purchase at Luna Aura";
 
@@ -824,7 +823,7 @@ public class SimpleServer extends AbstractServer {
 
 			httpServer.createContext("/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber, new MovieLink(startDate, LocalTime.of(wantedHour, wantedMinute), LocalTime.of(endHour, endMinute),original_link));
 
-			p1.setLink("http://"+host+":8080/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber);
+			p1.setLink("http://"+SimpleChatServer.host+":8080/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber);
 			String link = p1.getLink();
 			Date wantedDate = p1.getDate_of_link_activation();
 
