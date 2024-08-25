@@ -1,5 +1,4 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
-
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import il.cshaifasweng.OCSFMediatorExample.entities.Reports;
 import javafx.application.Platform;
@@ -12,7 +11,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.text.Text;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-
 import java.io.IOException;
 import java.util.*;
 
@@ -45,6 +43,7 @@ public class ReportsController {
     @FXML
     private TextArea report_text;
 
+    public static final String[] BRANCHES = {"Sakhnin", "Haifa", "Nazareth", "Nhif"};
 
     @FXML
     void initialize() {
@@ -52,7 +51,10 @@ public class ReportsController {
         Error_Message.setVisible(false);
 
         choosed_branch.getItems().clear();
-        choosed_branch.getItems().addAll("", "AllBranches" ,"Sakhnin", "Haifa", "Nazareth", "Nhif");
+        choosed_branch.getItems().addAll("", "AllBranches");
+        for (String branch : BRANCHES) {
+            choosed_branch.getItems().add(branch);
+        }
         choosed_year.getItems().clear();
         choosed_year.getItems().addAll("", "2024", "2023", "2022");
         choosed_year.setOnAction(event -> updateMonthsBasedOnYear());

@@ -43,7 +43,7 @@ import java.time.LocalDateTime;
 public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
 	private static SessionFactory sessionFactory = getSessionFactory(SimpleChatServer.password);
-
+	public static final String[] BRANCHES = {"Sakhnin", "Haifa", "Nazareth", "Nhif"};
 	// this variable for handle the link
 	private HttpServer httpServer;
 	private static final AtomicInteger linkCounter = new AtomicInteger(1);
@@ -1226,10 +1226,9 @@ public class SimpleServer extends AbstractServer {
 				}
 			} else if (userPurchases.getPurchase_type().equals("HomeLink")) {
 				payment_amount = userPurchases.getPayment_amount();
-				String[] purchases_branches = {"Sakhnin", "Haifa", "Nazareth", "Nhif"};
-				for (String currbranch : purchases_branches){
-					List<Integer> dailyPurchases = linkPurchasesByBranchYearMonth.get(currbranch).get(year).get(month);
-					dailyPurchases.set(day - 1, dailyPurchases.get(day - 1) + (int) payment_amount);
+				for (String currbranch : BRANCHES){
+					List<Integer> dailyLinkPurchases = linkPurchasesByBranchYearMonth.get(currbranch).get(year).get(month);
+					dailyLinkPurchases.set(day - 1, dailyLinkPurchases.get(day - 1) + (int) payment_amount);
 				}
 			}
 		}
@@ -1428,37 +1427,17 @@ public class SimpleServer extends AbstractServer {
 			transaction = session.beginTransaction();
 			if (reports_message.getMessage().equals("purchaseMultiTicket")) {
 				System.out.println("got into update report for purchaseMultiTicket");
-				Reports report1 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Haifa");
-				Reports report2 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Nhif");
-				Reports report3 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Nazareth");
-				Reports report4 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Sakhnin");
-
 				MultiEntryTicket ticket = (MultiEntryTicket) reports_message.getObject();
 				int remain_tickets = (int) ticket.INITIAL_PRICE;
 
-				List<Integer> multiEntryData1 = report1.getReport_multi_entry_ticket();
-				multiEntryData1.set(currentDay - 1, multiEntryData1.get(currentDay - 1) + remain_tickets);
-				report1.setReport_multi_entry_ticket(multiEntryData1);
-
-				List<Integer> multiEntryData2 = report2.getReport_multi_entry_ticket();
-				multiEntryData2.set(currentDay - 1, multiEntryData2.get(currentDay - 1) + remain_tickets);
-				report2.setReport_multi_entry_ticket(multiEntryData2);
-
-				List<Integer> multiEntryData3 = report3.getReport_multi_entry_ticket();
-				multiEntryData3.set(currentDay - 1, multiEntryData3.get(currentDay - 1) + remain_tickets);
-				report3.setReport_multi_entry_ticket(multiEntryData3);
-
-				List<Integer> multiEntryData4 = report4.getReport_multi_entry_ticket();
-				multiEntryData4.set(currentDay - 1, multiEntryData4.get(currentDay - 1) + remain_tickets);
-				report4.setReport_multi_entry_ticket(multiEntryData4);
-				changed_reports.add(report1);
-				changed_reports.add(report2);
-				changed_reports.add(report3);
-				changed_reports.add(report4);
-				session.update(report1);
-				session.update(report2);
-				session.update(report3);
-				session.update(report4);
+				for (String branch : SimpleServer.BRANCHES) {
+					Reports report = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, branch);
+					List<Integer> multiEntryData = report.getReport_multi_entry_ticket();
+					multiEntryData.set(currentDay - 1, multiEntryData.get(currentDay - 1) + remain_tickets);
+					report.setReport_multi_entry_ticket(multiEntryData);
+					session.update(report);
+					changed_reports.add(report);
+				}
 
 			} else if (reports_message.getMessage().equals("cancelPurchase")) {
 				System.out.println("got into update report for cancelPurchase");
@@ -1468,28 +1447,52 @@ public class SimpleServer extends AbstractServer {
 				Calendar calendar = Calendar.getInstance();
 				calendar.setTime(date_);
 				currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-				currentMonth = calendar.get(Calendar.MONTH) + 1; // Months are 0-based in Calendar, so add 1
+				currentMonth = calendar.get(Calendar.MONTH) + 1;
 				currentYear = calendar.get(Calendar.YEAR);
-				Reports report = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, purchase.getScreening().getBranch());
-				List<Integer> purchaseData = report.getReport_ticket_sells();
-				int originalPurchase = purchaseData.get(currentDay - 1);
-				purchaseData.set(currentDay - 1, originalPurchase - (int) refund);
-				report.setReport_ticket_sells(purchaseData);
-
-				session.update(report);
-				changed_reports.add(report);
-
+				if (purchase.getPurchase_type().equals("Ticket")){
+					Reports report = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, purchase.getScreening().getBranch());
+					List<Integer> purchaseData = report.getReport_ticket_sells();
+					int originalPurchase = purchaseData.get(currentDay - 1);
+					purchaseData.set(currentDay - 1, originalPurchase - (int) refund);
+					report.setReport_ticket_sells(purchaseData);
+					session.update(report);
+					changed_reports.add(report);
+				}
+				else if (purchase.getPurchase_type().equals("HomeLink")){
+					for (String branch : BRANCHES) {
+						Reports report = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, branch);
+						List<Integer> LinkPurchaseData = report.getReport_link_tickets_sells();
+						int originalLinkPurchase = LinkPurchaseData.get(currentDay - 1);
+						LinkPurchaseData.set(currentDay - 1, originalLinkPurchase - (int) refund);
+						report.setReport_link_tickets_sells(LinkPurchaseData);
+						session.update(report);
+						changed_reports.add(report);
+					}
+				}
 			}
 			else if (reports_message.getMessage().equals("extraComplaint")){
 				System.out.println("got into update report for extraComplaint");
 				Complains complain = (Complains) reports_message.getObject();
-				Reports report = getReportForCurrentDay(session, currentYear, currentMonth, currentDay,complain.getCinema_branch());
-				List<Integer> complainData = report.getReport_complains();
-				int original = complainData.get(currentDay - 1);
-				complainData.set(currentDay - 1, original + 1);
-				report.setReport_complains(complainData);
-				session.update(report);
-				changed_reports.add(report);
+				if (complain.getCinema_branch().equals("All")) {
+					for (String branch : BRANCHES) {
+						Reports report = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, branch);
+						List<Integer> complainData = report.getReport_complains();
+						int original = complainData.get(currentDay - 1);
+						complainData.set(currentDay - 1, original + 1);
+						report.setReport_complains(complainData);
+						session.update(report);
+						changed_reports.add(report);
+					}
+				}
+				else{
+					Reports report = getReportForCurrentDay(session, currentYear, currentMonth, currentDay,complain.getCinema_branch());
+					List<Integer> complainData = report.getReport_complains();
+					int original = complainData.get(currentDay - 1);
+					complainData.set(currentDay - 1, original + 1);
+					report.setReport_complains(complainData);
+					session.update(report);
+					changed_reports.add(report);
+				}
 			}
 			else if (reports_message.getMessage().equals("ExtraPurchase")){
 				System.out.println("got into update report for ExtraPurchase");
@@ -1506,50 +1509,24 @@ public class SimpleServer extends AbstractServer {
 			}
 			else if (reports_message.getMessage().equals("extraLinkPurchase")){
 				System.out.println("got into update report for extraLinkPurchase");
-				Reports report1 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Haifa");
-				Reports report2 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Nhif");
-				Reports report3 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Nazareth");
-				Reports report4 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Sakhnin");
-
 				UserPurchases purchase = (UserPurchases) reports_message.getObject();
 				double price = purchase.getPayment_amount();
 
-				List<Integer> linkPurchaseData1 = report1.getReport_link_tickets_sells();
-				int originalPurchase1 = linkPurchaseData1.get(currentDay - 1);
-				linkPurchaseData1.set(currentDay - 1, originalPurchase1 + (int) price);
-				report1.setReport_link_tickets_sells(linkPurchaseData1);
-
-				List<Integer> linkPurchaseData2 = report2.getReport_link_tickets_sells();
-				int originalPurchase2 = linkPurchaseData2.get(currentDay - 1);
-				linkPurchaseData2.set(currentDay - 1, originalPurchase2 + (int) price);
-				report2.setReport_link_tickets_sells(linkPurchaseData2);
-
-				List<Integer> linkPurchaseData3 = report3.getReport_link_tickets_sells();
-				int originalPurchase3 = linkPurchaseData3.get(currentDay - 1);
-				linkPurchaseData3.set(currentDay - 1, originalPurchase3 + (int) price);
-				report3.setReport_link_tickets_sells(linkPurchaseData3);
-
-				List<Integer> linkPurchaseData4 = report4.getReport_link_tickets_sells();
-				int originalPurchase4 = linkPurchaseData4.get(currentDay - 1);
-				linkPurchaseData4.set(currentDay - 1, originalPurchase4 + (int) price);
-				report4.setReport_link_tickets_sells(linkPurchaseData4);
-
-				session.update(report1);
-				changed_reports.add(report1);
-				session.update(report2);
-				changed_reports.add(report2);
-				session.update(report3);
-				changed_reports.add(report3);
-				session.update(report4);
-				changed_reports.add(report4);
-
+				for (String branch : BRANCHES) {
+					Reports report = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, branch);
+					List<Integer> linkPurchaseData = report.getReport_link_tickets_sells();
+					int originalPurchase = linkPurchaseData.get(currentDay - 1);
+					linkPurchaseData.set(currentDay - 1, originalPurchase + (int) price);
+					report.setReport_link_tickets_sells(linkPurchaseData);
+					session.update(report);
+					changed_reports.add(report);
+				}
 			}
 
 			reports_message.setMessage("updatedReports");
 			reports_message.setObject(changed_reports);
 
-			// Save the updated report back to the database
-			transaction.commit();	//causes error!
+			transaction.commit();
 
 		} catch (Exception e) {
 			if (session.getTransaction() != null) {
