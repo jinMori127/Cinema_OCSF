@@ -410,13 +410,7 @@ public class SimpleServer extends AbstractServer {
 		}
 		return 0;
 	}
-	private void delete_purchase(UserPurchases purchase) throws Exception {
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		session.delete(purchase);
-		session.getTransaction().commit();
-		session.close();
-	}
+
 
 	private List<Movie> search_with_filter(Movie movie,int year2 , String sorting_attribute,String Sorting_direction) throws Exception
 	{
@@ -498,8 +492,36 @@ public class SimpleServer extends AbstractServer {
 		return data.get(0);
 	}
 
+	private UserPurchases getPurchaseByAuto(int auto_num) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<UserPurchases> query = builder.createQuery(UserPurchases.class);
+		Root<UserPurchases> root = query.from(UserPurchases.class);
+		Predicate namePredicate = builder.equal(root.get("auto_number_purchase"), auto_num);
+		query.select(root).where(namePredicate);
+		UserPurchases data = session.createQuery(query).getSingleResult();
+		session.getTransaction().commit();
+		session.close();
+		return data;
+	}
 
-	private List<MultiEntryTicket> getMTForID(IdUser ID) {
+
+	private MultiEntryTicket getMultiTicketUsingIdUser_not_list(IdUser ID) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
+		Root<MultiEntryTicket> root = query.from(MultiEntryTicket.class);
+		Predicate namePredicate = builder.equal(root.get("id_user"), ID);
+		query.select(root).where(namePredicate);
+		MultiEntryTicket data = session.createQuery(query).getSingleResult();
+		session.getTransaction().commit();
+		session.close();
+		return data;
+	}
+
+	private List<MultiEntryTicket> getMultiTicketUsingIdUser(IdUser ID) {
 		List<MultiEntryTicket> data = new ArrayList<>();
 		System.out.println("MT func 1");
 
@@ -512,23 +534,19 @@ public class SimpleServer extends AbstractServer {
 			CriteriaQuery<MultiEntryTicket> query = builder.createQuery(MultiEntryTicket.class);
 			Root<MultiEntryTicket> root = query.from(MultiEntryTicket.class);
 
-			System.out.println("MT func 2");
 
 
 			// Adding the predicate condition
 			Predicate namePredicate = builder.equal(root.get("id_user"), ID);
 
-			System.out.println("MT func 3");
 
 
 			query.select(root).where(namePredicate);
 
-			System.out.println("MT func 4");
 
 			// Execute query and get the result
 			data = session.createQuery(query).getResultList();
 
-			System.out.println("MT func 5");
 
 			// Flush session before commit
 			session.flush();
@@ -536,8 +554,6 @@ public class SimpleServer extends AbstractServer {
 			// Commit transaction
 			session.getTransaction().commit();
 
-			System.out.println("MT func 6");
-			System.out.println(data.get(0).getId_user().getUser_id());
 
 			session.close();
 		} catch (Exception e) {
@@ -765,7 +781,6 @@ public class SimpleServer extends AbstractServer {
 
 	private void sendThankYouEmailLink(UserPurchases p1) {
 		try {
-			// Ensure p1 and its associated IdUser are properly managed
 			if (p1 == null || p1.getId_user() == null) {
 				throw new IllegalArgumentException("UserPurchases or associated IdUser is null.");
 			}
@@ -778,26 +793,28 @@ public class SimpleServer extends AbstractServer {
 			String id = p1.getId_user().getUser_id();
 			LocalDate date = LocalDate.now();
 			double paymentAmount = p1.getPayment_amount();
+			String movie_name = p1.getMovie_name();
 
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
 			String formattedDate = date.format(formatter);
 
 			// Retrieve link and wantedDate
-			String movie_name = p1.getMovie_name();
-			String original_link="";
+			String original_link = "";
 			Date durationDate = null;
-					List<Movie> data = get_movies_by_name(movie_name);
+			List<Movie> data = get_movies_by_name(movie_name);
 			for (Movie m : data) {
-				if(m.getMovie_name().equals(movie_name)) {
+				if (m.getMovie_name().equals(movie_name)) {
 					original_link = m.getMovie_link();
-					 durationDate = m.getTime_();
+					durationDate = m.getTime_();
 				}
 			}
-			if(original_link.isEmpty() || durationDate == null){return;}
+			if (original_link.isEmpty() || durationDate == null) {
+				return;
+			}
 
 			int uniqueNumber = linkCounter.getAndIncrement();
 
-			// extract the  begin and  start hour
+			// extract the begin and start hour
 			Date movie_active_date = p1.getDate_of_link_activation();
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(movie_active_date);
@@ -821,9 +838,10 @@ public class SimpleServer extends AbstractServer {
 			Instant instant = movie_active_date.toInstant(); // Convert Date to Instant
 			LocalDate startDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
 
-			httpServer.createContext("/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber, new MovieLink(startDate, LocalTime.of(wantedHour, wantedMinute), LocalTime.of(endHour, endMinute),original_link));
+			httpServer.createContext("/" + p1.getMovie_name() + p1.getId_user().getUser_id() + uniqueNumber,
+					new MovieLink(startDate, LocalTime.of(wantedHour, wantedMinute), LocalTime.of(endHour, endMinute), original_link));
 
-			p1.setLink("http://"+SimpleChatServer.host+":8080/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber);
+			p1.setLink("http://" + SimpleChatServer.host + ":8080/" + p1.getMovie_name() + p1.getId_user().getUser_id() + uniqueNumber);
 			String link = p1.getLink();
 			Date wantedDate = p1.getDate_of_link_activation();
 
@@ -847,6 +865,7 @@ public class SimpleServer extends AbstractServer {
 					+ "<h3 style='color: #555;'>YOUR ORDER INFORMATION:</h3>"
 					+ "<p><strong>Order ID:</strong> " + id + "<br/>"
 					+ "<strong>Order Date:</strong> " + formattedDate + "<br/>"
+					+ "<strong>Movie Name:</strong> " + movie_name + "<br/>"
 					+ "<strong>Source:</strong> Luna Aura<br/>"
 					+ "<strong>Link:</strong> <a href='" + link + "'>" + link + "</a><br/>"
 					+ "<strong>Wanted Date:</strong> " + formattedWantedDate + "</p>"
@@ -860,7 +879,7 @@ public class SimpleServer extends AbstractServer {
 					+ "</thead>"
 					+ "<tbody>"
 					+ "<tr>"
-					+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Link Movie</td>"
+					+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Link Movie: " + movie_name + "</td>"
 					+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>₪" + paymentAmount + "</td>"
 					+ "</tr>"
 					+ "</tbody>"
@@ -1605,6 +1624,7 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(getScreeningForMovie(movie));
 				message.setMessage("#GetScreeningDone");
 				client.sendToClient(message);
+
 			}
 
 			else if (message.getMessage().equals("#InsertMovie")) {
@@ -1741,6 +1761,23 @@ public class SimpleServer extends AbstractServer {
 
 			}
 
+			else if (message.getMessage().equals("#return_tickets")) {
+				Session session = sessionFactory.openSession();
+				session.beginTransaction();
+				int auto_num =  (int)message.getObject();
+				int num_of_seats=(int)message.getObject2();
+				UserPurchases p1 = (UserPurchases) getPurchaseByAuto(auto_num);
+				IdUser user = p1.getId_user();
+				MultiEntryTicket t1= getMultiTicketUsingIdUser_not_list(user);
+				t1.setRemain_tickets(t1.getRemain_tickets()+num_of_seats);
+				session.update(t1);
+				session.getTransaction().commit();
+				session.close();
+				message.setMessage("#ADD_Multi_tickets_client");
+				message.setObject(t1.getRemain_tickets());
+				client.sendToClient(message);
+
+			}
 
 			else if (message.getMessage().equals("#PayMultiTicket")) {
 				System.out.println("We are now in the server yo ");
@@ -1774,7 +1811,7 @@ public class SimpleServer extends AbstractServer {
 				int seats_num = (int) message.getObject2();
 				System.out.println("Seats number: " + seats_num);
 
-				List <MultiEntryTicket> multiEntryTicketList = getMTForID(idUser_from_base);
+				List <MultiEntryTicket> multiEntryTicketList = getMultiTicketUsingIdUser(idUser_from_base);
 
 				if (multiEntryTicketList != null) {
 					for (MultiEntryTicket multiEntryTicket : multiEntryTicketList) {
@@ -1907,7 +1944,7 @@ public class SimpleServer extends AbstractServer {
 
 			//////////////////////////////////////////////////////Purchase Part /////////////////////////////////////////////////////////
 
-		else if (message.getMessage().equals("#purchase_movie_link")) {
+			else if (message.getMessage().equals("#purchase_movie_link")) {
 					UserPurchases p1 = (UserPurchases) message.getObject();
 					IdUser user1 = getOrSaveIdUser(p1.getId_user());
 
@@ -1943,7 +1980,6 @@ public class SimpleServer extends AbstractServer {
 				System.out.println("Error while saving movie link: " + e.getMessage());
 			}
 			}
-
 			else if (message.getMessage().equals("#purchase_movie_link_by_multi_ticket")) {
 					message.setMessage("#purchase_movie_link_by_multi_ticket_client");
 					UserPurchases p1 = (UserPurchases) message.getObject();
@@ -1994,9 +2030,6 @@ public class SimpleServer extends AbstractServer {
 					System.out.println("Error while saving movie link: " + e.getMessage());
 				}
 			}
-
-
-
 			else if (message.getMessage().equals("#purchase_multi_ticket")) {
                 try (Session session = sessionFactory.openSession()) {
                     Transaction transaction = session.beginTransaction();
@@ -2180,6 +2213,7 @@ public class SimpleServer extends AbstractServer {
 	}
 
 	public void sendToAllClients(Message message) {
+
 		try {
 			for (SubscribedClient SubscribedClient : SubscribersList) {
 				SubscribedClient.getClient().sendToClient(message);

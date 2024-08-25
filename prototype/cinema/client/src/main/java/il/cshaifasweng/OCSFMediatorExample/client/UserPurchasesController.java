@@ -90,6 +90,11 @@ public class UserPurchasesController {
                 create_user_purchases(event.getMessage());
             });
         }
+        else if (event.getId()==BaseEventBox.get_event_id("ADDTickets")) {
+            String text_multi_ticket = "Remaining Ticket: " + event.getMessage().getObject().toString();
+            multi_ticket_info.setText(text_multi_ticket);
+
+        }
     }
 
 
@@ -141,35 +146,26 @@ public class UserPurchasesController {
         });
     }
     @FXML
+
     public void show_purchase_information() {
         try {
-            // Hide warning message initially
             ErrorMessage.setVisible(false);
-
-            // Get the selected row index
             int selectedRow = table_view.getSelectionModel().getSelectedIndex();
-
-            // Check if the selected row is valid
             if (selectedRow >= 0 && selectedRow < table_view.getItems().size()) {
-                // Get the columns
                 ObservableList<TableColumn<UserPurchases, ?>> columns = table_view.getColumns();
 
                 StringBuilder contentText = new StringBuilder();
 
-                // Iterate through columns to get cell data
                 for (TableColumn<UserPurchases, ?> column : columns) {
                     Object cellData = column.getCellData(selectedRow);
                     contentText.append(column.getText()).append(": ").append(cellData).append("\n");
                 }
 
                 purchase_detailed_text.setText(contentText.toString());
-
-                // checking if there is a link so to adapt the text field with it
                 TableColumn<UserPurchases, ?> link = table_view.getColumns().get(3);
                 Object cellData = link.getCellData(selectedRow);
                 String link_text = (String) cellData;
 
-                // Set warning message and make it visible
                 ErrorMessage.setVisible(true);
                 if(link_text == null || link_text.isEmpty()) {
                     ErrorMessage.setText("Note:\nif still more than 3 hours you will get 100%\nif still between 1-3 hours you will get 50%\n" +
@@ -217,6 +213,14 @@ public class UserPurchasesController {
             cellData = link.getCellData(selectedRow);
             String link_text = (String) cellData;
 
+            TableColumn<UserPurchases, ?> seats = table_view.getColumns().get(2);
+            cellData = seats.getCellData(selectedRow);
+            String seats_text = (String) cellData;
+
+            seats_text = seats_text.replace("seats:", "").trim();
+            String[] seatPairs = seats_text.split(",");
+            int numOfSeats = seatPairs.length;
+
             if (date_screening.before(curr_date)) {
                 ErrorMessage.setVisible(true);
                 percent_return=0;
@@ -239,16 +243,35 @@ public class UserPurchasesController {
                 calendar2.add(Calendar.HOUR, +1);
                 Date curr_date_1 = calendar2.getTime();
 
-                TableColumn<UserPurchases, ?> third_col = table_view.getColumns().get(5);
-                cellData = third_col.getCellData(selectedRow);
+                TableColumn<UserPurchases, ?> five_col = table_view.getColumns().get(5);
+                cellData = five_col.getCellData(selectedRow);
                 double price =(double)cellData;
+
+                TableColumn<UserPurchases, ?> seven_col = table_view.getColumns().get(7);
+                cellData = seven_col.getCellData(selectedRow);
+                String purchase_type =(String) cellData;
 
 
                 if (curr_date_3.before(date_screening) && (link_text == null||link_text.isEmpty())) {
-                    ErrorMessage.setVisible(true);
-                    ErrorMessage.setText("Value returned 100%,Your Total Will be:"+price);
-                    refund = price;
-                    percent_return = 100;
+                    if (purchase_type.equals("Multi Ticket")){
+                        Message message = new Message(102, "#return_tickets");
+                        message.setObject(auto_num);
+                        message.setObject2(numOfSeats);
+                        ErrorMessage.setVisible(true);
+                        ErrorMessage.setText("Value returned is"+numOfSeats+ "tickets" );
+                        try {
+                            SimpleClient.getClient().sendToServer(message);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    }
+                    else {
+                        ErrorMessage.setVisible(true);
+                        ErrorMessage.setText("Value returned 100%,Your Total Will be:" + price);
+                        refund = price;
+                        percent_return = 100;
+                    }
                 }
 
                 else if (curr_date_1.before(date_screening)) {
