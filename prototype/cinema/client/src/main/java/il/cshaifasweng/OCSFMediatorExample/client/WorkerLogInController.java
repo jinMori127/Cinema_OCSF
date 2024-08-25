@@ -74,6 +74,9 @@ public class WorkerLogInController {
                             throw new RuntimeException(e);
                         }
                         break;
+                    case "#alreadylogin":
+                        output.setText("You're already logged in from other device");
+                        break;
                 }
             });
         }

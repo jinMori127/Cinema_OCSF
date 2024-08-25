@@ -108,7 +108,8 @@ public class SimpleClient extends AbstractClient {
 
 		else if(message.getMessage().equals("#loginWorkerFailedUserName") ||
 				message.getMessage().equals("#loginWorker") ||
-				message.getMessage().equals("#loginWorkerFailedPass")){
+				message.getMessage().equals("#loginWorkerFailedPass")||
+				message.getMessage().equals("#alreadylogin")){
 			EventBus.getDefault().post(new BaseEventBox("LOGIN", message));
 		}
 		else if(message.getMessage().equals("#ShowUserComplaints")){

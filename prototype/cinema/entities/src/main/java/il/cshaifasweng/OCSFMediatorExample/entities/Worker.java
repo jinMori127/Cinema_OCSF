@@ -15,7 +15,7 @@ public class Worker implements Serializable {
     private String name;
     private String branch;
     private String role;
-
+    private boolean is_worker_loggedIn;
     //default constructor
     public Worker() {
     }
@@ -27,6 +27,7 @@ public class Worker implements Serializable {
         this.name = name;
         this.branch = branch;
         this.role = role;
+        this.is_worker_loggedIn = false;
     }
 
     // getters and setters
@@ -73,4 +74,8 @@ public class Worker implements Serializable {
     public void setRole(String role) {
         this.role = role;
     }
+
+    public boolean getIs_worker_loggedIn() {return is_worker_loggedIn;}
+
+    public void setIs_worker_loggedIn(boolean is_worker_loggedIn) {this.is_worker_loggedIn = is_worker_loggedIn;}
 }
