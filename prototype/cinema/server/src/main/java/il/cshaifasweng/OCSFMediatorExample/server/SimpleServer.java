@@ -8,6 +8,10 @@ import java.time.Duration;
 import java.time.ZoneId;
 
 import java.util.*;
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpExchange;
+import java.net.InetSocketAddress;
 
 import il.cshaifasweng.OCSFMediatorExample.server.EmailSender;
 import java.text.SimpleDateFormat;
@@ -28,6 +32,9 @@ import org.hibernate.service.ServiceRegistry;
 
 import javax.persistence.criteria.*;
 import java.io.IOException;
+import java.time.LocalTime;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import java.io.Serializable;
 import java.security.PrivateKey;
 import java.time.LocalDateTime;
@@ -36,6 +43,10 @@ import java.time.LocalDateTime;
 public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
 	private static SessionFactory sessionFactory = getSessionFactory(SimpleChatServer.password);
+
+	// this variable for handle the link
+	private HttpServer httpServer;
+	private static final AtomicInteger linkCounter = new AtomicInteger(1);
 
 	private Message reports_message = new Message(0, "reports_message");
 	private static Map<Integer, Map<Integer, Map<Integer, Integer>>> multiEntryTicketSales = new HashMap<>();
@@ -82,7 +93,24 @@ public class SimpleServer extends AbstractServer {
 
 	public SimpleServer(int port) {
 		super(port);
+		try {
+			initHttpServer();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
+	private void initHttpServer() throws IOException {
+		httpServer = HttpServer.create(new InetSocketAddress(8080), 0);
+
+//		// Add contexts for different movies
+//		httpServer.createContext("/movie1", new MovieLink("https://chatgpt.com/", LocalTime.of(9, 0), LocalTime.of(12, 0)));
+//		httpServer.createContext("/movie2", new MovieLink("https://chatgpt.com/", LocalTime.of(13, 0), LocalTime.of(16, 0)));
+//		httpServer.createContext("/movie3", new MovieLink("https://example.com/movie3", LocalTime.of(17, 0), LocalTime.of(20, 0)));
+
+		httpServer.setExecutor(null); // Use default executor
+		httpServer.start();
+		System.out.println("HTTP server is running on http://"+SimpleChatServer.host+":8080/");
 	}
 	/////////////////////////////////////////////// HELPER FUNCTIONS ////////////////////////////////////////////////////////////////////
 
@@ -755,6 +783,47 @@ public class SimpleServer extends AbstractServer {
 			String formattedDate = date.format(formatter);
 
 			// Retrieve link and wantedDate
+			String movie_name = p1.getMovie_name();
+			String original_link="";
+			Date durationDate = null;
+					List<Movie> data = get_movies_by_name(movie_name);
+			for (Movie m : data) {
+				if(m.getMovie_name().equals(movie_name)) {
+					original_link = m.getMovie_link();
+					 durationDate = m.getTime_();
+				}
+			}
+			if(original_link.isEmpty() || durationDate == null){return;}
+
+			int uniqueNumber = linkCounter.getAndIncrement();
+
+			// extract the  begin and  start hour
+			Date movie_active_date = p1.getDate_of_link_activation();
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(movie_active_date);
+
+			// Extract hour and minute from wantedDateObj
+			int wantedHour = calendar.get(Calendar.HOUR_OF_DAY);
+			int wantedMinute = calendar.get(Calendar.MINUTE);
+
+			Calendar durationCal = Calendar.getInstance();
+			durationCal.setTime(durationDate);
+			int durationHours = durationCal.get(Calendar.HOUR_OF_DAY);
+			int durationMinutes = durationCal.get(Calendar.MINUTE);
+
+			calendar.add(Calendar.HOUR_OF_DAY, durationHours);
+			calendar.add(Calendar.MINUTE, durationMinutes);
+
+			// Get the end hour and minute
+			int endHour = calendar.get(Calendar.HOUR_OF_DAY);
+			int endMinute = calendar.get(Calendar.MINUTE);
+
+			Instant instant = movie_active_date.toInstant(); // Convert Date to Instant
+			LocalDate startDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+
+			httpServer.createContext("/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber, new MovieLink(startDate, LocalTime.of(wantedHour, wantedMinute), LocalTime.of(endHour, endMinute),original_link));
+
+			p1.setLink("http://"+SimpleChatServer.host+":8080/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber);
 			String link = p1.getLink();
 			Date wantedDate = p1.getDate_of_link_activation();
 

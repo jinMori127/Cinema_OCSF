@@ -93,6 +93,10 @@ public class MovieEditingDetailsController {
     @FXML
     private ImageView selected_image;
 
+
+    @FXML
+    private TextField movie_link;
+
     @FXML
     void add_movie(ActionEvent event) {
         ErrorMessage.setVisible(false);
@@ -137,6 +141,9 @@ public class MovieEditingDetailsController {
             ErrorMessage.setVisible(true);
             ErrorMessage.setText("Please enter a rating");
             return;
+        } else if (movie_link.getText().trim().isEmpty()) {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("Please enter a rating");
         }
         Movie movie = new Movie();
         if(File_uploaded == null)
@@ -194,6 +201,7 @@ public class MovieEditingDetailsController {
         int priceC = Integer.parseInt(price.getText());
         String descriptionC = description.getText();
         double ratingC = Double.parseDouble(rating.getText());
+        String movie_linkC = movie_link.getText();
         if (ratingC <0 || ratingC > 10)
         {
             ErrorMessage.setVisible(true);
@@ -206,6 +214,7 @@ public class MovieEditingDetailsController {
         movie.setMain_actors(main_actor);
         movie.setCategory(catgoryC);
         movie.setYear_(yearC);
+        movie.setMovie_link(movie_linkC);
         movie.setRating(ratingC);
         try {
             movie.setTime_(timeFormate.parse(durationC));
@@ -325,6 +334,10 @@ public class MovieEditingDetailsController {
             ErrorMessage.setVisible(true);
             ErrorMessage.setText("Please enter a rating");
             return;
+        } else if (movie_link.getText().trim().isEmpty()) {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("Please enter a movie link");
+            return;
         }
         Movie movie = SelectedMovie;
         if(File_uploaded == null)
@@ -383,6 +396,7 @@ public class MovieEditingDetailsController {
         String directorC = director.getText();
         int priceC = Integer.parseInt(price.getText());
         String descriptionC = description.getText();
+        String movie_linkC = movie_link.getText();
         double ratingC = Double.parseDouble(rating.getText());
         if (ratingC <0 || ratingC > 10)
         {
@@ -395,6 +409,7 @@ public class MovieEditingDetailsController {
         movie.setMain_actors(main_actor);
         movie.setCategory(catgoryC);
         movie.setYear_(yearC);
+        movie.setMovie_link(movie_linkC);
         movie.setRating(ratingC);
         SimpleDateFormat timeFormate = new SimpleDateFormat("HH:mm");
         try {
