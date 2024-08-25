@@ -1647,7 +1647,7 @@ public class SimpleServer extends AbstractServer {
 
 			}
 
-			else if (message.getMessage().equals("#return_1_ticket")) {
+			else if (message.getMessage().equals("#return_tickets")) {
 				Session session = sessionFactory.openSession();
 				session.beginTransaction();
 				int auto_num =  (int)message.getObject();
@@ -1659,7 +1659,7 @@ public class SimpleServer extends AbstractServer {
 				session.update(t1);
 				session.getTransaction().commit();
 				session.close();
-				message.setMessage("#Minus_1_ticket_client");
+				message.setMessage("#ADD_Multi_tickets_client");
 				message.setObject(t1.getRemain_tickets());
 				client.sendToClient(message);
 

@@ -254,7 +254,7 @@ public class UserPurchasesController {
 
                 if (curr_date_3.before(date_screening) && (link_text == null||link_text.isEmpty())) {
                     if (purchase_type.equals("Multi Ticket")){
-                        Message message = new Message(102, "#return_1_ticket");
+                        Message message = new Message(102, "#return_tickets");
                         message.setObject(auto_num);
                         message.setObject2(numOfSeats);
                         ErrorMessage.setVisible(true);

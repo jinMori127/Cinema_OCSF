@@ -93,8 +93,8 @@ public class SimpleClient extends AbstractClient {
 			EventBus.getDefault().post(new BaseEventBox("SERVER_ERROR_MESSAGE", message));
 		}
 
-		else if (message.getMessage().equals("#Minus_1_ticket_client")) {
-			EventBus.getDefault().post(new BaseEventBox("Minus1Ticket", message));
+		else if (message.getMessage().equals("#ADD_Multi_tickets_client")) {
+			EventBus.getDefault().post(new BaseEventBox("ADDTickets", message));
 		}
 
 		else if (message.getMessage().equals("#GotSearchMovieFillter"))
