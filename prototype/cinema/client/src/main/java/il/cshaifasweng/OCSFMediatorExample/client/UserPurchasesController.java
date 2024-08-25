@@ -258,7 +258,7 @@ public class UserPurchasesController {
                         message.setObject(auto_num);
                         message.setObject2(numOfSeats);
                         ErrorMessage.setVisible(true);
-                        ErrorMessage.setText("Value returned is 1 ticket" );
+                        ErrorMessage.setText("Value returned is"+numOfSeats+ "tickets" );
                         try {
                             SimpleClient.getClient().sendToServer(message);
                         } catch (IOException e) {
