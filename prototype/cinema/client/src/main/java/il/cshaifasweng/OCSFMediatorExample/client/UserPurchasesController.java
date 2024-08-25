@@ -90,7 +90,7 @@ public class UserPurchasesController {
                 create_user_purchases(event.getMessage());
             });
         }
-        else if (event.getId()==BaseEventBox.get_event_id("Minus1Ticket")) {
+        else if (event.getId()==BaseEventBox.get_event_id("ADDTickets")) {
             String text_multi_ticket = "Remaining Ticket: " + event.getMessage().getObject().toString();
             multi_ticket_info.setText(text_multi_ticket);
 
