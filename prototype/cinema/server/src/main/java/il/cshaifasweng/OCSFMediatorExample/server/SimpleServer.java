@@ -765,7 +765,6 @@ public class SimpleServer extends AbstractServer {
 
 	private void sendThankYouEmailLink(UserPurchases p1) {
 		try {
-			// Ensure p1 and its associated IdUser are properly managed
 			if (p1 == null || p1.getId_user() == null) {
 				throw new IllegalArgumentException("UserPurchases or associated IdUser is null.");
 			}
@@ -778,26 +777,28 @@ public class SimpleServer extends AbstractServer {
 			String id = p1.getId_user().getUser_id();
 			LocalDate date = LocalDate.now();
 			double paymentAmount = p1.getPayment_amount();
+			String movie_name = p1.getMovie_name();
 
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
 			String formattedDate = date.format(formatter);
 
 			// Retrieve link and wantedDate
-			String movie_name = p1.getMovie_name();
-			String original_link="";
+			String original_link = "";
 			Date durationDate = null;
-					List<Movie> data = get_movies_by_name(movie_name);
+			List<Movie> data = get_movies_by_name(movie_name);
 			for (Movie m : data) {
-				if(m.getMovie_name().equals(movie_name)) {
+				if (m.getMovie_name().equals(movie_name)) {
 					original_link = m.getMovie_link();
-					 durationDate = m.getTime_();
+					durationDate = m.getTime_();
 				}
 			}
-			if(original_link.isEmpty() || durationDate == null){return;}
+			if (original_link.isEmpty() || durationDate == null) {
+				return;
+			}
 
 			int uniqueNumber = linkCounter.getAndIncrement();
 
-			// extract the  begin and  start hour
+			// extract the begin and start hour
 			Date movie_active_date = p1.getDate_of_link_activation();
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(movie_active_date);
@@ -821,9 +822,10 @@ public class SimpleServer extends AbstractServer {
 			Instant instant = movie_active_date.toInstant(); // Convert Date to Instant
 			LocalDate startDate = instant.atZone(ZoneId.systemDefault()).toLocalDate();
 
-			httpServer.createContext("/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber, new MovieLink(startDate, LocalTime.of(wantedHour, wantedMinute), LocalTime.of(endHour, endMinute),original_link));
+			httpServer.createContext("/" + p1.getMovie_name() + p1.getId_user().getUser_id() + uniqueNumber,
+					new MovieLink(startDate, LocalTime.of(wantedHour, wantedMinute), LocalTime.of(endHour, endMinute), original_link));
 
-			p1.setLink("http://"+SimpleChatServer.host+":8080/"+p1.getMovie_name()+p1.getId_user().getUser_id()+uniqueNumber);
+			p1.setLink("http://" + SimpleChatServer.host + ":8080/" + p1.getMovie_name() + p1.getId_user().getUser_id() + uniqueNumber);
 			String link = p1.getLink();
 			Date wantedDate = p1.getDate_of_link_activation();
 
@@ -847,6 +849,7 @@ public class SimpleServer extends AbstractServer {
 					+ "<h3 style='color: #555;'>YOUR ORDER INFORMATION:</h3>"
 					+ "<p><strong>Order ID:</strong> " + id + "<br/>"
 					+ "<strong>Order Date:</strong> " + formattedDate + "<br/>"
+					+ "<strong>Movie Name:</strong> " + movie_name + "<br/>"
 					+ "<strong>Source:</strong> Luna Aura<br/>"
 					+ "<strong>Link:</strong> <a href='" + link + "'>" + link + "</a><br/>"
 					+ "<strong>Wanted Date:</strong> " + formattedWantedDate + "</p>"
@@ -860,7 +863,7 @@ public class SimpleServer extends AbstractServer {
 					+ "</thead>"
 					+ "<tbody>"
 					+ "<tr>"
-					+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Link Movie</td>"
+					+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Link Movie: " + movie_name + "</td>"
 					+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>₪" + paymentAmount + "</td>"
 					+ "</tr>"
 					+ "</tbody>"
