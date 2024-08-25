@@ -453,9 +453,15 @@ public class SimpleServer extends AbstractServer {
 		session.getTransaction().commit();
 		session.close();
 	}
+
 	private void SignOut_Worker(Worker worker)
 	{
-
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		worker.setIs_worker_loggedIn(false);
+		session.update(worker);
+		session.getTransaction().commit();
+		session.close();
 	}
 
 
@@ -1910,7 +1916,14 @@ public class SimpleServer extends AbstractServer {
 						message.setMessage("#loginWorkerFailedUserName");
 						client.sendToClient(message);
 					} else if (worker.getPassword().equals(password)) {
-						message.setMessage("#loginWorker");
+						if(worker.getIs_worker_loggedIn()) {
+							message.setMessage("#alreadylogin");
+						}
+						else {
+							message.setMessage("#loginWorker");
+							worker.setIs_worker_loggedIn(true);
+							session.update(worker);
+						}
 						message.setObject(worker);
 						client.sendToClient(message);
 
@@ -2154,7 +2167,7 @@ public class SimpleServer extends AbstractServer {
 					session.close();
 				}
 			}
-			else if (message.getMessage().equals("#SignOut_UserID")) {
+			else if (message.getMessage().equals("#SignOut_UserID") || message.getMessage().equals("#SignOut_Worker")) {
 				Object user = message.getObject();
 				if (user instanceof IdUser) {
 					SignOut_IDUser((IdUser) user);
@@ -2203,6 +2216,15 @@ public class SimpleServer extends AbstractServer {
 				client.sendToClient(message);
 				transaction.commit();
 				session.close();
+			}
+			else if (message.getMessage().equals("#Log_out_user"))
+			{
+				System.out.println("I'm here 12 12 ");
+				IdUser user = (IdUser) message.getObject();
+				SignOut_IDUser(user);
+			} else if (message.getMessage().equals("#Log_out_worker")) {
+				Worker worker = (Worker) message.getObject();
+				SignOut_Worker(worker);
 			}
 
 		} catch (IOException e1) {
