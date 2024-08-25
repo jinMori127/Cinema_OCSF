@@ -1,6 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
-
+import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -32,6 +32,27 @@ public class SimpleChatClient extends Application {
     	EventBus.getDefault().register(this);
         create_rooms();
         //print_rooms();
+
+        stage.setOnCloseRequest(event -> {
+            Message message = new Message(10101, "#Log_out_all");
+
+            if(UserLogInWithIDController.idUser != null ) {
+                message.setObject(UserLogInWithIDController.idUser);
+                message.setMessage("#Log_out_user");
+            }
+            else if (WorkerLogInController.worker != null) {
+                message.setObject(WorkerLogInController.worker);
+                message.setMessage("#Log_out_worker");
+            }
+            else{return;}
+            try {
+                SimpleClient.getClient().sendToServer(message);
+            } catch (IOException e) {
+                System.err.println("Error sending message to server");
+                return;
+            }
+        });
+
         scene = new Scene(loadFXML("host"), 640, 480);
         appStage = stage;
         stage.setScene(scene);

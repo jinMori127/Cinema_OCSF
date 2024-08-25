@@ -2171,6 +2171,17 @@ public class SimpleServer extends AbstractServer {
 				transaction.commit();
 				session.close();
 			}
+			else if (message.getMessage().equals("#Log_out_user"))
+			{
+				System.out.println("I'm here 12 12 ");
+				Session session = sessionFactory.openSession();
+				Transaction transaction = session.beginTransaction();
+				IdUser user = (IdUser) message.getObject();
+				user.setIsLoggedIn(false);
+				session.update(user);
+				transaction.commit();
+				session.close();
+			}
 
 		} catch (IOException e1) {
 			e1.printStackTrace();
