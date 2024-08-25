@@ -213,6 +213,14 @@ public class UserPurchasesController {
             cellData = link.getCellData(selectedRow);
             String link_text = (String) cellData;
 
+            TableColumn<UserPurchases, ?> seats = table_view.getColumns().get(2);
+            cellData = seats.getCellData(selectedRow);
+            String seats_text = (String) cellData;
+
+            seats_text = seats_text.replace("seats:", "").trim();
+            String[] seatPairs = seats_text.split(",");
+            int numOfSeats = seatPairs.length;
+
             if (date_screening.before(curr_date)) {
                 ErrorMessage.setVisible(true);
                 percent_return=0;
@@ -248,6 +256,7 @@ public class UserPurchasesController {
                     if (purchase_type.equals("Multi Ticket")){
                         Message message = new Message(102, "#return_1_ticket");
                         message.setObject(auto_num);
+                        message.setObject2(numOfSeats);
                         ErrorMessage.setVisible(true);
                         ErrorMessage.setText("Value returned is 1 ticket" );
                         try {

@@ -1651,10 +1651,11 @@ public class SimpleServer extends AbstractServer {
 				Session session = sessionFactory.openSession();
 				session.beginTransaction();
 				int auto_num =  (int)message.getObject();
+				int num_of_seats=(int)message.getObject2();
 				UserPurchases p1 = (UserPurchases) getPurchaseByAuto(auto_num);
 				IdUser user = p1.getId_user();
 				MultiEntryTicket t1= getMultiTicketUsingIdUser_not_list(user);
-				t1.setRemain_tickets(t1.getRemain_tickets()+1);
+				t1.setRemain_tickets(t1.getRemain_tickets()+num_of_seats);
 				session.update(t1);
 				session.getTransaction().commit();
 				session.close();
