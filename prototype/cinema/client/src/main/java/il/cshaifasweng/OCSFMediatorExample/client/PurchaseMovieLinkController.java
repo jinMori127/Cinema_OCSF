@@ -196,9 +196,9 @@ public class PurchaseMovieLinkController {
         if(check_credit) {
 
             String user_card_number_str = user_card_number.getText();
-            if (!user_card_number_str.matches("\\d{12}")) {
+            if (!user_card_number_str.matches("\\d{16}")) {
                 error_message.setVisible(true);
-                error_message.setText("Card number must contain exactly 12 digits");
+                error_message.setText("Card number must contain exactly 16 digits");
                 user_card_number.setText("");
                 return false;
             }
