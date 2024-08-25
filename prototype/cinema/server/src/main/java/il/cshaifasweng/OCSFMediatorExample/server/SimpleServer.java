@@ -1123,12 +1123,14 @@ public class SimpleServer extends AbstractServer {
 		// Maps for storing complaints, purchases, and multi-entry data
 		Map<String, Map<Integer, Map<Integer, List<Integer>>>> complaintsByBranchYearMonth = new HashMap<>();
 		Map<String, Map<Integer, Map<Integer, List<Integer>>>> purchasesByBranchYearMonth = new HashMap<>();
+		Map<String, Map<Integer, Map<Integer, List<Integer>>>> linkPurchasesByBranchYearMonth = new HashMap<>();
 		Map<String, Map<Integer, Map<Integer, List<Integer>>>> multiEntryByBranchYearMonth = new HashMap<>();
 
 		// Initialize maps for each branch, year, and month
 		for (String branch : branches) {
 			complaintsByBranchYearMonth.put(branch, new HashMap<>());
 			purchasesByBranchYearMonth.put(branch, new HashMap<>());
+			linkPurchasesByBranchYearMonth.put(branch, new HashMap<>());
 			multiEntryByBranchYearMonth.put(branch, new HashMap<>());
 
 			for (int year : years) {
@@ -1138,6 +1140,10 @@ public class SimpleServer extends AbstractServer {
 							.put(month, initializeEmptyListForMonth(year, month));
 
 					purchasesByBranchYearMonth.get(branch)
+							.computeIfAbsent(year, k -> new HashMap<>())
+							.put(month, initializeEmptyListForMonth(year, month));
+
+					linkPurchasesByBranchYearMonth.get(branch)
 							.computeIfAbsent(year, k -> new HashMap<>())
 							.put(month, initializeEmptyListForMonth(year, month));
 
@@ -1186,13 +1192,20 @@ public class SimpleServer extends AbstractServer {
 			int year = calendar.get(Calendar.YEAR);
 			int month = calendar.get(Calendar.MONTH) + 1;
 			int day = calendar.get(Calendar.DAY_OF_MONTH);
-			double payment_amount = userPurchases.getPayment_amount();
-//			String seats = userPurchases.getSeats();
-//			int num_seats = seats.isEmpty() ? 0 : seats.split(",").length;
-
-			if (purchasesByBranchYearMonth.containsKey(purchases_branch)) {
-				List<Integer> dailyPurchases = purchasesByBranchYearMonth.get(purchases_branch).get(year).get(month);
-				dailyPurchases.set(day - 1, dailyPurchases.get(day - 1) + (int) payment_amount);
+			double payment_amount = 0;
+			if (userPurchases.getPurchase_type().equals("Ticket")){
+				payment_amount = userPurchases.getPayment_amount();
+				if (purchasesByBranchYearMonth.containsKey(purchases_branch)) {
+					List<Integer> dailyPurchases = purchasesByBranchYearMonth.get(purchases_branch).get(year).get(month);
+					dailyPurchases.set(day - 1, dailyPurchases.get(day - 1) + (int) payment_amount);
+				}
+			} else if (userPurchases.getPurchase_type().equals("HomeLink")) {
+				payment_amount = userPurchases.getPayment_amount();
+				String[] purchases_branches = {"Sakhnin", "Haifa", "Nazareth", "Nhif"};
+				for (String currbranch : purchases_branches){
+					List<Integer> dailyPurchases = linkPurchasesByBranchYearMonth.get(currbranch).get(year).get(month);
+					dailyPurchases.set(day - 1, dailyPurchases.get(day - 1) + (int) payment_amount);
+				}
 			}
 		}
 
@@ -1225,7 +1238,7 @@ public class SimpleServer extends AbstractServer {
 
 					generateReport(session, reportsList, branch, year, month, reportDate,
 							complaintsByBranchYearMonth, purchasesByBranchYearMonth,
-							multiEntryByBranchYearMonth);
+							linkPurchasesByBranchYearMonth, multiEntryByBranchYearMonth);
 				}
 			}
 		}
@@ -1236,17 +1249,20 @@ public class SimpleServer extends AbstractServer {
 								int month, Date reportDate,
 								Map<String, Map<Integer, Map<Integer, List<Integer>>>> complaintsByBranchYearMonth,
 								Map<String, Map<Integer, Map<Integer, List<Integer>>>> purchasesByBranchYearMonth,
+								Map<String, Map<Integer, Map<Integer, List<Integer>>>> linkPurchasesByBranchYearMonth,
 								Map<String, Map<Integer, Map<Integer, List<Integer>>>> multiEntryByBranchYearMonth) {
 
 		Reports report = new Reports(reportDate, branch);
 
 		List<Integer> dailyComplaints = complaintsByBranchYearMonth.get(branch).get(year).get(month);
 		List<Integer> dailyPurchases = purchasesByBranchYearMonth.get(branch).get(year).get(month);
+		List<Integer> dailyLinkPurchases = linkPurchasesByBranchYearMonth.get(branch).get(year).get(month);
 		List<Integer> dailyMultiEntry = multiEntryByBranchYearMonth.get(branch).get(year).get(month);
 
 		report.setReport_complains(dailyComplaints);
 		report.setReport_ticket_sells(dailyPurchases);
-		report.setReport_multy_entry_ticket(dailyMultiEntry);
+		report.setReport_link_tickets_sells(dailyLinkPurchases);
+		report.setReport_multi_entry_ticket(dailyMultiEntry);
 
 		reportsList.add(report);
 
@@ -1303,6 +1319,37 @@ public class SimpleServer extends AbstractServer {
 		}
 	}
 
+	private void search_report_allBranches(Session session, Message message) {
+		Integer year = (Integer) message.getObject2();
+		Integer month = (Integer) message.getObject3();
+
+		try {
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<Reports> query = builder.createQuery(Reports.class);
+			Root<Reports> root = query.from(Reports.class);
+
+			Expression<Integer> yearExpr = builder.function("YEAR", Integer.class, root.get("report_date"));
+			Expression<Integer> monthExpr = builder.function("MONTH", Integer.class, root.get("report_date"));
+
+			Predicate monthPredicate = builder.equal(monthExpr, month);
+			Predicate yearPredicate = builder.equal(yearExpr, year);
+
+			query.select(root).where(builder.and(monthPredicate, yearPredicate));
+
+			List<Reports> searched_reports = session.createQuery(query).getResultList();
+
+			if (searched_reports != null && !searched_reports.isEmpty()) {
+				message.setObject(searched_reports);
+			} else {
+				message.setObject(null);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
 	private void deleteAllReports(Session session) {
 		System.out.println("Deleting all existing reports...");
 		session.createQuery("DELETE FROM Reports").executeUpdate();
@@ -1346,13 +1393,14 @@ public class SimpleServer extends AbstractServer {
 
 	private void update_reports() {
 		Session session = sessionFactory.openSession();
+		Transaction transaction = null;
 		Calendar today = Calendar.getInstance();
 		int currentYear = today.get(Calendar.YEAR);
 		int currentMonth = today.get(Calendar.MONTH) + 1; // Months are 0-based in Calendar
 		int currentDay = today.get(Calendar.DAY_OF_MONTH);
 		List<Reports> changed_reports = new ArrayList<Reports>();
 		try {
-
+			transaction = session.beginTransaction();
 			if (reports_message.getMessage().equals("purchaseMultiTicket")) {
 				System.out.println("got into update report for purchaseMultiTicket");
 				Reports report1 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Haifa");
@@ -1361,23 +1409,23 @@ public class SimpleServer extends AbstractServer {
 				Reports report4 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Sakhnin");
 
 				MultiEntryTicket ticket = (MultiEntryTicket) reports_message.getObject();
-				int remain_tickets = ticket.getRemain_tickets();
+				int remain_tickets = (int) ticket.INITIAL_PRICE;
 
-				List<Integer> multiEntryData1 = report1.getReport_multy_entry_ticket();
+				List<Integer> multiEntryData1 = report1.getReport_multi_entry_ticket();
 				multiEntryData1.set(currentDay - 1, multiEntryData1.get(currentDay - 1) + remain_tickets);
-				report1.setReport_multy_entry_ticket(multiEntryData1);
+				report1.setReport_multi_entry_ticket(multiEntryData1);
 
-				List<Integer> multiEntryData2 = report2.getReport_multy_entry_ticket();
+				List<Integer> multiEntryData2 = report2.getReport_multi_entry_ticket();
 				multiEntryData2.set(currentDay - 1, multiEntryData2.get(currentDay - 1) + remain_tickets);
-				report2.setReport_multy_entry_ticket(multiEntryData2);
+				report2.setReport_multi_entry_ticket(multiEntryData2);
 
-				List<Integer> multiEntryData3 = report3.getReport_multy_entry_ticket();
+				List<Integer> multiEntryData3 = report3.getReport_multi_entry_ticket();
 				multiEntryData3.set(currentDay - 1, multiEntryData3.get(currentDay - 1) + remain_tickets);
-				report3.setReport_multy_entry_ticket(multiEntryData3);
+				report3.setReport_multi_entry_ticket(multiEntryData3);
 
-				List<Integer> multiEntryData4 = report4.getReport_multy_entry_ticket();
+				List<Integer> multiEntryData4 = report4.getReport_multi_entry_ticket();
 				multiEntryData4.set(currentDay - 1, multiEntryData4.get(currentDay - 1) + remain_tickets);
-				report4.setReport_multy_entry_ticket(multiEntryData4);
+				report4.setReport_multi_entry_ticket(multiEntryData4);
 				changed_reports.add(report1);
 				changed_reports.add(report2);
 				changed_reports.add(report3);
@@ -1391,10 +1439,12 @@ public class SimpleServer extends AbstractServer {
 				System.out.println("got into update report for cancelPurchase");
 				UserPurchases purchase = (UserPurchases) reports_message.getObject();
 				double refund = (double) reports_message.getObject2();
-				Date date = purchase.getDate_of_purchase();
-				currentDay = date.getDay();
-				currentMonth = date.getMonth();
-				currentYear = date.getYear();
+				Date date_ = purchase.getDate_of_purchase();
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(date_);
+				currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+				currentMonth = calendar.get(Calendar.MONTH) + 1; // Months are 0-based in Calendar, so add 1
+				currentYear = calendar.get(Calendar.YEAR);
 				Reports report = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, purchase.getScreening().getBranch());
 				List<Integer> purchaseData = report.getReport_ticket_sells();
 				int originalPurchase = purchaseData.get(currentDay - 1);
@@ -1405,12 +1455,76 @@ public class SimpleServer extends AbstractServer {
 				changed_reports.add(report);
 
 			}
+			else if (reports_message.getMessage().equals("extraComplaint")){
+				System.out.println("got into update report for extraComplaint");
+				Complains complain = (Complains) reports_message.getObject();
+				Reports report = getReportForCurrentDay(session, currentYear, currentMonth, currentDay,complain.getCinema_branch());
+				List<Integer> complainData = report.getReport_complains();
+				int original = complainData.get(currentDay - 1);
+				complainData.set(currentDay - 1, original + 1);
+				report.setReport_complains(complainData);
+				session.update(report);
+				changed_reports.add(report);
+			}
+			else if (reports_message.getMessage().equals("ExtraPurchase")){
+				System.out.println("got into update report for ExtraPurchase");
+				UserPurchases purchase = (UserPurchases) reports_message.getObject();
+				double price = (double) purchase.getPayment_amount();
+				Reports report = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, purchase.getScreening().getBranch());
+				List<Integer> purchaseData = report.getReport_ticket_sells();
+				int originalPurchase = purchaseData.get(currentDay - 1);
+				purchaseData.set(currentDay - 1, originalPurchase + (int) price);
+				report.setReport_ticket_sells(purchaseData);
+
+				session.update(report);
+				changed_reports.add(report);
+			}
+			else if (reports_message.getMessage().equals("extraLinkPurchase")){
+				System.out.println("got into update report for extraLinkPurchase");
+				Reports report1 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Haifa");
+				Reports report2 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Nhif");
+				Reports report3 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Nazareth");
+				Reports report4 = getReportForCurrentDay(session, currentYear, currentMonth, currentDay, "Sakhnin");
+
+				UserPurchases purchase = (UserPurchases) reports_message.getObject();
+				double price = purchase.getPayment_amount();
+
+				List<Integer> linkPurchaseData1 = report1.getReport_link_tickets_sells();
+				int originalPurchase1 = linkPurchaseData1.get(currentDay - 1);
+				linkPurchaseData1.set(currentDay - 1, originalPurchase1 + (int) price);
+				report1.setReport_link_tickets_sells(linkPurchaseData1);
+
+				List<Integer> linkPurchaseData2 = report2.getReport_link_tickets_sells();
+				int originalPurchase2 = linkPurchaseData2.get(currentDay - 1);
+				linkPurchaseData2.set(currentDay - 1, originalPurchase2 + (int) price);
+				report2.setReport_link_tickets_sells(linkPurchaseData2);
+
+				List<Integer> linkPurchaseData3 = report3.getReport_link_tickets_sells();
+				int originalPurchase3 = linkPurchaseData3.get(currentDay - 1);
+				linkPurchaseData3.set(currentDay - 1, originalPurchase3 + (int) price);
+				report3.setReport_link_tickets_sells(linkPurchaseData3);
+
+				List<Integer> linkPurchaseData4 = report4.getReport_link_tickets_sells();
+				int originalPurchase4 = linkPurchaseData4.get(currentDay - 1);
+				linkPurchaseData4.set(currentDay - 1, originalPurchase4 + (int) price);
+				report4.setReport_link_tickets_sells(linkPurchaseData4);
+
+				session.update(report1);
+				changed_reports.add(report1);
+				session.update(report2);
+				changed_reports.add(report2);
+				session.update(report3);
+				changed_reports.add(report3);
+				session.update(report4);
+				changed_reports.add(report4);
+
+			}
 
 			reports_message.setMessage("updatedReports");
 			reports_message.setObject(changed_reports);
 
 			// Save the updated report back to the database
-			session.getTransaction().commit();
+			transaction.commit();	//causes error!
 
 		} catch (Exception e) {
 			if (session.getTransaction() != null) {
@@ -1708,8 +1822,12 @@ public class SimpleServer extends AbstractServer {
 				System.out.println(userPurchases.getSeats());
 				saveUP(userPurchases);
 				message.setMessage("#SavedUserPurchases");
+				reports_message.setObject(userPurchases);
+				reports_message.setMessage("ExtraPurchase");
+				update_reports();
 				//sendToAllClients(message);
 				client.sendToClient(message);
+				sendToAllClients(reports_message);
 			}
 
 			else if (message.getMessage().equals("#Success_CC")){
@@ -1800,6 +1918,10 @@ public class SimpleServer extends AbstractServer {
 				message.setMessage("#purchase_movie_link_client");
 				message.setObject("");
 				client.sendToClient(message);
+				reports_message.setObject(p1);
+				reports_message.setMessage("extraLinkPurchase");
+				update_reports();
+				sendToAllClients(reports_message);
 				sendThankYouEmailLink(p1);
 				Date sendTime = p1.getDate_of_link_activation();
 				EmailScheduler emailScheduler = new EmailScheduler();
@@ -1916,7 +2038,11 @@ public class SimpleServer extends AbstractServer {
 				message.setMessage("#ShowUserComplaints");
 				List<Complains> updated_complaints = handle_get_user_complaints(current_id);
 				message.setObject(updated_complaints);
+				reports_message.setObject(complaint);
+				reports_message.setMessage("extraComplaint");
+				update_reports();
 				client.sendToClient(message);
+				sendToAllClients(reports_message);
 			} else if (message.getMessage().equals("#GetCMEditedDetails")) {
 				//System.out.println("get cme details");
 				List<EditedDetails> editedDetailsList = getEditedDetails();
@@ -2031,6 +2157,16 @@ public class SimpleServer extends AbstractServer {
 				deleteAllReports(session);
 				resetAutoIncrement(session);
 				message.setMessage("#reportsDeleted");;
+				client.sendToClient(message);
+				transaction.commit();
+				session.close();
+			}
+			else if (message.getMessage().equals("#SearchReportForAllBranches")){
+				System.out.println("got into SearchReportForAllBranches (simpleServer)");
+				Session session = sessionFactory.openSession();
+				Transaction transaction = session.beginTransaction();
+				search_report_allBranches(session, message);
+				message.setMessage("#searchedReportsForAllBranches");
 				client.sendToClient(message);
 				transaction.commit();
 				session.close();
