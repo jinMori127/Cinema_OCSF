@@ -3,6 +3,7 @@ import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.Current_Me
 
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
+import il.cshaifasweng.OCSFMediatorExample.entities.EditedDetails;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -418,17 +419,21 @@ public class MovieEditingDetailsController {
             throw new RuntimeException(e);
         }
         movie.setDirector(directorC);
-        movie.setPrice(priceC);
+
         movie.setDescription_(descriptionC);
 
         movie.setImageLocation(f);
 
+        EditedDetails price_change = new EditedDetails();
+        price_change.setChanged_price(priceC);
+        price_change.setMovie(movie);
         /*if (!image_name.equals( movie.getImage_location())) {
             File f4 = new File("src/main/resources/images/"+image_name);
             f4.delete();
         }*/
         Message insert_message = new Message(3,"#UpdateMovie");
         insert_message.setObject(movie);
+        insert_message.setObject2(price_change);
 
         try {
             SimpleClient.getClient().sendToServer(insert_message);
