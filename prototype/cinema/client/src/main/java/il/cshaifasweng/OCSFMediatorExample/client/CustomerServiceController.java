@@ -79,15 +79,19 @@ public class CustomerServiceController {
     @Subscribe
     public void show_complains(BaseEventBox event) {
         if (event.getId() == BaseEventBox.get_event_id("SHOW_COMPLAINS")) {
+            System.out.println("here1");
             Platform.runLater(() -> {
                 create_complains_table(event.getMessage());
             });
         } else if (event.getId() == BaseEventBox.get_event_id("SHOW_COMPLAINS_AND_MESSAGE")) {
+            System.out.println("here2");
             Platform.runLater(() -> {
                 create_complains_table_and_message(event.getMessage());
             });
         }
         else if (event.getId() == BaseEventBox.get_event_id("SHOW_COMPLAINS_RESPOND")) {
+            System.out.println("here3");
+
             Platform.runLater(() -> {
                 create_complains_table(event.getMessage());
             });
@@ -339,6 +343,7 @@ public class CustomerServiceController {
 
     private void create_complains_table_and_message(Message message) {
         create_complains_table(message);
+        System.out.println("here12");
 
         // Display a success message
         JOptionPane.showMessageDialog(null, "Response sent successfully!", "Success",

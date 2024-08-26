@@ -158,6 +158,16 @@ public class UserComplainsController {
         else if(event.getId() == BaseEventBox.get_event_id("INCORRECT_PURCHASE_INFO")) {
             error_text.setVisible(true);
             error_text.setText("Incorrect Purchase Info");
+        } else if (event.getId() == BaseEventBox.get_event_id("REFRESH_RESPOND")) {
+            event.getMessage().setMessage("");
+            Message request_message = new Message(74, "#GetUserComplaints");
+            request_message.setObject(curr_id);
+            try {
+                SimpleClient.getClient().sendToServer(request_message);
+                //System.out.println("Request for complaints sent to server");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -2192,6 +2192,9 @@ public class SimpleServer extends AbstractServer {
 				// delete the responded complains
 				message.setObject(data);
 				client.sendToClient(message);
+
+				message.setMessage("#refresh_complain_clients_page");
+				sendToAllClients(message);
 			}
 			else if(message.getMessage().equals("#Update_theater_map")){
 				message.setMessage("#theater_map_updated");

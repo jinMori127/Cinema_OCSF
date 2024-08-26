@@ -38,7 +38,8 @@ public class BaseEventBox {
         ADDTickets,
         GET_PURCHASE_INFO,
         INCORRECT_PURCHASE_INFO,
-        NOT_FOUND_PURCHASE;
+        NOT_FOUND_PURCHASE,
+        REFRESH_RESPOND;
 
         public static EventEnum getByName(String name) {
             try {
