@@ -5,8 +5,10 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <AnchorPane prefHeight="615.0" prefWidth="781.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.CustomerServiceController">
     <children>
@@ -29,6 +31,8 @@
       <TextArea fx:id="respond" layoutX="391.0" layoutY="21.0" prefHeight="127.0" prefWidth="202.0" promptText="enter respond " />
       <Button fx:id="show_responded" layoutX="631.0" layoutY="60.0" mnemonicParsing="false" onAction="#handle_show_respond_complains" text="responded complains" textFill="#045372" />
       <Button fx:id="not_responded" layoutX="623.0" layoutY="21.0" mnemonicParsing="false" onAction="#handle_show_complains" text="not responded complains" textFill="#771515" />
-      <ComboBox fx:id="branch" layoutX="309.0" layoutY="183.0" onAction="#choose_branch" prefWidth="150.0" promptText="choose branch " />
+      <ComboBox fx:id="branch" layoutX="114.0" layoutY="182.0" onAction="#choose_branch" prefWidth="150.0" promptText="choose branch " />
+      <TextField fx:id="returned_price" layoutX="428.0" layoutY="164.0" promptText="refund" />
+      <Text layoutX="377.0" layoutY="181.0" strokeType="OUTSIDE" strokeWidth="0.0" text="optional" />
     </children>
 </AnchorPane>

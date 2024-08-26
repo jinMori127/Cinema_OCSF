@@ -785,6 +785,48 @@ public class SimpleServer extends AbstractServer {
 		emailSender.sendEmail(recipients, subject, body);
 	}
 
+	private void customer_service_email(IdUser user,String respond, int price, boolean phase) {
+		EmailSender emailSender = new EmailSender();
+		String[] recipients = {user.getEmail()};
+		String subject;
+		if(phase) {
+			 subject = "Luna Aura Customer Support Response";
+		}
+		else {
+			subject = "Luna Aura Customer Support Update Response ";
+		}
+
+		String name = user.getName();
+		LocalDate date = LocalDate.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+		String formattedDate = date.format(formatter);
+
+		String body = "<html>"
+				+ "<body style='font-family: Arial, sans-serif; color: #333;'>"
+				+ "<div style='max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd;'>"
+				+ "<div style='text-align: center;'>"
+				+ "<img src='YOUR_LOGO_URL' alt='Luna Aura' style='width: 100px; margin-bottom: 20px;'/>"
+				+ "<h1 style='font-size: 24px; color: #555;'>We're Here to Help</h1>"
+				+ "</div>"
+				+ "<p>Hi " + name + ",</p>"
+				+ "<p>Thank you for reaching out to us regarding your recent experience.</p>"
+				+ "<p>Here is our response:</p>"
+				+ "<div style='border: 1px solid #ccc; padding: 15px; background-color: #f9f9f9;'>"
+				+ "<p><strong>Response:</strong> " + respond + "</p>"
+				+ "<p><strong>Refund Price:</strong> $" + price + "</p>"
+				+ "</div>"
+				+ "<p>We hope this addresses your concern. If you have any further questions or need additional assistance, please don't hesitate to reach out.</p>"
+				+ "<p>Best regards,<br/>Luna Aura Customer Support Team</p>"
+				+ "<p style='font-size: 12px; color: #777;'>This email was sent on " + formattedDate + "</p>"
+				+ "</div>"
+				+ "</body>"
+				+ "</html>";
+
+		emailSender.sendEmail(recipients, subject, body);
+	}
+
+
+
 	private void sendThankYouEmailLink(UserPurchases p1) {
 		try {
 			if (p1 == null || p1.getId_user() == null) {
@@ -2115,7 +2157,22 @@ public class SimpleServer extends AbstractServer {
 				boolean phase = (boolean) ((List<Object>)message.getObject()).get(1);
 
 				int number = (int)message.getObject2();
+				int returned_price = (int)message.getObject3();
+				///////////////////////////////////////
+				/// aisha u can update the reports here
+				//////////////////////////////////////
+
 				List<Complains> data = update_respond(number, respondText, phase);
+
+				Session session = sessionFactory.openSession();
+				session.beginTransaction();
+
+				// Find the object with the specified auto_num
+				Complains complains = session.get(Complains.class, number);
+				customer_service_email(complains.getId_user(),respondText, returned_price, phase);
+
+				session.getTransaction().commit();
+				session.close();
 
 				message.setMessage("#submit_respond_for_client");
 				// delete the responded complains

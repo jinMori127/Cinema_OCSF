@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ComboBox;
 import javafx.collections.ObservableList;
 import javafx.application.Platform;
@@ -64,6 +65,9 @@ public class CustomerServiceController {
 
     @FXML
     private ComboBox<String> branch;
+
+    @FXML
+    private TextField returned_price;
 
     private boolean phase;
 
@@ -149,6 +153,13 @@ public class CustomerServiceController {
         respond_then_phase.add(phase);
         insert_message.setObject(respond_then_phase);
         insert_message.setObject2(auto_number);
+        String  return_price_text = returned_price.getText();
+        if(return_price_text.isEmpty())
+        {
+            return_price_text = "0";
+        }
+        int convert_price = Integer.parseInt(return_price_text);
+        insert_message.setObject3(convert_price);
         try {
             SimpleClient.getClient().sendToServer(insert_message);
 
@@ -161,6 +172,7 @@ public class CustomerServiceController {
     public void handle_show_respond_complains(ActionEvent event) {
         complains_detailes.setText("");
         respond.setText("");
+        returned_price.setText("");
         respond.setEditable(false);
         submit_respond.setDisable(true);
         phase = false;
@@ -178,6 +190,7 @@ public class CustomerServiceController {
     public void handle_show_complains(ActionEvent event) {
         complains_detailes.setText("");
         respond.setText("");
+        returned_price.setText("");
         respond.setEditable(false);
         submit_respond.setDisable(true);
         phase = true;
@@ -280,6 +293,7 @@ public class CustomerServiceController {
         // set the text to empty
         complains_detailes.setText("");
         respond.setText("");
+        returned_price.setText("");
         respond.setEditable(false);
         submit_respond.setDisable(true);
     }
