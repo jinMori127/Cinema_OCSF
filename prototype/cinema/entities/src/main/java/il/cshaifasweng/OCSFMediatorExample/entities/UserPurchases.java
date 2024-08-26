@@ -15,6 +15,7 @@ public class UserPurchases implements Serializable{
     private String payment_type;
     private double payment_amount;
 
+
     private String movie_name;
 
     @ManyToOne(fetch = FetchType.EAGER)
