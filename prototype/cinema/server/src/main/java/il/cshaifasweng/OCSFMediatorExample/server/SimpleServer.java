@@ -335,7 +335,46 @@ public class SimpleServer extends AbstractServer {
 
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public static int[][] cerate_map(String s)
+	{
+		String[] tokens = s.split("\n");
+		int[][] map = new int[tokens.length][tokens[0].split(",").length];
+		for (int i = 0; i < tokens.length; i++)
+		{
+			String[] places = tokens[i].split(",");
+			for(int j=0; j<places.length; j++)
+			{
+				//System.out.println(i+"::"+j);
+				map [i][j] = Integer.parseInt(places[j].trim());
+			}
+		}
+		return map;
+	}
+	public static String create_string_of_map(int[][] map)
+	{
+		String s = "";
+		for(int i=0; i< map.length; i++)
+		{
+			for(int j=0; j<map[i].length; j++)
+			{
+				if(j == map[i].length-1)
+				{
+					s += map[i][j];
+				}
+				else {
+					s += map[i][j] + " ,";
+				}
+			}
+			if(i != map.length-1)
+			{
+				s += "\n";
+			}
+		}
+		return s;
+	}
+	private Screening message_screening = null;
 	private List<UserPurchases> delete_user_purchases(int auto_num,String id, Message message) throws Exception {
+		message_screening = null;
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 
@@ -354,6 +393,21 @@ public class SimpleServer extends AbstractServer {
 		reports_message.setObject2(message.getObject3());
 		reports_message.setMessage("cancelPurchase");
 		update_reports();
+		if (purchase.getSeats()!=null && !purchase.getSeats().isEmpty()) {
+			Screening current_screening = purchase.getScreening();
+			int[][] map = cerate_map(current_screening.getTheater_map());
+			String[] seats = purchase.getSeats().split(",");
+			for(String seat : seats)
+			{
+				String[] indexes = seat.split("::");
+				int row = Integer.parseInt(indexes[0].trim());
+				int col = Integer.parseInt(indexes[1].trim());
+				map[row][col] = 0;
+			}
+			current_screening.setTheater_map(create_string_of_map(map));
+			session.update(current_screening);
+			message_screening = current_screening;
+		}
 
 		// Delete the UserPurchases object
 		session.delete(purchase);
@@ -1741,6 +1795,12 @@ public class SimpleServer extends AbstractServer {
 				System.out.println(message.getMessage());
 				client.sendToClient(message);
 				sendToAllClients(reports_message);
+				if(message_screening !=null)
+				{
+					message.setMessage("#theater_map_updated");
+					message.setObject(message_screening);
+					sendToAllClients(message);
+				}
 
 			}
 
