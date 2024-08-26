@@ -37,7 +37,8 @@ public class BaseEventBox {
         THEATER_MAP_UPDATED,
         ADDTickets,
         GET_PURCHASE_INFO,
-        INCORRECT_PURCHASE_INFO;
+        INCORRECT_PURCHASE_INFO,
+        NOT_FOUND_PURCHASE;
 
         public static EventEnum getByName(String name) {
             try {

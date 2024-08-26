@@ -136,6 +136,7 @@ public class MasterPageCotroller {
             throw new RuntimeException(e);
         }
     }
+
     @FXML
     void handle_action(ActionEvent event) {
         MenuItem source = (MenuItem) event.getSource();
@@ -197,7 +198,5 @@ public class MasterPageCotroller {
         }
 
     }
-
-
 
 }

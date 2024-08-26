@@ -97,6 +97,11 @@ public class CustomerServiceController {
                 show_purchase_info(event.getMessage());
             });
         }
+        else if (event.getId() == BaseEventBox.get_event_id("NOT_FOUND_PURCHASE")) {
+            Platform.runLater(() -> {
+                not_found_show_purchase_info(event.getMessage());
+            });
+        }
     }
 
     @Subscribe
@@ -323,6 +328,14 @@ public class CustomerServiceController {
         complains_detailes.setText(currentText + additionalDetails);
         return ;
     }
+
+    private void not_found_show_purchase_info(Message message)
+    {
+        String currentText = complains_detailes.getText();
+        String additionalDetails = "\n This purchase have been canceled by the user";
+        complains_detailes.setText(currentText + additionalDetails);
+    }
+
 
     private void create_complains_table_and_message(Message message) {
         create_complains_table(message);

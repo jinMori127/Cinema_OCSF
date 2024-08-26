@@ -2279,6 +2279,11 @@ public class SimpleServer extends AbstractServer {
 				Session session = sessionFactory.openSession();
 				Transaction transaction = session.beginTransaction();
 				UserPurchases purchase = session.get(UserPurchases.class, purchase_num);
+				if(purchase == null)
+				{
+					message.setMessage("#not_fond_purchase_info_client");
+					client.sendToClient(message);
+				}
 				message.setMessage("#get_purchase_info_client");
 				message.setObject(purchase);
 				client.sendToClient(message);
