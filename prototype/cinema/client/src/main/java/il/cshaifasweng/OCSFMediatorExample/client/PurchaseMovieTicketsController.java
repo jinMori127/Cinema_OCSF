@@ -59,8 +59,8 @@ public class PurchaseMovieTicketsController {
     @FXML
     void multiTicket_pay(ActionEvent event) {
         ErrorMessage.setVisible(false);
-        Screening screening = TheaterMapController.screening;
-        if(screening == null)
+        //Screening screening = TheaterMapController.screening;
+        if(TheaterMapController.places_took.isEmpty())
         {
             ErrorMessage.setVisible(true);
             ErrorMessage.setText("You have already purchased");
@@ -128,8 +128,8 @@ public class PurchaseMovieTicketsController {
     @FXML
     void pay_amount(ActionEvent event) {
         ErrorMessage.setVisible(false);
-        Screening screening = TheaterMapController.screening;
-        if(screening == null)
+        //Screening screening = TheaterMapController.screening;
+        if(TheaterMapController.places_took.isEmpty())
         {
             ErrorMessage.setVisible(true);
             ErrorMessage.setText("You have already purchased");
@@ -266,11 +266,28 @@ public class PurchaseMovieTicketsController {
     {
 
         System.out.println(event.getPage());
-        if(!event.getPage().equals("#TheaterMap"))
+        if(!event.getPage().equals("TheaterMap"))
         {
-            TheaterMapController.places_took.clear();
-            TheaterMapController.screening = null;
+            if(TheaterMapController.screening !=null) {
+                int[][] map = TheaterMapController.cerate_map(TheaterMapController.screening.getTheater_map());
+                for (ArrayList<Integer> list : TheaterMapController.places_took) {
+                    map[list.get(0)][list.get(1)] = 0;
+                }
+                TheaterMapController.screening.setTheater_map(TheaterMapController.create_string_of_map(map));
+                Message m = new Message(10000, "#Update_theater_map");
+                m.setObject(TheaterMapController.screening);
+                try {
+                    SimpleClient.getClient().sendToServer(m);
+                } catch (IOException e) {
+                    ErrorMessage.setVisible(true);
+                    ErrorMessage.setText(e.getMessage());
+                    return;
+                }
+            }
+           TheaterMapController.places_took.clear();
         }
+
+
         EventBus.getDefault().unregister(this);
         EventBus.getDefault().post(new ContentChangeEvent(event.getPage()));
 
@@ -349,7 +366,7 @@ public class PurchaseMovieTicketsController {
                 return;
             }
             TheaterMapController.places_took.clear();
-            TheaterMapController.screening = null;
+            //TheaterMapController.screening = null;
 
         }
 
@@ -400,7 +417,7 @@ public class PurchaseMovieTicketsController {
                 }
 
                 TheaterMapController.places_took.clear();
-                TheaterMapController.screening = null;
+                //TheaterMapController.screening = null;
 
         }
         else if (eventBox.getId() == BaseEventBox.get_event_id("THEATER_MAP_UPDATED")) {
@@ -432,5 +449,16 @@ public class PurchaseMovieTicketsController {
             }
         }
 
+    }
+    @FXML
+    void go_back(ActionEvent event) {
+        ErrorMessage.setVisible(false);
+        try {
+            SimpleChatClient.setRoot("TheaterMap");
+        } catch (IOException e) {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText(e.getMessage());
+            return;
+        }
     }
 }
