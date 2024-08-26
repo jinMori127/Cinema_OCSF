@@ -850,10 +850,15 @@ public class SimpleServer extends AbstractServer {
 			p1.setLink("http://" + SimpleChatServer.host + ":8080/" + p1.getMovie_name() + p1.getId_user().getUser_id() + uniqueNumber);
 			String link = p1.getLink();
 			Date wantedDate = p1.getDate_of_link_activation();
+			Date EndDate = p1.getEnd_date_of_link_activation();
 
 			// Format wantedDate
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy, HH:mm");
 			String formattedWantedDate = (wantedDate != null) ? dateFormat.format(wantedDate) : "N/A";
+
+			// Format EndDaye
+			String formattedEndDate = (EndDate != null) ? dateFormat.format(EndDate) : "N/A";
+
 
 			// Email body
 			String body = "<html>"
@@ -875,6 +880,8 @@ public class SimpleServer extends AbstractServer {
 					+ "<strong>Source:</strong> Luna Aura<br/>"
 					+ "<strong>Link:</strong> <a href='" + link + "'>" + link + "</a><br/>"
 					+ "<strong>Wanted Date:</strong> " + formattedWantedDate + "</p>"
+					+ "<strong>End Date:</strong> " + formattedEndDate + "</p>"
+
 					+ "<h3 style='color: #555;'>HERE'S WHAT YOU ORDERED:</h3>"
 					+ "<table style='width: 100%; border-collapse: collapse;'>"
 					+ "<thead>"

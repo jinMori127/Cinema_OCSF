@@ -34,6 +34,11 @@ public class UserPurchases implements Serializable{
     @Temporal(TemporalType.TIMESTAMP)
     private Date date_of_link_activation;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date end_date_of_link_activation;
+
+
+
     // constructors
     public UserPurchases() {}
 
@@ -50,7 +55,7 @@ public class UserPurchases implements Serializable{
     }
 
     // purchase HomeLink constructor
-    public UserPurchases(String payment_type, double payment_amount, IdUser id_user, Date date_of_link_activation, String link, String movie_name){
+    public UserPurchases(String payment_type, double payment_amount, IdUser id_user, Date date_of_link_activation,Date end_date_of_link_activation, String link, String movie_name){
         this.payment_type = payment_type;
         this.payment_amount = payment_amount;
         this.id_user = id_user;
@@ -60,6 +65,7 @@ public class UserPurchases implements Serializable{
         this.movie_name = movie_name;
         this.date_of_purchase = new Date();;
         this.seats = "";
+        this.end_date_of_link_activation=end_date_of_link_activation;
     }
 
     // get/set methods
@@ -139,5 +145,11 @@ public class UserPurchases implements Serializable{
             return screening.getMovie().getMovie_name();
         }
         return movie_name;
+    }
+    public Date getEnd_date_of_link_activation() {
+        return end_date_of_link_activation;
+    }
+    public void getEnd_date_of_link_activation(Date end_date_of_link_activation) {
+        this.end_date_of_link_activation = end_date_of_link_activation;
     }
 }
