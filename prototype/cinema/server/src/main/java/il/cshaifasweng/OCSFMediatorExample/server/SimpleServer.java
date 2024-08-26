@@ -813,7 +813,7 @@ public class SimpleServer extends AbstractServer {
 				+ "<p>Here is our response:</p>"
 				+ "<div style='border: 1px solid #ccc; padding: 15px; background-color: #f9f9f9;'>"
 				+ "<p><strong>Response:</strong> " + respond + "</p>"
-				+ "<p><strong>Refund Price:</strong> $" + price + "</p>"
+				+ "<p><strong>Refund Price:</strong> ₪" + price + "</p>"
 				+ "</div>"
 				+ "<p>We hope this addresses your concern. If you have any further questions or need additional assistance, please don't hesitate to reach out.</p>"
 				+ "<p>Best regards,<br/>Luna Aura Customer Support Team</p>"
@@ -2260,6 +2260,18 @@ public class SimpleServer extends AbstractServer {
 				Worker worker = (Worker) message.getObject();
 				SignOut_Worker(worker);
 			}
+			else if (message.getMessage().equals("#get_purchase_info")) {
+				int purchase_num = (int) message.getObject();
+				Session session = sessionFactory.openSession();
+				Transaction transaction = session.beginTransaction();
+				UserPurchases purchase = session.get(UserPurchases.class, purchase_num);
+				message.setMessage("#get_purchase_info_client");
+				message.setObject(purchase);
+				client.sendToClient(message);
+				transaction.commit();
+				session.close();
+			}
+
 
 		} catch (IOException e1) {
 			e1.printStackTrace();

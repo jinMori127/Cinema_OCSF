@@ -1,5 +1,6 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.UserPurchases;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -20,6 +21,7 @@ import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import il.cshaifasweng.OCSFMediatorExample.entities.Complains;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
 import javax.swing.*;
@@ -88,6 +90,11 @@ public class CustomerServiceController {
         else if (event.getId() == BaseEventBox.get_event_id("SHOW_COMPLAINS_RESPOND")) {
             Platform.runLater(() -> {
                 create_complains_table(event.getMessage());
+            });
+        }
+        else if (event.getId() == BaseEventBox.get_event_id("GET_PURCHASE_INFO")) {
+            Platform.runLater(() -> {
+                show_purchase_info(event.getMessage());
             });
         }
     }
@@ -253,7 +260,22 @@ public class CustomerServiceController {
                 }
             }
             complains_detailes.setText(contentText.toString());
+
+            Complains complain = table_view.getItems().get(selectedRow);
+            if(complain.getAuto_number_purchase() == -1)
+            {
+                return;
+            }
+            Message insert_message = new Message(selectedRow, "#get_purchase_info");
+            insert_message.setObject(complain.getAuto_number_purchase());
+            try {
+                SimpleClient.getClient().sendToServer(insert_message);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
         }
+
     }
 
     private void create_complains_table(Message message) {
@@ -281,7 +303,26 @@ public class CustomerServiceController {
             table_view.setItems(filtered_list);
     }
 
+    private void show_purchase_info(Message message)
+    {
+        UserPurchases purchases = (UserPurchases) message.getObject();
+        String purchase_type = purchases.getPurchase_type();
+        double price = purchases.getPayment_amount();
+        Date date_of_purchase = purchases.getDate_of_purchase();
+        String movie_name = purchases.getMovie_name();
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
+        String formattedDate = dateFormat.format(date_of_purchase);
+
+        String currentText = complains_detailes.getText();
+        String additionalDetails = "\n\nPurchase Type: " + purchase_type +
+                "\nPrice: $" + price +
+                "\nDate of Purchase: " + formattedDate +
+                "\nMovie Name: " + movie_name;
+
+        complains_detailes.setText(currentText + additionalDetails);
+        return ;
+    }
 
     private void create_complains_table_and_message(Message message) {
         create_complains_table(message);

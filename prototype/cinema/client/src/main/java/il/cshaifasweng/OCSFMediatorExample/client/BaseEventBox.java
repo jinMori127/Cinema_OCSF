@@ -26,7 +26,6 @@ public class BaseEventBox {
         SHOW_COMPLAINS_RESPOND,
         GOT_SEARCH_MOVIE_FILTER,
         SIGN_OUT,
-
         DONE_PAY_MULTITICKET,
         FAILED_MT,
         SAVED_USER_PURCHASES,
@@ -36,7 +35,8 @@ public class BaseEventBox {
         PURCHASE_LINK_USING_MULTI,
         PURCHASE_LINK_N,
         THEATER_MAP_UPDATED,
-        ADDTickets;
+        ADDTickets,
+        GET_PURCHASE_INFO;
 
         public static EventEnum getByName(String name) {
             try {
