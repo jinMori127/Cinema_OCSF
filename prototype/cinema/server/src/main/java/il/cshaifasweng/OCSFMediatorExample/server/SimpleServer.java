@@ -1058,12 +1058,20 @@ public class SimpleServer extends AbstractServer {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	private void handle_submit_complaint(Complains complaint) {
+	private boolean handle_submit_complaint(Complains complaint) {
+		String id = complaint.getId_user().getUser_id();
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
+		if(complaint.getAuto_number_purchase() != -1) {
+			UserPurchases purchases = session.get(UserPurchases.class, complaint.getAuto_number_purchase());
+			if(purchases == null || !(purchases.getId_user().getUser_id().equals(id))) {
+				return false;
+			}
+		}
 		session.save(complaint);
 		session.getTransaction().commit();
 		session.close();
+		return true;
 	}
 
 
@@ -2098,7 +2106,13 @@ public class SimpleServer extends AbstractServer {
 			} else if (message.getMessage().equals("#SubmitComplaint")) {
 				//System.out.println("submit user complaint");
 				Complains complaint = (Complains) message.getObject();
-				handle_submit_complaint(complaint);
+				boolean suc = handle_submit_complaint(complaint);
+				if(!suc)
+				{
+					message.setMessage("#incorrect_purchase_number");
+					client.sendToClient(message);
+					return;
+				}
 				String current_id = complaint.getId_user().getUser_id();
 				message.setMessage("#ShowUserComplaints");
 				List<Complains> updated_complaints = handle_get_user_complaints(current_id);

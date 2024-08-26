@@ -155,6 +155,10 @@ public class UserComplainsController {
                 System.out.println("Complaints table updated with " + complaintsList.size() + " items.");
             });
         }
+        else if(event.getId() == BaseEventBox.get_event_id("INCORRECT_PURCHASE_INFO")) {
+            error_text.setVisible(true);
+            error_text.setText("Incorrect Purchase Info");
+        }
     }
 
     @Subscribe

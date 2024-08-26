@@ -169,6 +169,9 @@ public class SimpleClient extends AbstractClient {
 		{
 			EventBus.getDefault().post(new BaseEventBox("GET_PURCHASE_INFO", message));
 		}
+		else if(message.getMessage().equals("#incorrect_purchase_number")){
+			EventBus.getDefault().post(new BaseEventBox("INCORRECT_PURCHASE_INFO", message));
+		}
 		else {
 			EventBus.getDefault().post(new BaseEventBox("WRONG_NAMEING", message));
 		}

@@ -315,7 +315,7 @@ public class CustomerServiceController {
         String formattedDate = dateFormat.format(date_of_purchase);
 
         String currentText = complains_detailes.getText();
-        String additionalDetails = "\n\nPurchase Type: " + purchase_type +
+        String additionalDetails = "\nPurchase information: \nPurchase Type: " + purchase_type +
                 "\nPrice: $" + price +
                 "\nDate of Purchase: " + formattedDate +
                 "\nMovie Name: " + movie_name;
