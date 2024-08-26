@@ -124,6 +124,12 @@ public class HomePageCotroller {
             Button Button_Select = new Button();
             Button_Select.setText("Select");
             Button_Select.setOnAction(event->{
+                MovieDetailsController.current_movie = movie;
+                try {
+                    SimpleChatClient.setRoot("MovieDetails");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             });
             vboxButtons.getChildren().add(Button_Select);
             hbox_movies.getChildren().add(current_movie_vbox);

@@ -605,6 +605,7 @@ public class MovieEditingDetailsController {
                 description.setText(movie.getDescription_());
                 year.setText(Integer.toString(movie.getYear_()));
                 rating.setText(Double.toString(movie.getRating()));
+                movie_link.setText(movie.getMovie_link());
                 SelectedMovie = movie;
 
             });
