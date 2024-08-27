@@ -55,6 +55,15 @@ public class HomePageCotroller {
                 create_catalog(event.getMessage());
             });
         }
+        else if (event.getId()==BaseEventBox.get_event_id("SHOW_CM_CHANGES")){
+            Message message = new Message(10,"#GetHomePage");
+            try {
+                SimpleClient.getClient().sendToServer(message);
+            } catch (IOException e) {
+                ErrorMssage.setText(e.getMessage());
+                ErrorMssage.setVisible(true);
+            }
+        }
         else if(event.getId()==BaseEventBox.get_event_id("UPDATE_SCREENING_FOR_MOVIE")) {
             Message message = new Message(10,"#GetHomePage");
             try {

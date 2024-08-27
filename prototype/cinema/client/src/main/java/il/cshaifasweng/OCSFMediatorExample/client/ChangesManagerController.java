@@ -42,11 +42,25 @@ public class ChangesManagerController {
 
     private List<EditedDetails> editedDetailsList;
     @Subscribe
-    public void handle_show_cmchanges_event(BaseEventBox event) {
+    public void handle_events(BaseEventBox event) {
         if(event.getId()==BaseEventBox.get_event_id("SHOW_CM_CHANGES")) {
             Platform.runLater(() -> {
                 Message message = event.getMessage();
                 editedDetailsList = (List<EditedDetails>) message.getObject();
+
+                // Clear any existing children in the changes container
+                changesContainer.getChildren().clear();
+
+                // Populate the UI with the received edited details
+                for (EditedDetails details : editedDetailsList) {
+                    addChange(details);
+                }
+            });
+        }
+        if(event.getId()==BaseEventBox.get_event_id("UPDATE_MOVIE_LIST")) {
+            Platform.runLater(() -> {
+                Message message = event.getMessage();
+                editedDetailsList = (List<EditedDetails>) message.getObject2();
 
                 // Clear any existing children in the changes container
                 changesContainer.getChildren().clear();

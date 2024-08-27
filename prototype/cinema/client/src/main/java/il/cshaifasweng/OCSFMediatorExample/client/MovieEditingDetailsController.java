@@ -433,7 +433,13 @@ public class MovieEditingDetailsController {
         }*/
         Message insert_message = new Message(3,"#UpdateMovie");
         insert_message.setObject(movie);
-        insert_message.setObject2(price_change);
+        if(price_change.getChanged_price() != movie.getPrice()){
+            System.out.println("here");
+            insert_message.setObject2(price_change);
+        }
+        else {
+            insert_message.setObject2(null);
+        }
 
         try {
             SimpleClient.getClient().sendToServer(insert_message);
@@ -441,9 +447,18 @@ public class MovieEditingDetailsController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
-
+        Movie_id.setText("");
+        movie_name.setText("");
+        lead_actor.setText("");
+        catgory.setValue("");
+        year.setText("");
+        duration.setText("");
+        selected_image.setImage(null);
+        director.setText("");
+        price.setText("");
+        description.setText("");
+        File_uploaded = null;
+        SelectedMovie = null;
     }
     private static Movie SelectedMovie;
     @Subscribe
@@ -471,6 +486,9 @@ public class MovieEditingDetailsController {
                 Movie_id.setText(Integer.toString(the_movie.getAuto_number_movie()));
                 SelectedMovie = the_movie;
             });
+        }
+        else if (event.getId()==BaseEventBox.get_event_id("SHOW_CM_CHANGES")){
+            search_movie_name_function();
         }
     }
 
@@ -507,7 +525,13 @@ public class MovieEditingDetailsController {
     {
         Vbox_movies.getChildren().clear();
         Vbox_movies.setPrefHeight(50);
-        List<Movie> movies = (List<Movie>)M.getObject();
+        List<Movie> movies = null;
+        if(M.getMessage().equals("ShowCMEditedDetails")) {
+            movies = (List<Movie>)M.getObject2();
+        }
+        else {
+            movies = (List<Movie>)M.getObject();
+        }
         for (Movie movie : movies) {
             Vbox_movies.setPrefHeight(Vbox_movies.getPrefHeight()+190);
             HBox hbox_movies = new HBox();

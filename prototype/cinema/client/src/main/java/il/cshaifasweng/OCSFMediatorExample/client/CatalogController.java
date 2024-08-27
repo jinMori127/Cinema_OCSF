@@ -297,6 +297,9 @@ public class CatalogController {
                 create_catalog(event.getMessage());
             });
         }
+        else if (event.getId()==BaseEventBox.get_event_id("SHOW_CM_CHANGES")){
+            //To be added
+        }
         else if(event.getId() == BaseEventBox.get_event_id("GOT_SEARCH_MOVIE_FILTER")) {
             Platform.runLater(() -> {
                 System.out.println("GOT_SEARCH_MOVIE_FILTER");
