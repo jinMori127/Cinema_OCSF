@@ -1,5 +1,4 @@
 USE catalog;
--- Insert movies with names and descriptions in English and Hebrew, and categories in the required format
 INSERT INTO movies (movie_name, main_actors, category, description_, time_, year_, director, price, rating, movie_link)
 VALUES
 ('Moana / מואנה', 'Aulii Cravalho, Dwayne Johnson', 'Family - משפחה', 'Disney animated film about a brave Polynesian girl who sets sail on a daring mission to save her people, with the help of the demigod Maui / סרט אנימציה של דיסני על נערה פולינזית אמיצה שיוצאת להציל את עמה בעזרת חצי אל מאווי', '1:47', 2016, 'Ron - רון ', 40, 3, 'https://w27.my-cima.net/watch.php?vid=7c7d539b0'),
@@ -8,10 +7,7 @@ VALUES
 ('Divergent / מפוצלים', 'Shailene Woodley, Theo James', 'Action - פעולה', 'In a dystopian future, a young woman discovers she is a Divergent and must uncover the secrets behind her society’s facade / בעתיד דיסטופי, נערה מגלה שהיא מפוצלת וצריכה לחשוף את הסודות מאחורי החברה שלה', '2:19', 2014, 'Aisha - עאישה', 30, 7, 'https://w27.my-cima.net/watch.php?vid=7c7d539b0'),
 ('Spider-Man: No Way Home / ספיידרמן: אין דרך הביתה', 'Tom Holland, Zendaya, Benedict Cumberbatch', 'Action - פעולה', 'Spider-Man seeks Doctor Strange’s help to restore his secret identity, unleashing multiverse chaos / ספיידרמן מבקש את עזרתו של דוקטור סטריינג\' לשחזר את זהותו הסודית, מה שגורם לכאוס ביקומים מקבילים', '2:30', 2021, 'Jan - גאן', 30, 1, 'https://w27.my-cima.net/watch.php?vid=');
 
--- Truncate the Worker table
 TRUNCATE TABLE Worker;
-
--- Insert workers
 INSERT INTO Worker (user_name, password, name, branch, role, is_worker_loggedIn)
 VALUES 
     ('MA1', 'MA1', 'John Doe', 'Sakhnin', 'Manager', false),
