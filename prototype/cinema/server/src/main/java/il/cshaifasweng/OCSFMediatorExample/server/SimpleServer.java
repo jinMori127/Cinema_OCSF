@@ -767,6 +767,8 @@ public class SimpleServer extends AbstractServer {
 		int paymentAmount = MultiEntryTicket.INITIAL_PRICE;
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
 		String formattedDate = date.format(formatter);
+		int orderId = t.getAuto_number_multi_entry_ticket();
+
 
 		String body = "<html>"
 				+ "<body style='font-family: Arial, sans-serif; color: #333;'>"
@@ -781,7 +783,7 @@ public class SimpleServer extends AbstractServer {
 				+ "<p><em>(Please keep a copy of this receipt for your records.)</em></p>"
 				+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
 				+ "<h3 style='color: #555;'>YOUR ORDER INFORMATION:</h3>"
-				+ "<p><strong>Order ID:</strong> " + id + "<br/>"
+				+ "<p><strong>Order ID:</strong> " + orderId + "<br/>"
 				+ "<strong>Order Date:</strong> " + formattedDate + "<br/>"
 				+ "<strong>Source:</strong> Luna Aura</p>"
 				+ "<h3 style='color: #555;'>HERE'S WHAT YOU ORDERED:</h3>"
@@ -883,7 +885,7 @@ public class SimpleServer extends AbstractServer {
 
 			// Format EndDaye
 			String formattedEndDate = (EndDate != null) ? dateFormat.format(EndDate) : "N/A";
-
+			int orderId = p1.getAuto_number_purchase();
 
 			// Email body
 			String body = "<html>"
@@ -899,7 +901,7 @@ public class SimpleServer extends AbstractServer {
 					+ "<p><em>(Please keep a copy of this receipt for your records.)</em></p>"
 					+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
 					+ "<h3 style='color: #555;'>YOUR ORDER INFORMATION:</h3>"
-					+ "<p><strong>Order ID:</strong> " + id + "<br/>"
+					+ "<p><strong>Order ID:</strong> " + orderId + "<br/>"
 					+ "<strong>Order Date:</strong> " + formattedDate + "<br/>"
 					+ "<strong>Movie Name:</strong> " + movie_name + "<br/>"
 					+ "<strong>Source:</strong> Luna Aura<br/>"
