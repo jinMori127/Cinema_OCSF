@@ -80,6 +80,21 @@ public class PurchaseMovieLinkController {
     @FXML
     public void initialize() {
         EventBus.getDefault().register(this);
+        if(UserLogInWithIDController.idUser != null) {
+            IdUser old_id_user = UserLogInWithIDController.idUser;
+            String full_name = old_id_user.getName();
+            String split_first_name = full_name;
+            String split_last_name = "";
+            if (old_id_user.getName().contains(" ")) {
+                split_first_name = full_name.split(" ")[0];
+                split_last_name = full_name.split(" ")[1];
+            }
+            user_id.setText(old_id_user.getUser_id());
+            user_first_name.setText(split_first_name);
+            user_last_name.setText(split_last_name);
+            user_email.setText(old_id_user.getEmail());
+            user_phone_number.setText(old_id_user.getPhone_number());
+        }
     }
 
     @FXML
