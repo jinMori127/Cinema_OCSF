@@ -466,24 +466,70 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
-	private List<Movie> search_with_filter(Movie movie,int year2 , String sorting_attribute,String Sorting_direction) throws Exception
+	private List<Movie> search_with_filter(Movie movie,int year2 , String sorting_attribute,String Sorting_direction,String branch,String screening_start_date,String screening_end_date,String need_link) throws Exception
 	{
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		CriteriaBuilder builder = session.getCriteriaBuilder();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
 		CriteriaQuery<Movie> query = builder.createQuery(Movie.class);
+		query.distinct(true);
 		Root<Movie> root =  query.from(Movie.class);
+		// Create a join with the Screening table
+		Join<Movie, Screening> screeningRoot =null;
+		if(need_link.equals("no"))
+		{
+			screeningRoot = root.join("screenings", JoinType.INNER);
+		}
+
 		Predicate namePredicate = builder.like(root.get("movie_name"), "%"+movie.getMovie_name()+"%");
 		Predicate yearPredicate = builder.between(root.get("year_"),movie.getYear_(),year2);
 		Predicate ratingPredicate = builder.greaterThanOrEqualTo(root.get("rating"), movie.getRating());
 		Predicate categoryPredicate = builder.equal(root.get("category"), movie.getCategory());
 		Predicate directorPredicate = builder.like(root.get("director"), "%"+movie.getDirector()+"%");
 		Predicate mainActorPredicat = builder.like(root.get("main_actors"),"%"+movie.getMain_actors()+"%");
-		if(movie.getCategory()!=null && !movie.getCategory().isEmpty())
-			query.select(root).where(namePredicate,yearPredicate,ratingPredicate,categoryPredicate ,directorPredicate,mainActorPredicat);
-		else
-			query.select(root).where(namePredicate,yearPredicate,ratingPredicate ,directorPredicate,mainActorPredicat);
+
+		// Create predicates for Screening table (if necessary)
+		Predicate link = null ;
+		if(need_link.equals("yes"))
+		{
+			link = builder.notEqual(root.get("movie_link"),"");
+		}
+
+		Predicate branchPredicate = null;
+		Predicate screeningStartPredicate = null;
+		Predicate screeningEndPredicate = null;
+		if(need_link.equals("no")) {
+			if (!branch.equals("All")) {
+				branchPredicate = builder.equal(screeningRoot.get("branch"), branch);
+			} else {
+				branchPredicate = builder.notEqual(screeningRoot.get("branch"), "");
+			}
+			Date currentDate = formatter.parse(screening_end_date);
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(currentDate);
+			calendar.add(Calendar.SECOND, -1);
+			Date newDate = calendar.getTime();
+			screeningStartPredicate = builder.greaterThanOrEqualTo(screeningRoot.get("date_time"), formatter.parse(screening_start_date));
+			screeningEndPredicate = builder.lessThanOrEqualTo(screeningRoot.get("date_time"), newDate);
+		}
+		if(movie.getCategory()!=null && !movie.getCategory().isEmpty()) {
+			 if (need_link.equals("yes")){
+				query.select(root).where(namePredicate, yearPredicate, ratingPredicate, categoryPredicate, directorPredicate, mainActorPredicat,link);
+			} else if (need_link.equals("no")){
+				query.select(root).where(namePredicate, yearPredicate, ratingPredicate, categoryPredicate, directorPredicate, mainActorPredicat,branchPredicate,screeningStartPredicate,screeningEndPredicate);
+			}
+		}
+		else {
+			if (need_link.equals("yes")) {
+				query.select(root).where(namePredicate, yearPredicate, ratingPredicate, directorPredicate, mainActorPredicat,link);
+			}
+			else if (need_link.equals("no")) {
+				query.select(root).where(namePredicate, yearPredicate, ratingPredicate, directorPredicate, mainActorPredicat,branchPredicate,screeningStartPredicate,screeningEndPredicate);
+			}
+		}
+
 		if (Sorting_direction.equals("asc"))
 		{
 			query.orderBy(builder.asc(root.get(sorting_attribute)));
@@ -1628,7 +1674,51 @@ public class SimpleServer extends AbstractServer {
 			else if (message.getMessage().equals("#SearchMovieFillter")) {
 				Movie m = (Movie)message.getObject();
 				Map<String, String> dictionary = (Map<String, String>) message.getObject2();
-				List<Movie> answer = search_with_filter(m,Integer.parseInt(dictionary.get("year2")),dictionary.get("Sort_atribute"),dictionary.get("Sort_direction"));
+				List<Movie> answer = null;
+				if(!dictionary.get("need_link").equals("does not matter")) {
+					answer = search_with_filter(m, Integer.parseInt(dictionary.get("year2")), dictionary.get("Sort_atribute"), dictionary.get("Sort_direction"), dictionary.get("branch"), dictionary.get("screening_start_date"), dictionary.get("screening_end_date"), dictionary.get("need_link"));
+				}
+				else
+				{
+					List<Movie> list1 = search_with_filter(m, Integer.parseInt(dictionary.get("year2")), dictionary.get("Sort_atribute"), dictionary.get("Sort_direction"), dictionary.get("branch"), dictionary.get("screening_start_date"), dictionary.get("screening_end_date"), "yes");
+					List<Movie> list2 = search_with_filter(m, Integer.parseInt(dictionary.get("year2")), dictionary.get("Sort_atribute"), dictionary.get("Sort_direction"), dictionary.get("branch"), dictionary.get("screening_start_date"), dictionary.get("screening_end_date"), "no");
+					Set<Movie> unionSet = new HashSet<>(list1);
+					unionSet.addAll(list2);
+					answer = new ArrayList<>(unionSet);
+					if(dictionary.get("Sort_atribute").equals("movie_name")) {
+						if(dictionary.get("Sort_direction").equals("asc")) {
+							Collections.sort(answer, Comparator.comparing(Movie::getMovie_name));
+						}
+						else if(dictionary.get("Sort_direction").equals("desc")) {
+							Collections.sort(answer, Comparator.comparing(Movie::getMovie_name).reversed());
+						}
+					}
+					else if(dictionary.get("Sort_atribute").equals("price")) {
+						if(dictionary.get("Sort_direction").equals("asc")) {
+							Collections.sort(answer, Comparator.comparingDouble(Movie::getPrice));
+						}
+						else if(dictionary.get("Sort_direction").equals("desc")) {
+							Collections.sort(answer, Comparator.comparingDouble(Movie::getPrice).reversed());
+						}
+					}
+					else if(dictionary.get("Sort_atribute").equals("rating")) {
+						if(dictionary.get("Sort_direction").equals("asc")) {
+							Collections.sort(answer, Comparator.comparingDouble(Movie::getRating));
+						}
+						else if(dictionary.get("Sort_direction").equals("desc")) {
+							Collections.sort(answer, Comparator.comparingDouble(Movie::getRating).reversed());
+						}
+					}
+					else if(dictionary.get("Sort_atribute").equals("year_")) {
+						if(dictionary.get("Sort_direction").equals("asc")) {
+							Collections.sort(answer, Comparator.comparingInt(Movie::getYear_));
+						}
+						else if(dictionary.get("Sort_direction").equals("desc")) {
+							Collections.sort(answer, Comparator.comparingInt(Movie::getYear_).reversed());
+						}
+					}
+
+				}
 				message.setObject(answer);
 				message.setMessage("#GotSearchMovieFillter");
 				client.sendToClient(message);
