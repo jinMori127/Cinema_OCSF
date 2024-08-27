@@ -2108,7 +2108,8 @@ public class SimpleServer extends AbstractServer {
 				reports_message.setObject(complaint);
 				reports_message.setMessage("extraComplaint");
 				update_reports();
-				client.sendToClient(message);
+				message.setObject2(search_data(true));
+				sendToAllClients(message);
 				sendToAllClients(reports_message);
 			} else if (message.getMessage().equals("#GetCMEditedDetails")) {
 				//System.out.println("get cme details");
@@ -2173,7 +2174,7 @@ public class SimpleServer extends AbstractServer {
 				message.setMessage("#submit_respond_for_client");
 				// delete the responded complains
 				message.setObject(data);
-				client.sendToClient(message);
+				sendToAllClients(message);
 			}
 			else if(message.getMessage().equals("#Update_theater_map")){
 				message.setMessage("#theater_map_updated");
