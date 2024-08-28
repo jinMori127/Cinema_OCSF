@@ -11,11 +11,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import javafx.fxml.FXML;
 import javafx.scene.control.DateCell;
-import javafx.scene.control.DatePicker;
 import javafx.util.Callback;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.LocalTime;
@@ -66,8 +63,7 @@ public class PurchaseMovieLinkController {
     @FXML
     private Text error_message;
 
-    @FXML
-    private Text success_message;
+
 
     @FXML
     private DatePicker date_pic;
@@ -76,9 +72,6 @@ public class PurchaseMovieLinkController {
     @FXML
     private Text end_time;
 
-
-    @FXML
-    private Text MULTI;
 
     @FXML
     private Button purchase_multi; // Value injected by FXMLLoader
@@ -116,7 +109,7 @@ public class PurchaseMovieLinkController {
                         // Disable past dates
                         if (item.isBefore(today)) {
                             setDisable(true);
-                            setStyle("-fx-background-color: #ffc0cb;"); // Optional: Change background color
+                            setStyle("-fx-background-color: #ffc0cb;");
                         }
                     }
                 };
@@ -130,11 +123,12 @@ public class PurchaseMovieLinkController {
     @FXML
     public void purchase_multi_func(ActionEvent event) {
         if (!validateInputFields(false)) return;
+        LocalDate wantedDate = date_pic.getValue();  // date_pic.getValue() returns a LocalDate
+        LocalTime wantedTime = LocalTime.parse(wanted_Time.getText(), DateTimeFormatter.ISO_LOCAL_TIME);
+        LocalDateTime wantedDateTime = LocalDateTime.of(wantedDate, wantedTime);
 
-        LocalDateTime wantedDateTime = LocalDateTime.of(
-                LocalDate.parse(wanted_date, DateTimeFormatter.ISO_LOCAL_DATE),
-                LocalTime.parse(wanted_Time.getText(), DateTimeFormatter.ISO_LOCAL_TIME)
-        );
+
+
         Date wantedDateObj = Date.from(wantedDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
         Date screeningTimeDate = MovieDetailsController.current_movie.getTime_(); // Assuming Date type
@@ -284,37 +278,18 @@ public class PurchaseMovieLinkController {
             }
 
         }
-
-        String formattedDate="";
-        if (date_pic.getValue() != null) {
-            LocalDate selectedDate = date_pic.getValue();
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-             formattedDate = selectedDate.format(formatter);
-
-            error_message.setVisible(true);
-            error_message.setText("Selected date is " + formattedDate + ".");
-        } else {
+        if (date_pic.getValue() == null) {
             error_message.setVisible(true);
             error_message.setText("Selected date is null.");
+            return false;
         }
-        wanted_date=(formattedDate);
+        /////////////////////////
+        String formattedDate = "";
 
-     //   LocalDate wantedDate;
-       // try {
-         //   wantedDate = LocalDate.parse(wantedDateStr, DateTimeFormatter.ISO_LOCAL_DATE);
-        //} catch (DateTimeParseException e) {
-          //  error_message.setVisible(true);
-            //error_message.setText("Wanted Date must be in the format yyyy-MM-dd.");
-            //wanted_date.setText("");
-           // return false;
-        //}
-
-        // Validate wanted_Time
-        String wantedDateStr = formattedDate;
-
+        LocalDate selectedDate = date_pic.getValue();
         String wantedTimeStr = wanted_Time.getText();
         LocalTime wantedTime;
+
         try {
             wantedTime = LocalTime.parse(wantedTimeStr, DateTimeFormatter.ISO_LOCAL_TIME);
         } catch (DateTimeParseException e) {
@@ -324,31 +299,30 @@ public class PurchaseMovieLinkController {
             return false;
         }
 
-        try {
-            wantedTime = LocalTime.parse(wantedTimeStr, DateTimeFormatter.ISO_LOCAL_TIME);
-            if (wantedTime.isBefore(LocalTime.now())) {
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+
+
+        if (selectedDate.equals(currentDate)) {
+            if (wantedTime.isBefore(currentTime)) {
                 error_message.setVisible(true);
                 error_message.setText("Wanted Time has already passed.");
                 wanted_Time.setText("");
                 return false;
             }
-
-        } catch (DateTimeParseException e) {
-            error_message.setVisible(true);
-            error_message.setText("Wanted Time must be in the format HH:mm.");
-            wanted_Time.setText("");
-            return false;
         }
-
 
         return true;
     }
 
     private void processPurchase() {
-        LocalDateTime wantedDateTime = LocalDateTime.of(
-                LocalDate.parse(wanted_date, DateTimeFormatter.ISO_LOCAL_DATE),
-                LocalTime.parse(wanted_Time.getText(), DateTimeFormatter.ISO_LOCAL_TIME)
-        );
+        if (!validateInputFields(false)) return;
+
+        LocalDate wantedDate = date_pic.getValue();  // date_pic.getValue() returns a LocalDate
+        LocalTime wantedTime = LocalTime.parse(wanted_Time.getText(), DateTimeFormatter.ISO_LOCAL_TIME);
+        LocalDateTime wantedDateTime = LocalDateTime.of(wantedDate, wantedTime);
+
+
         Date wantedDateObj = Date.from(wantedDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
         Date screeningTimeDate = MovieDetailsController.current_movie.getTime_(); // Assuming Date type
