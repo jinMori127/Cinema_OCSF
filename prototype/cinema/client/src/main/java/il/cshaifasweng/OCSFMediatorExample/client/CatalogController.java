@@ -16,11 +16,15 @@ import org.greenrobot.eventbus.Subscribe;
 import javafx.scene.text.Text;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class CatalogController {
+    @FXML
+    private Button search_button;
 
     @FXML
     private Text ErrorMessage;
@@ -63,6 +67,17 @@ public class CatalogController {
 
     @FXML
     private Button Fillter_button;
+    @FXML
+    private ComboBox<String> branch_combobox;
+
+    @FXML
+    private DatePicker end_date;
+
+    @FXML
+    private ComboBox<String> link;
+
+    @FXML
+    private DatePicker start_date;
 
     @FXML
     void begin_filter(ActionEvent event) {
@@ -134,6 +149,22 @@ public class CatalogController {
                 return;
             }
         }
+        if(start_date.getValue() == null) {
+            ErrorMessage.setText("Start date cannot be empty");
+            ErrorMessage.setVisible(true);
+            return;
+        }
+        if(end_date.getValue() == null) {
+            ErrorMessage.setText("End date cannot be empty");
+            ErrorMessage.setVisible(true);
+            return;
+        }
+        if(start_date.getValue().isAfter(end_date.getValue()))
+        {
+            ErrorMessage.setText("Start date cannot be after end date");
+            ErrorMessage.setVisible(true);
+            return;
+        }
         String Sort_atribute = sort_atribute.getSelectionModel().getSelectedItem();
         if (Sort_atribute.equals("price")){
             Sort_atribute = "price";
@@ -169,6 +200,10 @@ public class CatalogController {
         dictionary.put("Sort_atribute", Sort_atribute);
         dictionary.put("Sort_direction", Sort_direction);
         dictionary.put("year2", String.valueOf(year2));
+        dictionary.put("branch", branch_combobox.getValue());
+        dictionary.put("screening_start_date", String.valueOf(start_date.getValue()));
+        dictionary.put("screening_end_date", String.valueOf(end_date.getValue().plusDays(1)));
+        dictionary.put("need_link", link.getValue());
         dictionary_search = dictionary;
         current_search = movie;
         Message m = new Message(10,"#SearchMovieFillter");
@@ -270,15 +305,26 @@ public class CatalogController {
         sort_atribute.getItems().clear();
         sort_atribute.getItems().addAll("movie name","year","price","rating");
         sort_atribute.setValue("movie name");
-
         catgory.getItems().clear();
         catgory.getItems().add("");
         List<String> cats = SimpleChatClient.get_categories();
+
         for (String cat : cats) {
             catgory.getItems().add(cat);
         }
+        branch_combobox.getItems().clear();
+        branch_combobox.getItems().add("All");
+        branch_combobox.setValue("All");
+        branch_combobox.getItems().addAll(SimpleChatClient.get_branches());
+        start_date.setValue(LocalDate.now());
+        end_date.setValue(LocalDate.now().plusYears(1000));
+        link.getItems().add("does not matter");
+        link.setValue("does not matter");
+        link.getItems().add("yes");
+        link.getItems().add("no");
         EventBus.getDefault().register(this);
-
+        search_button.fire();
+        /*
         Message message = new Message(2, "#GetAllMovies");
         try {
             SimpleClient.getClient().sendToServer(message);
@@ -287,6 +333,8 @@ public class CatalogController {
             ErrorMessage.setText(e.getMessage());
             ErrorMessage.setVisible(true);
         }
+         */
+
     }
     @Subscribe
     public void show_all_movies(BaseEventBox event)
