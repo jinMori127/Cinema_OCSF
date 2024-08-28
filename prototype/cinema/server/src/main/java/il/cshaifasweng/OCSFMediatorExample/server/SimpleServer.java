@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
-	private static SessionFactory sessionFactory = getSessionFactory(SimpleChatServer.password);
+	public static SessionFactory sessionFactory = getSessionFactory(SimpleChatServer.password);
 	public static final String[] BRANCHES = {"Sakhnin", "Haifa", "Nazareth", "Nhif"};
 	// this variable for handle the link
 	private HttpServer httpServer;
