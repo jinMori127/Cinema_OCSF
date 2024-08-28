@@ -27,6 +27,9 @@ public class ChangesManagerController {
         System.out.println("ChangesManagerController.initialize");
         EventBus.getDefault().register(this); // Registering with EventBus
 
+        // Bind the approve all button action
+        approveAllButton.setOnAction(event -> approveAllChanges());
+
         // Create and send a message to request all changes from the server
         Message requestMessage = new Message(81, "#GetCMEditedDetails");
         try {
@@ -37,12 +40,27 @@ public class ChangesManagerController {
         }
     }
 
+    private List<EditedDetails> editedDetailsList;
     @Subscribe
-    public void handle_show_cmchanges_event(BaseEventBox event) {
+    public void handle_events(BaseEventBox event) {
         if(event.getId()==BaseEventBox.get_event_id("SHOW_CM_CHANGES")) {
             Platform.runLater(() -> {
                 Message message = event.getMessage();
-                List<EditedDetails> editedDetailsList = (List<EditedDetails>) message.getObject();
+                editedDetailsList = (List<EditedDetails>) message.getObject();
+
+                // Clear any existing children in the changes container
+                changesContainer.getChildren().clear();
+
+                // Populate the UI with the received edited details
+                for (EditedDetails details : editedDetailsList) {
+                    addChange(details);
+                }
+            });
+        }
+        if(event.getId()==BaseEventBox.get_event_id("UPDATE_MOVIE_LIST")) {
+            Platform.runLater(() -> {
+                Message message = event.getMessage();
+                editedDetailsList = (List<EditedDetails>) message.getObject2();
 
                 // Clear any existing children in the changes container
                 changesContainer.getChildren().clear();
@@ -98,6 +116,18 @@ public class ChangesManagerController {
 
         try {
             SimpleClient.getClient().sendToServer(deny_message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void approveAllChanges(){
+        Message updateMessage = new Message(84, "#ApproveAllPriceChanges");
+        updateMessage.setObject(editedDetailsList);
+
+        try {
+            SimpleClient.getClient().sendToServer(updateMessage);
+            System.out.println("Approved all changes");
         } catch (IOException e) {
             e.printStackTrace();
         }

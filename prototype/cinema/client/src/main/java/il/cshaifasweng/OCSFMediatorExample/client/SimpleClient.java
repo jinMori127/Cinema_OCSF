@@ -44,7 +44,7 @@ public class SimpleClient extends AbstractClient {
 		}
 
 		else if (message.getMessage().equals("#DonePayMultiTicket")){
-			System.out.println("We are in DonePayMultiTicket eventbox yo ");
+
 			EventBus.getDefault().post(new BaseEventBox("DONE_PAY_MULTITICKET", message));
 		}
 

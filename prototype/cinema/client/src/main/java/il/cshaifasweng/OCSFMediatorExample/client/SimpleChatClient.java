@@ -137,6 +137,15 @@ public class SimpleChatClient extends Application {
 
 
     }
+    public static ArrayList<String> get_branches()
+    {
+        ArrayList<String> categories = new ArrayList<>();
+        categories.add("Sakhnin");
+        categories.add("Haifa");
+        categories.add("Nazareth");
+        categories.add("Nhif");
+        return categories;
+    }
     public static void print_rooms()
     {
         for (Map.Entry<List<String>, List<Integer>> entry : rooms.entrySet()) {

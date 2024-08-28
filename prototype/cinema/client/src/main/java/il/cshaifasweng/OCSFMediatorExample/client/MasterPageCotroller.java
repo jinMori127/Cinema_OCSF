@@ -196,7 +196,9 @@ public class MasterPageCotroller {
         else if (menuItemText.equals("Reports")) {
             EventBus.getDefault().post(new BeginContentChangeEnent("Reports"));
         }
-
+        else if (menuItemText.equals("Edited Prices")) {
+            EventBus.getDefault().post(new BeginContentChangeEnent("ChangesManager"));
+        }
     }
 
 }
