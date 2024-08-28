@@ -74,7 +74,7 @@ public class PurchaseMovieLinkController {
 
 
     @FXML
-    private Button purchase_multi; // Value injected by FXMLLoader
+    private Button purchase_multi;
 
     @FXML
     public void initialize() {
@@ -94,10 +94,8 @@ public class PurchaseMovieLinkController {
             user_email.setText(old_id_user.getEmail());
             user_phone_number.setText(old_id_user.getPhone_number());
         }
-        // Get the current date
         LocalDate today = LocalDate.now();
 
-        // Set the DatePicker's day cell factory to disable past dates
         date_pic.setDayCellFactory(new Callback<DatePicker, DateCell>() {
             @Override
             public DateCell call(DatePicker param) {
@@ -117,6 +115,8 @@ public class PurchaseMovieLinkController {
         });
 
         date_pic.setValue(today);
+
+
 
     }
 
