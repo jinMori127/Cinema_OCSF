@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.nio.file.Files;
+import java.util.Objects;
 
 @Entity
 @Table(name = "movies")
@@ -158,5 +159,18 @@ public class Movie implements Serializable {
                 "Rating: " + rating + " / 10" + "\n" +
                 "Category: " + category + "\n" +
                 "Production Year: " + year_ + "\n";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Movie movie = (Movie) o;
+        return movie.auto_number_movie == auto_number_movie;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(auto_number_movie);
     }
 }

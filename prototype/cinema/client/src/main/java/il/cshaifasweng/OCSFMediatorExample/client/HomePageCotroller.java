@@ -55,6 +55,15 @@ public class HomePageCotroller {
                 create_catalog(event.getMessage());
             });
         }
+        else if (event.getId()==BaseEventBox.get_event_id("SHOW_CM_CHANGES")){
+            Message message = new Message(10,"#GetHomePage");
+            try {
+                SimpleClient.getClient().sendToServer(message);
+            } catch (IOException e) {
+                ErrorMssage.setText(e.getMessage());
+                ErrorMssage.setVisible(true);
+            }
+        }
         else if(event.getId()==BaseEventBox.get_event_id("UPDATE_SCREENING_FOR_MOVIE")) {
             Message message = new Message(10,"#GetHomePage");
             try {
@@ -124,6 +133,12 @@ public class HomePageCotroller {
             Button Button_Select = new Button();
             Button_Select.setText("Select");
             Button_Select.setOnAction(event->{
+                MovieDetailsController.current_movie = movie;
+                try {
+                    SimpleChatClient.setRoot("MovieDetails");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             });
             vboxButtons.getChildren().add(Button_Select);
             hbox_movies.getChildren().add(current_movie_vbox);

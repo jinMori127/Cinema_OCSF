@@ -23,6 +23,9 @@ import java.util.Arrays;
 public class TheaterMapController {
 
     @FXML
+    private Button back_button;
+
+    @FXML
     private AnchorPane anchore_pane;
 
     @FXML
@@ -261,5 +264,15 @@ public class TheaterMapController {
         EventBus.getDefault().unregister(this);
         EventBus.getDefault().post(new ContentChangeEvent(event.getPage()));
     }
-
+    @FXML
+    void go_back(ActionEvent event) {
+        ErrorMessage.setVisible(false);
+        try {
+            SimpleChatClient.setRoot("MovieDetails");
+        } catch (IOException e) {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText(e.getMessage());
+            return;
+        }
+    }
 }

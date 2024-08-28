@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -19,7 +20,7 @@
             <Text layoutX="365.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="-" />
             <Text layoutX="449.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Min rating:" />
             <Text layoutX="305.0" layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0" text="category:" />
-            <ComboBox fx:id="sort_direction" layoutX="88.0" layoutY="12.0" prefHeight="26.0" prefWidth="100.0" promptText="Decending" />
+            <ComboBox fx:id="sort_direction" layoutX="96.0" layoutY="12.0" prefHeight="26.0" prefWidth="100.0" promptText="Decending" />
             <ComboBox fx:id="sort_atribute" layoutX="96.0" layoutY="44.0" prefWidth="150.0" promptText="name" />
             <ComboBox fx:id="catgory" layoutX="363.0" layoutY="44.0" prefWidth="150.0" />
             <Text layoutX="539.0" layoutY="62.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Leading actor:" />
@@ -29,12 +30,19 @@
             <TextField fx:id="rating" layoutX="513.0" layoutY="11.0" prefHeight="26.0" prefWidth="50.0" text="0" />
             <TextField fx:id="director" layoutX="614.0" layoutY="12.0" />
             <TextField fx:id="lead_actor" layoutX="615.0" layoutY="45.0" />
+            <Text layoutX="16.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="branch:" />
+            <ComboBox fx:id="branch_combobox" layoutX="63.0" layoutY="84.0" prefWidth="150.0" />
+            <Text layoutX="246.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="screening date:" />
+            <DatePicker fx:id="start_date" layoutX="329.0" layoutY="84.0" />
+            <Text layoutX="513.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="-" />
+            <DatePicker fx:id="end_date" layoutX="522.0" layoutY="84.0" />
+            <Text layoutX="272.0" layoutY="144.0" strokeType="OUTSIDE" strokeWidth="0.0" text="from home" />
+            <ComboBox fx:id="link" layoutX="342.0" layoutY="127.0" prefWidth="150.0" />
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="catalog_Pane" layoutX="71.0" layoutY="71.0" prefHeight="675.0" prefWidth="766.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+      <AnchorPane fx:id="catalog_Pane" layoutX="-1.0" layoutY="157.0" prefHeight="676.0" prefWidth="766.0" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="1.0">
          <children>
-            <Text layoutX="77.0" layoutY="63.0" strokeType="OUTSIDE" strokeWidth="0.0" />
-            <Button layoutX="402.0" layoutY="45.0" mnemonicParsing="false" onAction="#search_movies" text="search" />
+            <Button fx:id="search_button" layoutX="402.0" layoutY="45.0" mnemonicParsing="false" onAction="#search_movies" text="search" />
             <Button fx:id="Fillter_button" layoutX="468.0" layoutY="45.0" mnemonicParsing="false" onAction="#begin_filter" text="filter" />
             <ScrollPane layoutX="5.0" layoutY="77.0" prefHeight="587.0" prefWidth="766.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                <content>

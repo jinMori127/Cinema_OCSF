@@ -281,7 +281,19 @@ public class MovieDetailsController {
             });
 
         }
-
+        else if (eventBox.getId()==BaseEventBox.get_event_id("SHOW_CM_CHANGES")) {
+            Platform.runLater(()->{
+                List<Movie> movies = (List<Movie>)eventBox.getMessage().getObject2();
+                boolean found = false;
+                for (Movie m : movies) {
+                    if(m.getAuto_number_movie() == current_movie.getAuto_number_movie()) {
+                        current_movie = m;
+                        Lay_out_Movie_details();
+                        found = true;
+                    }
+                }
+            });
+        }
     }
 
     @FXML

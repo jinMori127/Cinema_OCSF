@@ -23,5 +23,6 @@
       <TextField fx:id="date" layoutX="437.0" layoutY="288.0" promptText="Validity:" />
       <TextField fx:id="phone_number" layoutX="246.0" layoutY="236.0" promptText="Phone Number:" />
       <Button fx:id="use_multiTicket_butt" layoutX="243.0" layoutY="341.0" mnemonicParsing="false" onAction="#multiTicket_pay" text="use multi ticket" />
+      <Button layoutX="183.0" layoutY="341.0" mnemonicParsing="false" onAction="#go_back" text="back" />
    </children>
 </AnchorPane>

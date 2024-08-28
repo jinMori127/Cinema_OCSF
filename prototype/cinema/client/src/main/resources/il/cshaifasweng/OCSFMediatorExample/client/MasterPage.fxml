@@ -29,26 +29,26 @@
                 <Menu fx:id="Defalult_menu" mnemonicParsing="false" onAction="#handle_action" styleClass="cool-menu" text="Default">
                     <items>
                         <MenuItem onAction="#handle_action" styleClass="cool-menu-item" text="Home page" />
-                        <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Catalog" />
-                        <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Purchase Multi Entry Ticket" />
+                  <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Catalog" />
+                  <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Purchase Multi Entry Ticket" />
                     </items>
                 </Menu>
-                <Menu fx:id="customer_service_menu" mnemonicParsing="false" text="CustomerService">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#handle_action" text="handle complains" />
-                    </items>
-                </Menu>
-                <Menu fx:id="data_manger_menu" mnemonicParsing="false" text="DataManger">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#handle_action" text="MovieEditDetails" />
-                    </items>
-                </Menu>
-                <Menu fx:id="manger_menu" mnemonicParsing="false" text="Manager">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Reports" />
-                        <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Edited Prices" />
-                    </items>
-                </Menu>
+            <Menu fx:id="customer_service_menu" mnemonicParsing="false" text="CustomerService">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#handle_action" text="handle complains" />
+              </items>
+            </Menu>
+            <Menu fx:id="data_manger_menu" mnemonicParsing="false" text="DataManger">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#handle_action" text="MovieEditDetails" />
+              </items>
+            </Menu>
+            <Menu fx:id="manger_menu" mnemonicParsing="false" text="Manager">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Reports" />
+                  <MenuItem mnemonicParsing="false" onAction="#handle_action" text="Edited Prices" />
+              </items>
+            </Menu>
                 <Menu fx:id="user_menu" mnemonicParsing="false" styleClass="cool-menu" text="User Action">
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#handle_action" styleClass="cool-menu-item" text="Purchases" />
