@@ -164,15 +164,14 @@ public class SimpleChatClient extends Application {
         values.add(column_size);
         rooms.put(keys,values);
     }
-    public static List<String> get_categories(){
+    public static List<String> get_categories() {
         ArrayList<String> categories = new ArrayList<>();
-        categories.add("Comedy");
-        categories.add("Sci-Fi");
-        categories.add("Action");
-        categories.add("Romance");
-        categories.add("Family");
+        categories.add("Comedy - קומדיה");
+        categories.add("Sci-Fi - מדע בדיוני");
+        categories.add("Action - פעולה");
+        categories.add("Romance - רומנטיקה");
+        categories.add("Family - משפחה");
         return categories;
-
     }
 
 }

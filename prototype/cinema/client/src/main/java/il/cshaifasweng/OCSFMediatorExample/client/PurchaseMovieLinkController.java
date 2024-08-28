@@ -1,5 +1,7 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
+import il.cshaifasweng.OCSFMediatorExample.entities.*;
 import javafx.fxml.FXML;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.event.ActionEvent;
@@ -9,11 +11,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-
+import javafx.scene.control.DateCell;
+import javafx.util.Callback;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
-import il.cshaifasweng.OCSFMediatorExample.entities.UserPurchases;
 import java.time.LocalTime;
 import java.text.SimpleDateFormat;
 
@@ -21,10 +22,8 @@ import javafx.application.Platform;
 import javafx.scene.control.Button;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import il.cshaifasweng.OCSFMediatorExample.entities.IdUser;
-import java.io.IOException;
 
-import il.cshaifasweng.OCSFMediatorExample.entities.Message;
+import java.io.IOException;
 
 public class PurchaseMovieLinkController {
 
@@ -52,8 +51,8 @@ public class PurchaseMovieLinkController {
     @FXML
     private TextField card_date;
 
-    @FXML
-    private TextField wanted_date;
+
+    private String wanted_date;
 
     @FXML
     private TextField wanted_Time;
@@ -64,35 +63,74 @@ public class PurchaseMovieLinkController {
     @FXML
     private Text error_message;
 
+
+
     @FXML
-    private Text success_message;
+    private DatePicker date_pic;
+
 
     @FXML
     private Text end_time;
 
 
     @FXML
-    private Text MULTI;
-
-    @FXML
-    private Button purchase_multi; // Value injected by FXMLLoader
+    private Button purchase_multi;
 
     @FXML
     public void initialize() {
         EventBus.getDefault().register(this);
+        if(UserLogInWithIDController.idUser != null) {
+            IdUser old_id_user = UserLogInWithIDController.idUser;
+            String full_name = old_id_user.getName();
+            String split_first_name = full_name;
+            String split_last_name = "";
+            if (old_id_user.getName().contains(" ")) {
+                split_first_name = full_name.split(" ")[0];
+                split_last_name = full_name.split(" ")[1];
+            }
+            user_id.setText(old_id_user.getUser_id());
+            user_first_name.setText(split_first_name);
+            user_last_name.setText(split_last_name);
+            user_email.setText(old_id_user.getEmail());
+            user_phone_number.setText(old_id_user.getPhone_number());
+        }
+        LocalDate today = LocalDate.now();
+
+        date_pic.setDayCellFactory(new Callback<DatePicker, DateCell>() {
+            @Override
+            public DateCell call(DatePicker param) {
+                return new DateCell() {
+                    @Override
+                    public void updateItem(LocalDate item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        // Disable past dates
+                        if (item.isBefore(today)) {
+                            setDisable(true);
+                            setStyle("-fx-background-color: #ffc0cb;");
+                        }
+                    }
+                };
+            }
+        });
+
+        date_pic.setValue(today);
+
+
+
     }
 
     @FXML
     public void purchase_multi_func(ActionEvent event) {
         if (!validateInputFields(false)) return;
+        LocalDate wantedDate = date_pic.getValue();  // date_pic.getValue() returns a LocalDate
+        LocalTime wantedTime = LocalTime.parse(wanted_Time.getText(), DateTimeFormatter.ISO_LOCAL_TIME);
+        LocalDateTime wantedDateTime = LocalDateTime.of(wantedDate, wantedTime);
 
-        LocalDateTime wantedDateTime = LocalDateTime.of(
-                LocalDate.parse(wanted_date.getText(), DateTimeFormatter.ISO_LOCAL_DATE),
-                LocalTime.parse(wanted_Time.getText(), DateTimeFormatter.ISO_LOCAL_TIME)
-        );
+
+
         Date wantedDateObj = Date.from(wantedDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
-        // Assuming MovieDetailsController.current_movie.getTime_() returns film length in hours and minutes
         Date screeningTimeDate = MovieDetailsController.current_movie.getTime_(); // Assuming Date type
 
         // Convert the Date to minutes
@@ -137,7 +175,7 @@ public class PurchaseMovieLinkController {
         String formattedDate = sdf.format(wantedDateObj);
         String movieLink = baseUrl + "/movies/" + formattedMovieName + "/" + formattedDate;
 
-        UserPurchases p1 = new UserPurchases("Crtesea", 0.0, id_user, wantedDateObj, "", movie1.getMovie_name());
+        UserPurchases p1 = new UserPurchases("Crtesea", 0.0, id_user, wantedDateObj,endDateObj, "", movie1.getMovie_name());
         Message message = new Message(35, "#purchase_movie_link_by_multi_ticket");
         message.setObject(p1);
 
@@ -165,7 +203,6 @@ public class PurchaseMovieLinkController {
         else if ((check_credit)&&isFieldEmpty(user_card_number, "Please enter your card number.")) return false;
         else if ((check_credit)&&isFieldEmpty(user_cvv, "Please enter your CVV.")) return false;
         else if ((check_credit)&&isFieldEmpty(card_date, "Please enter your card expiry date.")) return false;
-        else if (isFieldEmpty(wanted_date, "Please enter your Wanted Date.")) return false;
         else if (isFieldEmpty(wanted_Time, "Please enter your wanted Time")) return false;
 
         String user_id_str = user_id.getText();
@@ -241,21 +278,18 @@ public class PurchaseMovieLinkController {
             }
 
         }
-
-        String wantedDateStr = wanted_date.getText();
-        LocalDate wantedDate;
-        try {
-            wantedDate = LocalDate.parse(wantedDateStr, DateTimeFormatter.ISO_LOCAL_DATE);
-        } catch (DateTimeParseException e) {
+        if (date_pic.getValue() == null) {
             error_message.setVisible(true);
-            error_message.setText("Wanted Date must be in the format yyyy-MM-dd.");
-            wanted_date.setText("");
+            error_message.setText("Selected date is null.");
             return false;
         }
+        /////////////////////////
+        String formattedDate = "";
 
-        // Validate wanted_Time
+        LocalDate selectedDate = date_pic.getValue();
         String wantedTimeStr = wanted_Time.getText();
         LocalTime wantedTime;
+
         try {
             wantedTime = LocalTime.parse(wantedTimeStr, DateTimeFormatter.ISO_LOCAL_TIME);
         } catch (DateTimeParseException e) {
@@ -265,14 +299,30 @@ public class PurchaseMovieLinkController {
             return false;
         }
 
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+
+
+        if (selectedDate.equals(currentDate)) {
+            if (wantedTime.isBefore(currentTime)) {
+                error_message.setVisible(true);
+                error_message.setText("Wanted Time has already passed.");
+                wanted_Time.setText("");
+                return false;
+            }
+        }
+
         return true;
     }
 
     private void processPurchase() {
-        LocalDateTime wantedDateTime = LocalDateTime.of(
-                LocalDate.parse(wanted_date.getText(), DateTimeFormatter.ISO_LOCAL_DATE),
-                LocalTime.parse(wanted_Time.getText(), DateTimeFormatter.ISO_LOCAL_TIME)
-        );
+        if (!validateInputFields(false)) return;
+
+        LocalDate wantedDate = date_pic.getValue();  // date_pic.getValue() returns a LocalDate
+        LocalTime wantedTime = LocalTime.parse(wanted_Time.getText(), DateTimeFormatter.ISO_LOCAL_TIME);
+        LocalDateTime wantedDateTime = LocalDateTime.of(wantedDate, wantedTime);
+
+
         Date wantedDateObj = Date.from(wantedDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
         Date screeningTimeDate = MovieDetailsController.current_movie.getTime_(); // Assuming Date type
@@ -317,7 +367,7 @@ public class PurchaseMovieLinkController {
         String formattedDate = sdf.format(wantedDateObj);
         String movieLink = baseUrl + "/movies/" + formattedMovieName + "/" + formattedDate;
 
-        UserPurchases p1 = new UserPurchases("Credit", movie1.getPrice(), id_user, wantedDateObj, movieLink, movie1.getMovie_name());
+        UserPurchases p1 = new UserPurchases("Credit", movie1.getPrice(), id_user, wantedDateObj,endDateObj, movieLink, movie1.getMovie_name());
         Message message = new Message(84, "#purchase_movie_link");
         message.setObject(p1);
 
@@ -355,8 +405,8 @@ public class PurchaseMovieLinkController {
 
     public void print_success(Message message) {
         error_message.setVisible(false);
-        MULTI.setVisible(true);
-        MULTI.setText((String)(message.getObject()));
+        error_message.setVisible(true);
+        error_message.setText((String)(message.getObject()));
     }
 
 
@@ -365,8 +415,8 @@ public class PurchaseMovieLinkController {
         if (event.getId() == BaseEventBox.get_event_id("PURCHASE_LINK_N")) {
             Platform.runLater(() -> {
                 error_message.setVisible(false);
-                MULTI.setVisible(true);
-                MULTI.setText("Purchaes Success");
+                error_message.setVisible(true);
+                error_message.setText("Purchaes Success");
             });
         }
     }
