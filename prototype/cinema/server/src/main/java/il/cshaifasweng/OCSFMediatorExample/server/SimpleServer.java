@@ -95,12 +95,6 @@ public class SimpleServer extends AbstractServer {
 
 	private void initHttpServer() throws IOException {
 		httpServer = HttpServer.create(new InetSocketAddress(8080), 0);
-
-//		// Add contexts for different movies
-//		httpServer.createContext("/movie1", new MovieLink("https://chatgpt.com/", LocalTime.of(9, 0), LocalTime.of(12, 0)));
-//		httpServer.createContext("/movie2", new MovieLink("https://chatgpt.com/", LocalTime.of(13, 0), LocalTime.of(16, 0)));
-//		httpServer.createContext("/movie3", new MovieLink("https://example.com/movie3", LocalTime.of(17, 0), LocalTime.of(20, 0)));
-
 		httpServer.setExecutor(null); // Use default executor
 		httpServer.start();
 		System.out.println("HTTP server is running on http://"+SimpleChatServer.host+":8080/");
@@ -2475,10 +2469,10 @@ public class SimpleServer extends AbstractServer {
 			}
 			else if (message.getMessage().equals("#Log_out_user"))
 			{
-				System.out.println("I'm here 12 12 ");
 				IdUser user = (IdUser) message.getObject();
 				SignOut_IDUser(user);
-			} else if (message.getMessage().equals("#Log_out_worker")) {
+			}
+			else if (message.getMessage().equals("#Log_out_worker")) {
 				Worker worker = (Worker) message.getObject();
 				SignOut_Worker(worker);
 			}
