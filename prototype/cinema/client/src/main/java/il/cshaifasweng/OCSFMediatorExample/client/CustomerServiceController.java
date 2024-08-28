@@ -86,6 +86,11 @@ public class CustomerServiceController {
                 create_complains_table(event.getMessage());
             });
         }
+        else if(event.getId() == BaseEventBox.get_event_id("SHOW_USER_COMPLAINTS")) {
+            Platform.runLater(() -> {
+                create_complains_table(event.getMessage());
+            });
+        }
     }
 
     @Subscribe
@@ -244,7 +249,13 @@ public class CustomerServiceController {
     }
 
     private void create_complains_table(Message message) {
-        List<Complains> user_list = (List<Complains>) message.getObject();
+        List<Complains> user_list = null;
+        if(message.getMessage().equals("#ShowUserComplaints")) {
+            user_list = (List<Complains>) message.getObject2();
+        }
+        else {
+            user_list = (List<Complains>) message.getObject();
+        }
 
         auto_number_complains.setCellValueFactory(new PropertyValueFactory<>("auto_number_complains"));
         client_name.setCellValueFactory(new PropertyValueFactory<>("client_name"));

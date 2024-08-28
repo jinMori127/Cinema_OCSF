@@ -137,6 +137,18 @@ public class UserComplainsController {
                 System.out.println("Complaints table updated with " + complaintsList.size() + " items.");
             });
         }
+        if(event.getId() == BaseEventBox.get_event_id("SHOW_COMPLAINS_AND_MESSAGE")) {
+            Platform.runLater(() ->{
+                Message request_message = new Message(74, "#GetUserComplaints");
+                request_message.setObject(curr_id);
+                try {
+                    SimpleClient.getClient().sendToServer(request_message);
+                    //System.out.println("Request for complaints sent to server");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
     @Subscribe

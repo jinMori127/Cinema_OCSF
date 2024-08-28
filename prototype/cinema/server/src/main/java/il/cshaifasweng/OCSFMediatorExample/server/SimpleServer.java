@@ -9,13 +9,10 @@ import java.time.ZoneId;
 
 import java.util.*;
 import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpExchange;
+
 import java.net.InetSocketAddress;
 
-import il.cshaifasweng.OCSFMediatorExample.server.EmailSender;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -34,10 +31,6 @@ import javax.persistence.criteria.*;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import java.io.Serializable;
-import java.security.PrivateKey;
-import java.time.LocalDateTime;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 public class SimpleServer extends AbstractServer {
@@ -257,8 +250,10 @@ public class SimpleServer extends AbstractServer {
 		List<Movie> movies = getAllMovies();
 		for (Movie movie : movies)
 		{
-			movie.setPrice(new_price);
-			session.update(movie);
+			EditedDetails editedDetails = new EditedDetails();
+			editedDetails.setMovie(movie);
+			editedDetails.setChanged_price(new_price);
+			session.save(editedDetails);
 		}
 		session.getTransaction().commit();
 		session.close();
@@ -1146,7 +1141,7 @@ public class SimpleServer extends AbstractServer {
 	}
 
 
-	private List<EditedDetails> getEditedDetails() {
+	private List<EditedDetails> get_Edited_Details() {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -1157,13 +1152,55 @@ public class SimpleServer extends AbstractServer {
 		session.close();
 		return data;
 	}
-	private void removeEditedDetails(EditedDetails change) throws Exception {
+	private void add_Edited_Details(EditedDetails change) {
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<EditedDetails> query = builder.createQuery(EditedDetails.class);
+		Root<EditedDetails> root = query.from(EditedDetails.class);
+		Predicate movie_predicate = builder.equal(root.get("movie"),change.getMovie());
+		Predicate price_predicate = builder.equal(root.get("changed_price"),change.getChanged_price());
+		query.select(root).where(movie_predicate,price_predicate);
+		List<EditedDetails> data = session.createQuery(query).getResultList();
+		if(data.isEmpty()) {
+			session.save(change);
+		}
+		session.getTransaction().commit();
+		session.close();
+	}
+
+	private void remove_Edited_Details(EditedDetails change) throws Exception {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		session.delete(change);
 		session.getTransaction().commit();
 		session.close();
 	}
+	private void approveAllPriceChanges(List<EditedDetails> editedDetailsList) throws Exception {
+		Session session = sessionFactory.openSession();
+		Transaction transaction = session.beginTransaction();
+
+		try {
+			for (EditedDetails change : editedDetailsList) {
+				// Update the movie price
+				change.getMovie().setPrice((int) change.getChanged_price());
+				session.update(change.getMovie());
+
+				// Remove the change from the EditedDetails table
+				session.delete(change);
+			}
+
+			transaction.commit();
+		} catch (Exception e) {
+			if (transaction != null) {
+				transaction.rollback();
+			}
+			throw e;
+		} finally {
+			session.close();
+		}
+	}
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////// login functions
 
@@ -1730,6 +1767,7 @@ public class SimpleServer extends AbstractServer {
 				Movie movie = (Movie) message.getObject();
 				remove_movie(movie);
 				message.setObject(getAllMovies());
+				message.setObject2(get_Edited_Details());
 				message.setMessage("#UpdateMovieList");
 				sendToAllClients(message);
 			}
@@ -1759,6 +1797,7 @@ public class SimpleServer extends AbstractServer {
 				insert_movie(movie);
 				message.setObject(getAllMovies());
 				message.setMessage("#UpdateMovieList");
+				message.setObject2(get_Edited_Details());
 				sendToAllClients(message);
 				Message message1 = new Message(10, "#ChangeMovieIdBox");
 				message1.setObject(movie);
@@ -1768,6 +1807,11 @@ public class SimpleServer extends AbstractServer {
 			else if (message.getMessage().equals("#UpdateMovie")) {
 				Movie movie = (Movie) message.getObject();
 				update_movie(movie);
+				if(message.getObject2()!= null && message.getObject2() instanceof EditedDetails) {
+					EditedDetails new_price = (EditedDetails) message.getObject2();
+					add_Edited_Details(new_price);
+				}
+				message.setObject2(get_Edited_Details());
 				message.setObject(getAllMovies());
 				message.setMessage("#UpdateMovieList");
 				sendToAllClients(message);
@@ -2214,31 +2258,41 @@ public class SimpleServer extends AbstractServer {
 				reports_message.setObject(complaint);
 				reports_message.setMessage("extraComplaint");
 				update_reports();
-				client.sendToClient(message);
+				message.setObject2(search_data(true));
+				sendToAllClients(message);
 				sendToAllClients(reports_message);
 			} else if (message.getMessage().equals("#GetCMEditedDetails")) {
 				//System.out.println("get cme details");
-				List<EditedDetails> editedDetailsList = getEditedDetails();
+				List<EditedDetails> editedDetailsList = get_Edited_Details();
 				message.setObject(editedDetailsList);
 				message.setMessage("#ShowCMEditedDetails");
 				client.sendToClient(message);
 			} else if (message.getMessage().equals("#UpdateMoviePrice")) {
 				EditedDetails change = (EditedDetails) message.getObject();
 				update_movie(change.getMovie());
-				removeEditedDetails(change);
-				List<EditedDetails> editedDetailsList = getEditedDetails();
+				remove_Edited_Details(change);
+				List<EditedDetails> editedDetailsList = get_Edited_Details();
 				message.setObject(editedDetailsList);
 				message.setMessage("#ShowCMEditedDetails");
+				message.setObject2(getAllMovies());
 				sendToAllClients(message);
 			} else if (message.getMessage().equals("#DenyMoviePrice")) {
 				EditedDetails change = (EditedDetails) message.getObject();
-				removeEditedDetails(change);
-				List<EditedDetails> editedDetailsList = getEditedDetails();
+				remove_Edited_Details(change);
+				List<EditedDetails> editedDetailsList = get_Edited_Details();
 				message.setObject(editedDetailsList);
 				message.setMessage("#ShowCMEditedDetails");
 				sendToAllClients(message);
-			}
-			else if (message.getMessage().equals("#show_complains")){
+			} else if (message.getMessage().equals("#ApproveAllPriceChanges")) {
+				List<EditedDetails> editedDetailsList = (List<EditedDetails>) message.getObject();
+				approveAllPriceChanges(editedDetailsList);
+				editedDetailsList = get_Edited_Details();
+				message.setObject(editedDetailsList);
+				message.setMessage("#ShowCMEditedDetails");
+				message.setObject2(getAllMovies());
+				sendToAllClients(message);
+
+			} else if (message.getMessage().equals("#show_complains")){
 				// set massage
 				message.setMessage("#show_complains_for_client");
 
@@ -2270,7 +2324,7 @@ public class SimpleServer extends AbstractServer {
 				message.setMessage("#submit_respond_for_client");
 				// delete the responded complains
 				message.setObject(data);
-				client.sendToClient(message);
+				sendToAllClients(message);
 			}
 			else if(message.getMessage().equals("#Update_theater_map")){
 				message.setMessage("#theater_map_updated");
