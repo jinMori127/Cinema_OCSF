@@ -319,6 +319,28 @@ public class EditScreeningController {
                 }
             });
         }
+        else if (event.getId()==BaseEventBox.get_event_id("DELETE_PAST_SCREENING")) {
+            List<Screening> toDelete = (List<Screening>) event.getMessage().getObject();
+            if(list == null)
+                return;
+            List<Screening>list_copy = list;
+
+            Iterator<Screening> iterator = list_copy.iterator();
+            while (iterator.hasNext()) {
+                Screening s = iterator.next();
+                for (Screening d : toDelete) {
+                    if (s.getAuto_number_screening() == d.getAuto_number_screening()) {
+                        iterator.remove();  // Safely remove the element using Iterator
+                        break; // Exit the inner loop if a match is found and removal is done
+                    }
+                }
+            }
+
+            event.getMessage().setObject(list_copy);
+            Platform.runLater(()->{
+                get_data(event.getMessage());
+            });
+        }
     }
 
     private ObservableList<Screening> list;

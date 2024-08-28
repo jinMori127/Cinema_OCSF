@@ -36,6 +36,7 @@ public class BaseEventBox {
         PURCHASE_LINK_USING_MULTI,
         PURCHASE_LINK_N,
         THEATER_MAP_UPDATED,
+        DELETE_PAST_SCREENING,
         ADDTickets;
 
         public static EventEnum getByName(String name) {

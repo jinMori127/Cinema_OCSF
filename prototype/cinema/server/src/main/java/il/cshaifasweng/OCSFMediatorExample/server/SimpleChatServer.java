@@ -67,6 +67,35 @@ public class SimpleChatServer
             //sessionFactory.close();  // Close the session factory
         }
     }
+    private static void  log_out_from_everything()
+    {
+        Session session = server.sessionFactory.openSession();
+
+        // Begin a transaction
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            // HQL query to delete screenings older than one week
+            String hql = "UPDATE Worker SET is_worker_loggedIn = 0";
+            int rowsUpdated = session.createQuery(hql)
+                    .executeUpdate();
+            // Commit the transaction
+            hql = "UPDATE IdUser SET isLoggedIn = 0";
+             session.createQuery(hql)
+                    .executeUpdate();
+            transaction.commit();
+            //System.out.println("logedOu " + rowsUpdated + " past screenings.");
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();  // Rollback in case of an error
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+
+        }
+    }
     private static void daily_task()
     {
         // Create a ScheduledExecutorService with one thread
@@ -94,6 +123,7 @@ public class SimpleChatServer
         // Optionally, add a shutdown hook to gracefully shut down the scheduler
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Shutting down scheduler...");
+            log_out_from_everything();
             scheduler.shutdown();
         }));
     }
