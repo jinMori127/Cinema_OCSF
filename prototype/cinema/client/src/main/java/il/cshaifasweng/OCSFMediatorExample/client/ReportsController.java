@@ -64,7 +64,7 @@ public class ReportsController {
         {
             String branch = worker.getBranch();
             choosed_branch.getItems().clear();
-            choosed_branch.getItems().addAll("", branch);
+            choosed_branch.setValue(branch);
         }
         choosed_year.getItems().clear();
         choosed_year.getItems().addAll("", "2024", "2023", "2022");
