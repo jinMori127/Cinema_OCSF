@@ -20,17 +20,18 @@ public class Complains implements Serializable {
     private String respond;
     private boolean  respond_status;
     private String cinema_branch;
-
+    private int auto_number_purchase;
 
     public Complains() {}
     // Constructor
-    public Complains(IdUser id_user, String complain_text,Date time_of_complain, String respond, boolean status, String cinema_branch) {
+    public Complains(IdUser id_user, String complain_text,Date time_of_complain, String respond, boolean status, String cinema_branch, int auto_number_purchase) {
         this.id_user = id_user;
         this.complain_text = complain_text;
         this.time_of_complain = time_of_complain;
         this.respond = respond;
         this.respond_status = status;
         this.cinema_branch = cinema_branch;
+        this.auto_number_purchase = auto_number_purchase;
     }
 
     // getter and setter
@@ -84,4 +85,8 @@ public class Complains implements Serializable {
         return id_user.getName();
     }
 
+    public int getAuto_number_purchase() {return auto_number_purchase;}
+    public void setAuto_number_purchase(int auto_number_purchase) {
+        this.auto_number_purchase = auto_number_purchase;
+    }
 }

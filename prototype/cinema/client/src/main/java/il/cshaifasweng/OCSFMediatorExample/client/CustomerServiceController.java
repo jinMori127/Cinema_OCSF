@@ -1,11 +1,13 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 
+import il.cshaifasweng.OCSFMediatorExample.entities.UserPurchases;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ComboBox;
 import javafx.collections.ObservableList;
 import javafx.application.Platform;
@@ -19,6 +21,7 @@ import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import il.cshaifasweng.OCSFMediatorExample.entities.Complains;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
 import javax.swing.*;
@@ -65,6 +68,9 @@ public class CustomerServiceController {
     @FXML
     private ComboBox<String> branch;
 
+    @FXML
+    private TextField returned_price;
+
     private boolean phase;
 
     ////////////////////////////////////////////////////////////////////////////
@@ -73,17 +79,31 @@ public class CustomerServiceController {
     @Subscribe
     public void show_complains(BaseEventBox event) {
         if (event.getId() == BaseEventBox.get_event_id("SHOW_COMPLAINS")) {
+            System.out.println("here1");
             Platform.runLater(() -> {
                 create_complains_table(event.getMessage());
             });
         } else if (event.getId() == BaseEventBox.get_event_id("SHOW_COMPLAINS_AND_MESSAGE")) {
+            System.out.println("here2");
             Platform.runLater(() -> {
                 create_complains_table_and_message(event.getMessage());
             });
         }
         else if (event.getId() == BaseEventBox.get_event_id("SHOW_COMPLAINS_RESPOND")) {
+            System.out.println("here3");
+
             Platform.runLater(() -> {
                 create_complains_table(event.getMessage());
+            });
+        }
+        else if (event.getId() == BaseEventBox.get_event_id("GET_PURCHASE_INFO")) {
+            Platform.runLater(() -> {
+                show_purchase_info(event.getMessage());
+            });
+        }
+        else if (event.getId() == BaseEventBox.get_event_id("NOT_FOUND_PURCHASE")) {
+            Platform.runLater(() -> {
+                not_found_show_purchase_info(event.getMessage());
             });
         }
         else if(event.getId() == BaseEventBox.get_event_id("SHOW_USER_COMPLAINTS")) {
@@ -154,6 +174,13 @@ public class CustomerServiceController {
         respond_then_phase.add(phase);
         insert_message.setObject(respond_then_phase);
         insert_message.setObject2(auto_number);
+        String  return_price_text = returned_price.getText();
+        if(return_price_text.isEmpty())
+        {
+            return_price_text = "0";
+        }
+        int convert_price = Integer.parseInt(return_price_text);
+        insert_message.setObject3(convert_price);
         try {
             SimpleClient.getClient().sendToServer(insert_message);
 
@@ -166,6 +193,7 @@ public class CustomerServiceController {
     public void handle_show_respond_complains(ActionEvent event) {
         complains_detailes.setText("");
         respond.setText("");
+        returned_price.setText("");
         respond.setEditable(false);
         submit_respond.setDisable(true);
         phase = false;
@@ -183,6 +211,7 @@ public class CustomerServiceController {
     public void handle_show_complains(ActionEvent event) {
         complains_detailes.setText("");
         respond.setText("");
+        returned_price.setText("");
         respond.setEditable(false);
         submit_respond.setDisable(true);
         phase = true;
@@ -245,7 +274,22 @@ public class CustomerServiceController {
                 }
             }
             complains_detailes.setText(contentText.toString());
+
+            Complains complain = table_view.getItems().get(selectedRow);
+            if(complain.getAuto_number_purchase() == -1)
+            {
+                return;
+            }
+            Message insert_message = new Message(selectedRow, "#get_purchase_info");
+            insert_message.setObject(complain.getAuto_number_purchase());
+            try {
+                SimpleClient.getClient().sendToServer(insert_message);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
         }
+
     }
 
     private void create_complains_table(Message message) {
@@ -279,10 +323,38 @@ public class CustomerServiceController {
             table_view.setItems(filtered_list);
     }
 
+    private void show_purchase_info(Message message)
+    {
+        UserPurchases purchases = (UserPurchases) message.getObject();
+        String purchase_type = purchases.getPurchase_type();
+        double price = purchases.getPayment_amount();
+        Date date_of_purchase = purchases.getDate_of_purchase();
+        String movie_name = purchases.getMovie_name();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
+        String formattedDate = dateFormat.format(date_of_purchase);
+
+        String currentText = complains_detailes.getText();
+        String additionalDetails = "\nPurchase information: \nPurchase Type: " + purchase_type +
+                "\nPrice: $" + price +
+                "\nDate of Purchase: " + formattedDate +
+                "\nMovie Name: " + movie_name;
+
+        complains_detailes.setText(currentText + additionalDetails);
+        return ;
+    }
+
+    private void not_found_show_purchase_info(Message message)
+    {
+        String currentText = complains_detailes.getText();
+        String additionalDetails = "\n This purchase have been canceled by the user";
+        complains_detailes.setText(currentText + additionalDetails);
+    }
 
 
     private void create_complains_table_and_message(Message message) {
         create_complains_table(message);
+        System.out.println("here12");
 
         // Display a success message
         JOptionPane.showMessageDialog(null, "Response sent successfully!", "Success",
@@ -291,6 +363,7 @@ public class CustomerServiceController {
         // set the text to empty
         complains_detailes.setText("");
         respond.setText("");
+        returned_price.setText("");
         respond.setEditable(false);
         submit_respond.setDisable(true);
     }

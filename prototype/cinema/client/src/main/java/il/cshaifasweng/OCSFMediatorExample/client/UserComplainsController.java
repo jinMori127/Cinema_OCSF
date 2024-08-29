@@ -17,7 +17,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import javafx.scene.control.TextField;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -48,6 +50,12 @@ public class UserComplainsController {
     @FXML
     private TableColumn<Complains, String> response_column;
 
+    @FXML
+    private TableColumn<Complains, Integer> purchase_num_col;
+
+    @FXML
+    private TextField purchase_auto_number_text;
+
     private String curr_id = UserLogInWithIDController.idUser.getUser_id();
 
     @FXML
@@ -67,6 +75,9 @@ public class UserComplainsController {
 
         // Set up the table columns
         complaint_text_column.setCellValueFactory(new PropertyValueFactory<>("complain_text"));
+
+        purchase_num_col.setCellValueFactory(new PropertyValueFactory<>("auto_number_purchase"));
+
         status_column.setCellValueFactory(cellData -> {
             boolean status = cellData.getValue().getStatus();
             String statusText = status ? "Handled" : "Pending";
@@ -91,6 +102,12 @@ public class UserComplainsController {
         String complaint_text = complaint_text_area.getText();
         String selected_branch = branch_combo_box.getValue();
 
+        String purchase_number_text = purchase_auto_number_text.getText();
+        if (purchase_number_text.isEmpty()) {
+            purchase_number_text = "-1";
+        }
+        int purchase_number = Integer.parseInt(purchase_number_text);
+
         if(complaint_text.isEmpty()) {
             error_text.setVisible(true);
             error_text.setText("Cannot submit an empty complaint");
@@ -109,6 +126,7 @@ public class UserComplainsController {
             new_complaint.setRespond("");
             new_complaint.setStatus(false);
             new_complaint.setCinema_branch(selected_branch);
+            new_complaint.setAuto_number_purchase(purchase_number);
 
             submit_complaint(new_complaint);
             return;
@@ -137,24 +155,26 @@ public class UserComplainsController {
                 System.out.println("Complaints table updated with " + complaintsList.size() + " items.");
             });
         }
-        if(event.getId() == BaseEventBox.get_event_id("SHOW_COMPLAINS_AND_MESSAGE")) {
-            Platform.runLater(() ->{
-                Message request_message = new Message(74, "#GetUserComplaints");
-                request_message.setObject(curr_id);
-                try {
-                    SimpleClient.getClient().sendToServer(request_message);
-                    //System.out.println("Request for complaints sent to server");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+        else if(event.getId() == BaseEventBox.get_event_id("INCORRECT_PURCHASE_INFO")) {
+            error_text.setVisible(true);
+            error_text.setText("Incorrect Purchase Info");
+        } 
+        else if (event.getId() == BaseEventBox.get_event_id("REFRESH_RESPOND")) {
+            event.getMessage().setMessage("");
+            Message request_message = new Message(74, "#GetUserComplaints");
+            request_message.setObject(curr_id);
+            try {
+                SimpleClient.getClient().sendToServer(request_message);
+                //System.out.println("Request for complaints sent to server");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Subscribe
     public void change_content1(BeginContentChangeEnent event)
     {
-
         System.out.println(event.getPage());
         EventBus.getDefault().unregister(this);
         EventBus.getDefault().post(new ContentChangeEvent(event.getPage()));

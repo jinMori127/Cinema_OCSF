@@ -5,6 +5,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -12,6 +13,7 @@
 
 <VBox alignment="CENTER" spacing="10.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.UserComplainsController">
     <TextArea fx:id="complaint_text_area" prefHeight="134.0" prefWidth="625.0" promptText="Type your complaint here" />
+   <TextField fx:id="purchase_auto_number_text" prefHeight="25.0" prefWidth="535.0" promptText="purchase number optional " />
     <ComboBox fx:id="branch_combo_box" prefHeight="26.0" prefWidth="89.0" promptText="Branch" />
     <Button onAction="#handle_submit" text="Submit" />
     <Text fx:id="error_text" fill="#ef0404" layoutX="41.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="179.47006225585938">
@@ -31,11 +33,12 @@
                     <PropertyValueFactory property="respond_status" />
                 </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="response_column" prefWidth="458.0" text="Response">
+            <TableColumn fx:id="response_column" prefWidth="211.5" text="Response">
                 <cellValueFactory>
                     <PropertyValueFactory property="respond" />
                 </cellValueFactory>
             </TableColumn>
+         <TableColumn fx:id="purchase_num_col" prefWidth="132.5" text="purchase_number" />
         </columns>
     </TableView>
 </VBox>

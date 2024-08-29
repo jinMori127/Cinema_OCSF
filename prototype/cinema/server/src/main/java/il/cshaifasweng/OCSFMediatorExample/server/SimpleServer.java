@@ -95,12 +95,6 @@ public class SimpleServer extends AbstractServer {
 
 	private void initHttpServer() throws IOException {
 		httpServer = HttpServer.create(new InetSocketAddress(8080), 0);
-
-//		// Add contexts for different movies
-//		httpServer.createContext("/movie1", new MovieLink("https://chatgpt.com/", LocalTime.of(9, 0), LocalTime.of(12, 0)));
-//		httpServer.createContext("/movie2", new MovieLink("https://chatgpt.com/", LocalTime.of(13, 0), LocalTime.of(16, 0)));
-//		httpServer.createContext("/movie3", new MovieLink("https://example.com/movie3", LocalTime.of(17, 0), LocalTime.of(20, 0)));
-
 		httpServer.setExecutor(null); // Use default executor
 		httpServer.start();
 		System.out.println("HTTP server is running on http://"+SimpleChatServer.host+":8080/");
@@ -907,6 +901,48 @@ public class SimpleServer extends AbstractServer {
 		emailSender.sendEmail(recipients, subject, body);
 	}
 
+	private void customer_service_email(IdUser user,String respond, int price, boolean phase) {
+		EmailSender emailSender = new EmailSender();
+		String[] recipients = {user.getEmail()};
+		String subject;
+		if(phase) {
+			 subject = "Luna Aura Customer Support Response";
+		}
+		else {
+			subject = "Luna Aura Customer Support Update Response ";
+		}
+
+		String name = user.getName();
+		LocalDate date = LocalDate.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+		String formattedDate = date.format(formatter);
+
+		String body = "<html>"
+				+ "<body style='font-family: Arial, sans-serif; color: #333;'>"
+				+ "<div style='max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd;'>"
+				+ "<div style='text-align: center;'>"
+				+ "<img src='YOUR_LOGO_URL' alt='Luna Aura' style='width: 100px; margin-bottom: 20px;'/>"
+				+ "<h1 style='font-size: 24px; color: #555;'>We're Here to Help</h1>"
+				+ "</div>"
+				+ "<p>Hi " + name + ",</p>"
+				+ "<p>Thank you for reaching out to us regarding your recent experience.</p>"
+				+ "<p>Here is our response:</p>"
+				+ "<div style='border: 1px solid #ccc; padding: 15px; background-color: #f9f9f9;'>"
+				+ "<p><strong>Response:</strong> " + respond + "</p>"
+				+ "<p><strong>Refund Price:</strong> ₪" + price + "</p>"
+				+ "</div>"
+				+ "<p>We hope this addresses your concern. If you have any further questions or need additional assistance, please don't hesitate to reach out.</p>"
+				+ "<p>Best regards,<br/>Luna Aura Customer Support Team</p>"
+				+ "<p style='font-size: 12px; color: #777;'>This email was sent on " + formattedDate + "</p>"
+				+ "</div>"
+				+ "</body>"
+				+ "</html>";
+
+		emailSender.sendEmail(recipients, subject, body);
+	}
+
+
+
 	private void sendThankYouEmailLink(UserPurchases p1) {
 		try {
 			if (p1 == null || p1.getId_user() == null) {
@@ -1145,12 +1181,20 @@ public class SimpleServer extends AbstractServer {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	private void handle_submit_complaint(Complains complaint) {
+	private boolean handle_submit_complaint(Complains complaint) {
+		String id = complaint.getId_user().getUser_id();
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
+		if(complaint.getAuto_number_purchase() != -1) {
+			UserPurchases purchases = session.get(UserPurchases.class, complaint.getAuto_number_purchase());
+			if(purchases == null || !(purchases.getId_user().getUser_id().equals(id))) {
+				return false;
+			}
+		}
 		session.save(complaint);
 		session.getTransaction().commit();
 		session.close();
+		return true;
 	}
 
 
@@ -2255,7 +2299,13 @@ public class SimpleServer extends AbstractServer {
 			} else if (message.getMessage().equals("#SubmitComplaint")) {
 				//System.out.println("submit user complaint");
 				Complains complaint = (Complains) message.getObject();
-				handle_submit_complaint(complaint);
+				boolean suc = handle_submit_complaint(complaint);
+				if(!suc)
+				{
+					message.setMessage("#incorrect_purchase_number");
+					client.sendToClient(message);
+					return;
+				}
 				String current_id = complaint.getId_user().getUser_id();
 				message.setMessage("#ShowUserComplaints");
 				List<Complains> updated_complaints = handle_get_user_complaints(current_id);
@@ -2324,11 +2374,30 @@ public class SimpleServer extends AbstractServer {
 				boolean phase = (boolean) ((List<Object>)message.getObject()).get(1);
 
 				int number = (int)message.getObject2();
+				int returned_price = (int)message.getObject3();
+				///////////////////////////////////////
+				/// aisha u can update the reports here
+				//////////////////////////////////////
+
 				List<Complains> data = update_respond(number, respondText, phase);
+
+				Session session = sessionFactory.openSession();
+				session.beginTransaction();
+
+				// Find the object with the specified auto_num
+				Complains complains = session.get(Complains.class, number);
+				customer_service_email(complains.getId_user(),respondText, returned_price, phase);
+
+				session.getTransaction().commit();
+				session.close();
 
 				message.setMessage("#submit_respond_for_client");
 				// delete the responded complains
 				message.setObject(data);
+				client.sendToClient(message);
+
+				message.setMessage("#refresh_complain_clients_page");
+
 				sendToAllClients(message);
 			}
 			else if(message.getMessage().equals("#Update_theater_map")){
@@ -2405,13 +2474,30 @@ public class SimpleServer extends AbstractServer {
 			}
 			else if (message.getMessage().equals("#Log_out_user"))
 			{
-				System.out.println("I'm here 12 12 ");
 				IdUser user = (IdUser) message.getObject();
 				SignOut_IDUser(user);
-			} else if (message.getMessage().equals("#Log_out_worker")) {
+			}
+			else if (message.getMessage().equals("#Log_out_worker")) {
 				Worker worker = (Worker) message.getObject();
 				SignOut_Worker(worker);
 			}
+			else if (message.getMessage().equals("#get_purchase_info")) {
+				int purchase_num = (int) message.getObject();
+				Session session = sessionFactory.openSession();
+				Transaction transaction = session.beginTransaction();
+				UserPurchases purchase = session.get(UserPurchases.class, purchase_num);
+				if(purchase == null)
+				{
+					message.setMessage("#not_fond_purchase_info_client");
+					client.sendToClient(message);
+				}
+				message.setMessage("#get_purchase_info_client");
+				message.setObject(purchase);
+				client.sendToClient(message);
+				transaction.commit();
+				session.close();
+			}
+
 
 		} catch (IOException e1) {
 			e1.printStackTrace();
