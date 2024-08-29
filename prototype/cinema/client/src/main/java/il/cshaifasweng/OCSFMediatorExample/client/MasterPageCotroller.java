@@ -48,6 +48,9 @@ public class MasterPageCotroller {
     @FXML
     private Menu user_menu;
 
+    @FXML
+    private Menu branch_manger_menu;
+
     @Subscribe
     public void change_content(ContentChangeEvent event)
     {
@@ -74,6 +77,7 @@ public class MasterPageCotroller {
         user_menu.setVisible(false);
         Sing_in_menu.setVisible(false);
         sing_out_menu.setVisible(false);
+        branch_manger_menu.setVisible(false);
         IdUser user = UserLogInWithIDController.idUser;
         Worker worker = WorkerLogInController.worker;
         if (user == null && worker == null) {
@@ -100,6 +104,10 @@ public class MasterPageCotroller {
             {
                 customer_service_menu.setVisible(true);
             }
+            if(worker.getRole().equals("branchManager"))
+            {
+                branch_manger_menu.setVisible(true);
+            }
         }
 
     }
@@ -120,7 +128,7 @@ public class MasterPageCotroller {
     public void setContent(String file) {
         FXMLLoader new_content = null;
         try {
-             new_content = new FXMLLoader(getClass().getResource(file));
+            new_content = new FXMLLoader(getClass().getResource(file));
 
 
         } catch (Exception e) {
