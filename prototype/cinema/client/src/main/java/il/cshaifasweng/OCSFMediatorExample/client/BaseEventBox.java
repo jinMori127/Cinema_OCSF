@@ -40,8 +40,7 @@ public class BaseEventBox {
         INCORRECT_PURCHASE_INFO,
         NOT_FOUND_PURCHASE,
         REFRESH_RESPOND,
-        DELETE_PAST_SCREENING,
-        ADDTickets;
+        DELETE_PAST_SCREENING;
 
         public static EventEnum getByName(String name) {
             try {
