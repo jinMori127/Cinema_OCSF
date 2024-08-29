@@ -1,6 +1,7 @@
 package il.cshaifasweng.OCSFMediatorExample.client;
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import il.cshaifasweng.OCSFMediatorExample.entities.Reports;
+import il.cshaifasweng.OCSFMediatorExample.entities.Worker;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
@@ -50,10 +51,20 @@ public class ReportsController {
         EventBus.getDefault().register(this);
         Error_Message.setVisible(false);
 
-        choosed_branch.getItems().clear();
-        choosed_branch.getItems().addAll("", "AllBranches");
-        for (String branch : BRANCHES) {
-            choosed_branch.getItems().add(branch);
+        Worker worker = WorkerLogInController.worker;
+        if(worker.getRole().equals("Manager") || worker.getRole().equals("manager"))
+        {
+            choosed_branch.getItems().clear();
+            choosed_branch.getItems().addAll("", "AllBranches");
+            for (String branch : BRANCHES) {
+                choosed_branch.getItems().add(branch);
+            }
+        }
+        else if(worker.getRole().equals("branchManager"))
+        {
+            String branch = worker.getBranch();
+            choosed_branch.getItems().clear();
+            choosed_branch.getItems().addAll("", branch);
         }
         choosed_year.getItems().clear();
         choosed_year.getItems().addAll("", "2024", "2023", "2022");
