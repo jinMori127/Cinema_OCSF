@@ -179,6 +179,9 @@ public class SimpleClient extends AbstractClient {
 		else if (message.getMessage().equals("#not_fond_purchase_info_client")) {
 			EventBus.getDefault().post(new BaseEventBox("NOT_FOUND_PURCHASE", message));
 		}
+		else if(message.getMessage().equals("#Delete_Past_Screenings")) {
+			EventBus.getDefault().post(new BaseEventBox("DELETE_PAST_SCREENING", message));
+		}
 		else {
 			EventBus.getDefault().post(new BaseEventBox("WRONG_NAMEING", message));
 		}

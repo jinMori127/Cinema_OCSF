@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 public class SimpleServer extends AbstractServer {
 	private static ArrayList<SubscribedClient> SubscribersList = new ArrayList<>();
-	private static SessionFactory sessionFactory = getSessionFactory(SimpleChatServer.password);
+	public static SessionFactory sessionFactory = getSessionFactory(SimpleChatServer.password);
 	public static final String[] BRANCHES = {"Sakhnin", "Haifa", "Nazareth", "Nhif"};
 	// this variable for handle the link
 	private HttpServer httpServer;
@@ -777,47 +777,72 @@ public class SimpleServer extends AbstractServer {
 		session.close();
 	}
 
-	private void sendEmail1(UserPurchases userPurchases){
+
+	private void sendEmail1(UserPurchases userPurchases) {
 		EmailSender emailSender = new EmailSender();
-		String[] recipients = {userPurchases.getId_user().getEmail()};
-		String subject = "Thank You for Your Purchase at Luna Aura";
 
+		// Extract user information
+		String recipientEmail = userPurchases.getId_user().getEmail();
 		String name = userPurchases.getId_user().getName();
-		String id = userPurchases.getId_user().getUser_id();
-		LocalDate date = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
-		String formattedDate = date.format(formatter);
+		String userId = userPurchases.getId_user().getUser_id();
+		String seatsText = userPurchases.getSeats().replace("seats:", "").trim();
+		String[] seatPairs = seatsText.split(",");
+		int numOfSeats = seatPairs.length;
 
+		// Order and screening information
+		String movieName = userPurchases.getMovie_name();
+		String branch = userPurchases.getScreening().getBranch();
+		int roomNumber = userPurchases.getScreening().getRoom_number();
+		Date screeningTime = userPurchases.getScreening_time(); // Assuming this is a Date object
+		double paymentAmount = userPurchases.getPayment_amount();
+		int orderId = userPurchases.getAuto_number_purchase();
+
+		// Date formatting
+		LocalDate orderDate = LocalDate.now();
+		DateTimeFormatter orderFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+		String formattedOrderDate = orderDate.format(orderFormatter);
+
+		// Format the screening time
+		SimpleDateFormat screeningFormatter = new SimpleDateFormat("dd MMMM yyyy 'at' HH:mm");
+		String formattedScreeningTime = screeningFormatter.format(screeningTime);
+
+		// Email subject and recipients
+		String subject = "Thank You for Your Purchase at Luna Aura";
+		String[] recipients = {recipientEmail};
+
+		// Construct email body with HTML formatting
 		String body = "<html>"
 				+ "<body style='font-family: Arial, sans-serif; color: #333;'>"
 				+ "<div style='max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd;'>"
 				+ "<div style='text-align: center;'>"
 				+ "<img src='YOUR_LOGO_URL' alt='Luna Aura' style='width: 100px; margin-bottom: 20px;'/>"
-				+ "<h1 style='font-size: 24px; color: #555;'>Thank You.</h1>"
+				+ "<h1 style='font-size: 24px; color: #555;'>Thank You, " + name + "!</h1>"
 				+ "</div>"
-				+ "<p>Hi " + name + "!</p>"
-				+ "<p>Thanks for your purchase from Luna Aura.</p>"
-				+ "<h2 style='color: #555;'>INVOICE ID: " + id + "</h2>"
+				+ "<p>We appreciate your recent purchase from Luna Aura.</p>"
+				+ "<h2 style='color: #555;'>INVOICE ID: " + userId + "</h2>"
 				+ "<p><em>(Please keep a copy of this receipt for your records.)</em></p>"
 				+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
 				+ "<h3 style='color: #555;'>YOUR ORDER INFORMATION:</h3>"
-				+ "<p><strong>Order ID:</strong> " + userPurchases.getAuto_number_purchase() + "<br/>"
-				+ "<strong>Order Date:</strong> " + formattedDate + "<br/>"
+				+ "<p><strong>Order ID:</strong> " + orderId + "<br/>"
+				+ "<strong>Order Date:</strong> " + formattedOrderDate + "<br/>"
 				+ "<strong>Source:</strong> Luna Aura</p>"
-				+ "<p><strong>Amout:</strong> >" + userPurchases.getPayment_amount()+ "</p>"
-				+ "<p><strong>Branch:</strong> >" + userPurchases.getScreening().getBranch() + "</p>"
-				+ "<p><strong>Movie name:</strong> " + userPurchases.getMovie_name() + "<br/>"
-				+ "<p><strong>Room number:</strong> " + userPurchases.getScreening().getRoom_number() + "<br/>"
-				+ "<p><strong>Screening Time:</strong> " + userPurchases.getScreening_time() + "<br/>"
-				+ "<p><strong>Your seats:</strong> " + userPurchases.getSeats() + "<br/>"
-				+ "<p>We appreciate your business and hope to see you again soon!</p>"
+				+ "<p><strong>Amount:</strong> $" + paymentAmount + "</p>"
+				+ "<p><strong>Branch:</strong> " + branch + "</p>"
+				+ "<p><strong>Movie:</strong> " + movieName + "</p>"
+				+ "<p><strong>Room Number:</strong> " + roomNumber + "</p>"
+				+ "<p><strong>Screening Time:</strong> " + formattedScreeningTime + "</p>"
+				+ "<p><strong>Your Seats:</strong> " + seatsText + "</p>"
+				+ "<p><strong>Number of Seats:</strong> " + numOfSeats + "</p>"
+				+ "<p>We hope you enjoy your experience at Luna Aura!</p>"
 				+ "<p>Best regards,<br/>Luna Aura Team</p>"
 				+ "</div>"
 				+ "</body>"
 				+ "</html>";
 
+		// Send email
 		emailSender.sendEmail(recipients, subject, body);
 	}
+
 
 
 	private void sendThankYouEmail(MultiEntryTicket t) {
@@ -831,6 +856,8 @@ public class SimpleServer extends AbstractServer {
 		int paymentAmount = MultiEntryTicket.INITIAL_PRICE;
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
 		String formattedDate = date.format(formatter);
+		int orderId = t.getAuto_number_multi_entry_ticket();
+
 
 		String body = "<html>"
 				+ "<body style='font-family: Arial, sans-serif; color: #333;'>"
@@ -845,7 +872,7 @@ public class SimpleServer extends AbstractServer {
 				+ "<p><em>(Please keep a copy of this receipt for your records.)</em></p>"
 				+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
 				+ "<h3 style='color: #555;'>YOUR ORDER INFORMATION:</h3>"
-				+ "<p><strong>Order ID:</strong> " + id + "<br/>"
+				+ "<p><strong>Order ID:</strong> " + orderId + "<br/>"
 				+ "<strong>Order Date:</strong> " + formattedDate + "<br/>"
 				+ "<strong>Source:</strong> Luna Aura</p>"
 				+ "<h3 style='color: #555;'>HERE'S WHAT YOU ORDERED:</h3>"
@@ -981,10 +1008,15 @@ public class SimpleServer extends AbstractServer {
 			p1.setLink("http://" + SimpleChatServer.host + ":8080/" + p1.getMovie_name() + p1.getId_user().getUser_id() + uniqueNumber);
 			String link = p1.getLink();
 			Date wantedDate = p1.getDate_of_link_activation();
+			Date EndDate = p1.getEnd_date_of_link_activation();
 
 			// Format wantedDate
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy, HH:mm");
 			String formattedWantedDate = (wantedDate != null) ? dateFormat.format(wantedDate) : "N/A";
+
+			// Format EndDaye
+			String formattedEndDate = (EndDate != null) ? dateFormat.format(EndDate) : "N/A";
+			int orderId = p1.getAuto_number_purchase();
 
 			// Email body
 			String body = "<html>"
@@ -1000,12 +1032,14 @@ public class SimpleServer extends AbstractServer {
 					+ "<p><em>(Please keep a copy of this receipt for your records.)</em></p>"
 					+ "<hr style='border: 0; height: 1px; background-color: #ddd;'/>"
 					+ "<h3 style='color: #555;'>YOUR ORDER INFORMATION:</h3>"
-					+ "<p><strong>Order ID:</strong> " + id + "<br/>"
+					+ "<p><strong>Order ID:</strong> " + orderId + "<br/>"
 					+ "<strong>Order Date:</strong> " + formattedDate + "<br/>"
 					+ "<strong>Movie Name:</strong> " + movie_name + "<br/>"
 					+ "<strong>Source:</strong> Luna Aura<br/>"
 					+ "<strong>Link:</strong> <a href='" + link + "'>" + link + "</a><br/>"
 					+ "<strong>Wanted Date:</strong> " + formattedWantedDate + "</p>"
+					+ "<strong>End Date:</strong> " + formattedEndDate + "</p>"
+
 					+ "<h3 style='color: #555;'>HERE'S WHAT YOU ORDERED:</h3>"
 					+ "<table style='width: 100%; border-collapse: collapse;'>"
 					+ "<thead>"
@@ -2001,64 +2035,35 @@ public class SimpleServer extends AbstractServer {
 			}
 
 			else if (message.getMessage().equals("#PayMultiTicket")) {
-				System.out.println("We are now in the server yo ");
-
 				String id = (String)message.getObject();
-				System.out.println(id);
-
 				IdUser idUser = (IdUser)message.getObject3();
-				System.out.println(idUser.getUser_id());
-
 				IdUser idUser_from_base = getIUFromId(id);
-
 				if(idUser_from_base != null) {
 					idUser.setIsLoggedIn(idUser_from_base.getIsLoggedIn());
 					idUser.setAuto_number_id_user(idUser_from_base.getAuto_number_id_users());
 				}
 				else{
 					message.setMessage("#FailedMT");
-					System.out.println("Errorrrrrrrrrrrrrr");
 					client.sendToClient(message);
 					return;
 				}
 
-				//check if found:
 				saveUpdateIduser(idUser);
-
 				idUser_from_base = idUser;
-
-
-
 				int seats_num = (int) message.getObject2();
-				System.out.println("Seats number: " + seats_num);
-
 				List <MultiEntryTicket> multiEntryTicketList = getMultiTicketUsingIdUser(idUser_from_base);
-
 				if (multiEntryTicketList != null) {
 					for (MultiEntryTicket multiEntryTicket : multiEntryTicketList) {
-
-						System.out.println(multiEntryTicket.getId_user().getUser_id());
-						System.out.println("remaining tickets: " +multiEntryTicket.getRemain_tickets());
-
 						if (multiEntryTicket.getRemain_tickets() >= seats_num) {
 							multiEntryTicket.setRemain_tickets(multiEntryTicket.getRemain_tickets() - seats_num);
-							// update the database (function)
 							updateMT(multiEntryTicket);
 							message.setMessage("#DonePayMultiTicket");
-							//to do: add to the purchases data
-
-
-							//also send an email
-
 							message.setObject(idUser);
-
 							client.sendToClient(message);
 							break;
 						}
-
 						else {
 							message.setMessage("#FailedMT");
-							System.out.println("Errorrrrrrrrrrrrrr");
 							client.sendToClient(message);
 						}
 					}

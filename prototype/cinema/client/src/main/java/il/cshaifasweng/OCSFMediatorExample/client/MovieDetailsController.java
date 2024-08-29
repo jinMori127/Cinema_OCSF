@@ -94,7 +94,7 @@ public class MovieDetailsController {
 
         assert branchesBox != null : "fx:id=\"branchesBox\" was not injected: check your FXML file 'MovieDetails.fxml'.";
         branchesBox.getItems().clear();
-        branchesBox.getItems().addAll("All", "Nazareth", "Sakhnin", "Nhif", "Haifa");
+        branchesBox.getItems().addAll(SimpleChatClient.get_branches());
 
         if (current_movie != null) {
             Lay_out_Movie_details();
@@ -201,19 +201,9 @@ public class MovieDetailsController {
                 }
             }
         }
-        else {
-            // if there is no time assinged we will show the today screenings
-            for (Screening s : screenings) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-                String date_str = dateFormat.format(new Date());
-
-                String s_date = dateFormat.format(s.getDate_time());
-
-                if (date_str.equals(s_date)) {
-                    real_screenings.add(s);
-                }
-            }
+        else
+        {
+            real_screenings = screenings;
         }
         //screening_table.setItems(FXCollections.observableArrayList(screenings));
 
@@ -252,6 +242,13 @@ public class MovieDetailsController {
             Platform.runLater(()->{
 
                 screenings_list = (List<Screening>)eventBox.getMessage().getObject();
+                Iterator<Screening> iterator = screenings_list.iterator();
+                while (iterator.hasNext()) {
+                    Screening s = iterator.next();
+                    if (s.getDate_time().before(new Date())) {
+                        iterator.remove();  // Safely remove the element using Iterator
+                    }
+                }
                 changeTable();
 
             });
@@ -260,6 +257,14 @@ public class MovieDetailsController {
         else if(eventBox.getId() == BaseEventBox.get_event_id("UPDATE_SCREENING_FOR_MOVIE")){
             Platform.runLater(()->{
                 screenings_list = (List<Screening>)eventBox.getMessage().getObject();
+                Iterator<Screening> iterator = screenings_list.iterator();
+                while (iterator.hasNext()) {
+                    Screening s = iterator.next();
+                    System.out.println(new Date());
+                    if (s.getDate_time().before(new Date())) {
+                        iterator.remove();  // Safely remove the element using Iterator
+                    }
+                }
                 changeTable();
             });
         } else if (eventBox.getId() == BaseEventBox.get_event_id("UPDATE_MOVIE_LIST")) {
