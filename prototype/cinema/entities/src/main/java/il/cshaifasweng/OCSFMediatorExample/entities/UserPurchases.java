@@ -51,7 +51,7 @@ public class UserPurchases implements Serializable{
         this.id_user = id_user;
         this.screening = screening;
         this.purchase_type = "Ticket";
-        this.date_of_purchase = new Date();;
+        this.date_of_purchase = new Date();
         this.link = "";
     }
 
@@ -64,7 +64,7 @@ public class UserPurchases implements Serializable{
         this.purchase_type = "HomeLink";
         this.link = link;
         this.movie_name = movie_name;
-        this.date_of_purchase = new Date();;
+        this.date_of_purchase = new Date();
         this.seats = "";
         this.end_date_of_link_activation=end_date_of_link_activation;
     }
