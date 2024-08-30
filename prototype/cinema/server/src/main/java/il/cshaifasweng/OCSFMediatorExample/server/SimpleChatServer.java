@@ -1,6 +1,7 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
+import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
 import il.cshaifasweng.OCSFMediatorExample.entities.Screening;
 
 import java.io.IOException;
@@ -96,6 +97,38 @@ public class SimpleChatServer
 
         }
     }
+
+
+    private static List<Movie> getAllMoviess() {
+        // Step 2: Create session
+        Session session = server.sessionFactory.openSession();
+
+
+        List<Movie> movieList;
+        try {
+            // Step 3: Start transaction
+            session.beginTransaction();
+
+            // Step 4: Create a query to get all records from the Screening table
+            Query<Movie> query = session.createQuery("from Movie", Movie.class);
+
+            // Step 5: Execute the query and get the result list
+            movieList = query.getResultList();
+
+            // Step 6: Commit the transaction
+            session.getTransaction().commit();
+
+            // Step 7: Use the retrieved list
+
+
+        } finally {
+            // Step 8: Close the session
+            session.close();
+        }
+        return movieList;
+    }
+
+
     private static void daily_task()
     {
         // Create a ScheduledExecutorService with one thread
@@ -112,6 +145,21 @@ public class SimpleChatServer
             m.setObject(data);
             server.sendToAllClients(m);
             // Add your task logic here
+
+
+            List<Movie> movieList = getAllMoviess();
+            if(!movieList.isEmpty()) {
+                for (Movie movie : movieList) {
+                    System.out.println(movie.getAuto_number_movie());
+                    System.out.println(movie.getCategory());
+                    try {
+                        SimpleServer.setMovieAnnouncement(movie);
+                        System.out.println();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
         };
 
         // Schedule the task to run every 1 minute, starting now (0 initial delay)
