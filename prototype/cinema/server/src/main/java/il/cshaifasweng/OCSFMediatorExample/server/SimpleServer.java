@@ -123,7 +123,7 @@ public class SimpleServer extends AbstractServer {
 		return result;
 	}
 
-	private static List<Movie> getAllMovies() throws Exception {
+	public static List<Movie> getAllMovies() throws Exception {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -1142,15 +1142,10 @@ public class SimpleServer extends AbstractServer {
 
 
 	public static void newMovieAnnouncement(IdUser idUser, Date date, Movie movie){
-		//EmailSender emailSender = new EmailSender();
-		//String[] recipients = {idUser.getEmail()};
-		//String subject = "NEW MOVIE ANNOUNCEMENT FOR ALL MULTI TICKET OWNERS";
+		EmailSender emailSender = new EmailSender();
+		String[] recipients = {idUser.getEmail()};
+		String subject = "NEW MOVIE ANNOUNCEMENT FOR ALL MULTI TICKET OWNERS";
 
-		String name = idUser.getName();
-		//String id = idUser.getUser_id();
-		//LocalDate date = LocalDate.now();
-		//DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
-		//String formattedDate = date.format(formatter);
 
 		String body = "<html>"
 				+ "<body style='font-family: Arial, sans-serif; color: #333;'>"
@@ -1160,7 +1155,7 @@ public class SimpleServer extends AbstractServer {
 				+ "<h1 style='font-size: 24px; color: #555;'>\uD83C\uDFAC✨ NEW MOVIE ANNOUNCEMENT! ✨\uD83C\uDFAC</h1>"
 				+ "</div>"
 				+ "<h2 style='color: #555;'> Lights, Camera, Action! </h2>"
-				+ "<p>Dear mr/ms. " + name.toUpperCase() + " and ALL ladies and gentlemen who ever bought a multi Ticket from LUNA AURA!</p>"
+				+ "<p>Dear mr/ms. " + idUser.getName().toUpperCase() + " and ALL ladies and gentlemen who ever bought a multi Ticket from LUNA AURA!</p>"
 				+ "<p>Prepare to be dazzled by the most anticipated cinematic experience of the year! Step into a world of wonder and imagination as we bring to the big screen a movie event like no other.</p>"
 				+ "<p>\uD83C\uDF7F Premiering this Fall at LUNA AURA \uD83C\uDF7F</p>"
 				+ "<h2 style='color: #555;'> \uD83D\uDD2E \"" + movie.getMovie_name() + "\" \uD83D\uDD2E </h2>"
@@ -1175,17 +1170,16 @@ public class SimpleServer extends AbstractServer {
 				+ "</body>"
 				+ "</html>";
 
-		EmailScheduler emailScheduler = new EmailScheduler();
-		emailScheduler.scheduleEmail(
-				idUser.getEmail(),
-				"Schedule the New announcement",
-				body,
-				date
-		);
-		//emailSender.sendEmail(recipients, subject, body);
+		//EmailScheduler emailScheduler = new EmailScheduler();
+		//emailScheduler.scheduleEmail(idUser.getEmail(), "Schedule the New announcement", body, date);
+		emailSender.sendEmail(recipients, subject, body);
 	}
 
 	public static void setMovieAnnouncement(Movie movie) throws Exception {
+
+		if (movie.isNotified())
+			return;
+
 		List <Screening> screeningList = getScreeningForMovie(movie);
 		if(!screeningList.isEmpty()){
 			Date earliest_date = screeningList.getFirst().getDate_time();
@@ -2007,7 +2001,7 @@ public class SimpleServer extends AbstractServer {
 
 					client.sendToClient(message1);
 
-					setMovieAnnouncement(screening.getMovie());
+					//setMovieAnnouncement(screening.getMovie());
 
 				}
 
