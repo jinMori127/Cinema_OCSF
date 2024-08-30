@@ -221,15 +221,10 @@ public class UserPurchasesController {
             String[] seatPairs = seats_text.split(",");
             int numOfSeats = seatPairs.length;
 
-            if (date_screening.before(curr_date)) {
-                ErrorMessage.setVisible(true);
-                percent_return=0;
-                ErrorMessage.setText("Unable to cancel purchase, The screening time already passed");
-                return;
-            }
 
 
-            else {
+
+
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(curr_date);
                 calendar.add(Calendar.HOUR, +3);// adding here to the current date three hours so we will
@@ -250,9 +245,14 @@ public class UserPurchasesController {
                 TableColumn<UserPurchases, ?> seven_col = table_view.getColumns().get(7);
                 cellData = seven_col.getCellData(selectedRow);
                 String purchase_type =(String) cellData;
+                if (date_screening.before(curr_date)) {
+                     ErrorMessage.setVisible(true);
+                     percent_return=0;
+                     ErrorMessage.setText("The screening time already passed So your refund is 0");
+                 }
 
 
-                if (curr_date_3.before(date_screening) && (link_text == null||link_text.isEmpty())) {
+                else if (curr_date_3.before(date_screening) && (link_text == null||link_text.isEmpty())) {
                     if (purchase_type.equals("Multi Ticket")){
                         Message message = new Message(102, "#return_tickets");
                         message.setObject(auto_num);
@@ -288,7 +288,7 @@ public class UserPurchasesController {
                     percent_return = 0;
                 }
             }
-        }
+
 
         if (auto_num >= 0 && selectedRow < table_view.getItems().size()) {
             Message delete_message = new Message(21,"#delete_purchases");

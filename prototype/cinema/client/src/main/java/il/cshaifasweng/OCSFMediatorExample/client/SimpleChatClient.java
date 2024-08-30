@@ -166,11 +166,11 @@ public class SimpleChatClient extends Application {
     }
     public static List<String> get_categories() {
         ArrayList<String> categories = new ArrayList<>();
-        categories.add("Comedy - קומדיה");
-        categories.add("Sci-Fi - מדע בדיוני");
-        categories.add("Action - פעולה");
-        categories.add("Romance - רומנטיקה");
-        categories.add("Family - משפחה");
+        categories.add("Comedy");
+        categories.add("Sci-Fi");
+        categories.add("Action");
+        categories.add("Romance");
+        categories.add("Family");
         return categories;
     }
 

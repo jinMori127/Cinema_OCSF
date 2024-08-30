@@ -20,11 +20,18 @@ public class MultiEntryTicket implements Serializable{
     private IdUser id_user;
     private int remain_tickets;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date date_of_purchase;
+
+
 
 
     public MultiEntryTicket(){
         this.id_user = new IdUser();
         this.remain_tickets = INITIAL_REMAIN_TICKETS;
+        this.date_of_purchase = new Date();
+
+
     }
 
     // get/set methods
