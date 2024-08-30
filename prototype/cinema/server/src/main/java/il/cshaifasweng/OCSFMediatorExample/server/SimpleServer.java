@@ -1,11 +1,7 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
-import java.time.LocalDate;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.time.LocalDateTime;
-import java.time.Duration;
-import java.time.ZoneId;
 
 import java.util.*;
 import com.sun.net.httpserver.HttpServer;
@@ -29,7 +25,6 @@ import org.hibernate.service.ServiceRegistry;
 
 import javax.persistence.criteria.*;
 import java.io.IOException;
-import java.time.LocalTime;
 import java.util.concurrent.atomic.AtomicInteger;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1185,6 +1180,9 @@ public class SimpleServer extends AbstractServer {
 			Date earliest_date = screeningList.getFirst().getDate_time();
 			Date today = new Date();
 
+			LocalDate todayLocal = today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+			LocalDate earliestLocal = earliest_date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
 			for (Screening s : screeningList) {
 				if(s.getDate_time().before(earliest_date)){
@@ -1192,13 +1190,15 @@ public class SimpleServer extends AbstractServer {
 				}
 			}
 
-			if(earliest_date.before(today)){
+
+			if(earliestLocal.isBefore(todayLocal)){
 				movie.setNotified(true);
 				update_movie(movie);
 
 			}
 
-			else if(earliest_date.equals(today) && !movie.isNotified()){
+
+			else if(earliestLocal.equals(todayLocal) && !movie.isNotified()){
 				//notify all multi ticket owners
 				List <IdUser> idUserList = getAllMultiTicketUsers();
 
@@ -1208,7 +1208,9 @@ public class SimpleServer extends AbstractServer {
 
 				movie.setNotified(true);
 				update_movie(movie);
+				System.out.println("enterrrrrrreeeeeddddddddd");
 			}
+
 		}
 
 	}
@@ -2001,7 +2003,7 @@ public class SimpleServer extends AbstractServer {
 
 					client.sendToClient(message1);
 
-					//setMovieAnnouncement(screening.getMovie());
+					setMovieAnnouncement(screening.getMovie());
 
 				}
 
