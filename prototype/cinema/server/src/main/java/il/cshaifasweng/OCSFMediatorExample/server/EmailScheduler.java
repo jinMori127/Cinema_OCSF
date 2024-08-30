@@ -31,8 +31,11 @@ public class EmailScheduler {
 
         scheduler.schedule(() -> {
             try {
-                EmailSender emailSender = new EmailSender();
-                emailSender.sendEmail(new String[]{recipient}, subject, body); // Pass recipient as a String[]
+                // Create and start the EmailSender thread
+                EmailSender emailSender = new EmailSender(new String[]{recipient}, subject, body);
+                Thread emailThread = new Thread(emailSender);
+                emailThread.start();  // Start the thread
+
                 System.out.println("Email sent to " + recipient);
             } catch (Exception e) {
                 e.printStackTrace();

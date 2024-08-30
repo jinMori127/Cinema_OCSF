@@ -774,7 +774,6 @@ public class SimpleServer extends AbstractServer {
 
 
 	private void sendEmail1(UserPurchases userPurchases) {
-		EmailSender emailSender = new EmailSender();
 
 		// Extract user information
 		String recipientEmail = userPurchases.getId_user().getEmail();
@@ -835,13 +834,15 @@ public class SimpleServer extends AbstractServer {
 				+ "</html>";
 
 		// Send email
-		emailSender.sendEmail(recipients, subject, body);
+		EmailSender emailSender = new EmailSender(recipients, subject, body);
+		// Run the email sending task in a separate thread
+		Thread emailThread = new Thread(emailSender);
+		emailThread.start();
 	}
 
 
 
 	private void sendThankYouEmail(MultiEntryTicket t) {
-		EmailSender emailSender = new EmailSender();
 		String[] recipients = {t.getId_user().getEmail()};
 		String subject = "Thank You for Your Purchase at Luna Aura";
 
@@ -893,11 +894,13 @@ public class SimpleServer extends AbstractServer {
 				+ "</body>"
 				+ "</html>";
 
-		emailSender.sendEmail(recipients, subject, body);
+		EmailSender emailSender = new EmailSender(recipients, subject, body);
+		// Run the email sending task in a separate thread
+		Thread emailThread = new Thread(emailSender);
+		emailThread.start();
 	}
 
 	private void customer_service_email(IdUser user,String respond, int price, boolean phase) {
-		EmailSender emailSender = new EmailSender();
 		String[] recipients = {user.getEmail()};
 		String subject;
 		if(phase) {
@@ -933,7 +936,10 @@ public class SimpleServer extends AbstractServer {
 				+ "</body>"
 				+ "</html>";
 
-		emailSender.sendEmail(recipients, subject, body);
+		EmailSender emailSender = new EmailSender(recipients, subject, body);
+		// Run the email sending task in a separate thread
+		Thread emailThread = new Thread(emailSender);
+		emailThread.start();
 	}
 
 
@@ -944,7 +950,6 @@ public class SimpleServer extends AbstractServer {
 				throw new IllegalArgumentException("UserPurchases or associated IdUser is null.");
 			}
 
-			EmailSender emailSender = new EmailSender();
 			String[] recipients = {p1.getId_user().getEmail()};
 			String subject = "Thank You for Your Purchase at Luna Aura";
 
@@ -1058,7 +1063,10 @@ public class SimpleServer extends AbstractServer {
 					+ "</body>"
 					+ "</html>";
 
-			emailSender.sendEmail(recipients, subject, body);
+			EmailSender emailSender = new EmailSender(recipients, subject, body);
+			// Run the email sending task in a separate thread
+			Thread emailThread = new Thread(emailSender);
+			emailThread.start();
 
 		} catch (Exception e) {
 			// Log the error
@@ -1137,7 +1145,6 @@ public class SimpleServer extends AbstractServer {
 
 
 	public static void newMovieAnnouncement(IdUser idUser, Date date, Movie movie){
-		EmailSender emailSender = new EmailSender();
 		String[] recipients = {idUser.getEmail()};
 		String subject = "NEW MOVIE ANNOUNCEMENT FOR ALL MULTI TICKET OWNERS";
 
@@ -1165,9 +1172,10 @@ public class SimpleServer extends AbstractServer {
 				+ "</body>"
 				+ "</html>";
 
-		//EmailScheduler emailScheduler = new EmailScheduler();
-		//emailScheduler.scheduleEmail(idUser.getEmail(), "Schedule the New announcement", body, date);
-		emailSender.sendEmail(recipients, subject, body);
+		EmailSender emailSender = new EmailSender(recipients, subject, body);
+		// Run the email sending task in a separate thread
+		Thread emailThread = new Thread(emailSender);
+		emailThread.start();
 	}
 
 	public static void setMovieAnnouncement(Movie movie) throws Exception {

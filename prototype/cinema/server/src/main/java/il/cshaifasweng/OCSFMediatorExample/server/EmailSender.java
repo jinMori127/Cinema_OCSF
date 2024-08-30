@@ -4,11 +4,23 @@ import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
 
-public class EmailSender {
+public class EmailSender implements Runnable {
     private static final String EMAIL = "LunaAura.cinema@gmail.com";
     private static final String PASSWORD = "sxym ghxu reni jyki";
 
-    public void sendEmail(String[] recipients, String subject, String body) {
+    private String[] recipients;
+    private String subject;
+    private String body;
+
+    // Constructor to initialize email details
+    public EmailSender(String[] recipients, String subject, String body) {
+        this.recipients = recipients;
+        this.subject = subject;
+        this.body = body;
+    }
+
+    @Override
+    public void run() {
         // Set up the SMTP server properties
         Properties properties = new Properties();
         properties.put("mail.smtp.host", "smtp.gmail.com");
