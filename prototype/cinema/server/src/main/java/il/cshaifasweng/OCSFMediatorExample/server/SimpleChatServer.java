@@ -1,6 +1,7 @@
 package il.cshaifasweng.OCSFMediatorExample.server;
 
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
+import il.cshaifasweng.OCSFMediatorExample.entities.Movie;
 import il.cshaifasweng.OCSFMediatorExample.entities.Screening;
 
 import java.io.IOException;
@@ -96,6 +97,9 @@ public class SimpleChatServer
 
         }
     }
+
+
+
     private static void daily_task()
     {
         // Create a ScheduledExecutorService with one thread
@@ -112,6 +116,26 @@ public class SimpleChatServer
             m.setObject(data);
             server.sendToAllClients(m);
             // Add your task logic here
+
+
+            List<Movie> movieList;
+            try {
+                movieList = SimpleServer.getAllMovies();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            if(!movieList.isEmpty()) {
+                for (Movie movie : movieList) {
+                    System.out.println(movie.getAuto_number_movie());
+                    System.out.println(movie.getCategory());
+                    try {
+                        SimpleServer.setMovieAnnouncement(movie);
+                        System.out.println();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
         };
 
         // Schedule the task to run every 1 minute, starting now (0 initial delay)

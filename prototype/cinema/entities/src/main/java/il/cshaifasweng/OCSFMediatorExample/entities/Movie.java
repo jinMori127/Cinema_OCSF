@@ -37,6 +37,9 @@ public class Movie implements Serializable {
     private String director;
     private double rating;
 
+
+    private boolean notified;
+
     private String movie_link;
 
     @OneToMany(mappedBy = "movie",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -51,6 +54,7 @@ public class Movie implements Serializable {
         this.time_ = time_;
         this.year_ = year_;
         this.movie_link = movie_link;
+        notified = false;
     }
 
     public Movie() {
@@ -160,6 +164,15 @@ public class Movie implements Serializable {
                 "Category: " + category + "\n" +
                 "Production Year: " + year_ + "\n";
     }
+
+    public boolean isNotified() {
+        return notified;
+    }
+
+    public void setNotified(boolean notified) {
+        this.notified = notified;
+    }
+
 
     @Override
     public boolean equals(Object o) {
