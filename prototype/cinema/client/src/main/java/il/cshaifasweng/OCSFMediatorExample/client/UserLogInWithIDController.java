@@ -96,11 +96,19 @@ public class UserLogInWithIDController {
                         error_message.setVisible(true);
                         error_message.setText("You have successfully logged in");
                         idUser = (IdUser) message.getObject();
+                        Message message_s = new Message(10, "#get_user_name");
+                        try {
+                            SimpleClient.getClient().sendToServer(message_s);
+                        }
+                        catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         try {
                             SimpleChatClient.setRoot("HomePage");
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
+
                         break;
                     case "#serverError":
                         error_message.setVisible(true);

@@ -1399,6 +1399,7 @@ public class SimpleServer extends AbstractServer {
 			message.setMessage("#loginConfirmed");
 			message.setObject(user);
 			client.sendToClient(message);
+
 		}
 	}
 
@@ -2595,6 +2596,10 @@ public class SimpleServer extends AbstractServer {
 				client.sendToClient(message);
 				transaction.commit();
 				session.close();
+			}
+			else if (message.getMessage().equals("#get_user_name")) {
+				message.setMessage("#get_user_name_client");
+				sendToAllClients(message);
 			}
 
 

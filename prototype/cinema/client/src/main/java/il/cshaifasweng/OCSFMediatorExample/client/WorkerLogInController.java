@@ -68,6 +68,13 @@ public class WorkerLogInController {
                     case "#loginWorker":
                         output.setText("Successfully logged in");
                         worker = (Worker) message.getObject();
+                        Message message_s = new Message(10, "#get_user_name");
+                        try {
+                            SimpleClient.getClient().sendToServer(message_s);
+                        }
+                        catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         try {
                             SimpleChatClient.setRoot("HomePage");
                         } catch (IOException e) {

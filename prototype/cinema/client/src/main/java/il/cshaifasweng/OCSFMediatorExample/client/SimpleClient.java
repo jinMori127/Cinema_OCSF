@@ -182,6 +182,9 @@ public class SimpleClient extends AbstractClient {
 		else if(message.getMessage().equals("#Delete_Past_Screenings")) {
 			EventBus.getDefault().post(new BaseEventBox("DELETE_PAST_SCREENING", message));
 		}
+		else if(message.getMessage().equals("#get_user_name_client")) {
+			EventBus.getDefault().post(new BaseEventBox("GET_USER_WORKER_NAME", message));
+		}
 		else {
 			EventBus.getDefault().post(new BaseEventBox("WRONG_NAMEING", message));
 		}

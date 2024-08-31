@@ -66,9 +66,23 @@ public class MasterPageCotroller {
             double screenHeight = screenBounds.getHeight();
             content_area.layoutXProperty().setValue(screenWidth/2);
         });
-
-
     }
+
+    @Subscribe
+    public void onUpdateIdUserEvent(BaseEventBox event) {
+        if(event.getId() == BaseEventBox.get_event_id("GET_USER_WORKER_NAME")) {
+            Platform.runLater(()->{
+                
+                if(UserLogInWithIDController.idUser != null) {
+                    sing_out_menu.setText("Hello "+ UserLogInWithIDController.idUser.getName());
+                }
+                else if(WorkerLogInController.worker != null) {
+                    sing_out_menu.setText("Hello "+ WorkerLogInController.worker.getUser_name());
+                }
+            });
+        }
+    }
+
     private void create_activity_list(){
         Defalult_menu.setVisible(false);
         customer_service_menu.setVisible(false);
