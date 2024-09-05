@@ -89,11 +89,16 @@ public class TheaterMapController {
             {Platform.runLater(()->{
                 screening = (Screening) event.getMessage().getObject();
                 create_the_page();
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 Platform.runLater(()->{
                     buttons_vbox.layout();
                     anchore_pane.layout();
                     buy_button.setLayoutY(buttons_vbox.getLayoutY()+buttons_vbox.getHeight()+10);
-                    buy_button.setLayoutX(anchore_pane.getLayoutX()+anchore_pane.getWidth()/2);
+                    buy_button.setLayoutX(anchore_pane.getLayoutX()+anchore_pane.getWidth()-35);
                     buy_button.layout();
                     anchore_pane.layout();
                 });
