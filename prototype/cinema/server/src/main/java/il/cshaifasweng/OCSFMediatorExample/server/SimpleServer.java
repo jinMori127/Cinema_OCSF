@@ -1179,14 +1179,19 @@ public class SimpleServer extends AbstractServer {
 	}
 
 	public static void setMovieAnnouncement(Movie movie) throws Exception {
-
 		if (movie.isNotified())
 			return;
 
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		movie = session.get(Movie.class,movie.getAuto_number_movie());
+		session.getTransaction().commit();
+		session.close();
 		List <Screening> screeningList = getScreeningForMovie(movie);
 		if(!screeningList.isEmpty()){
 			Date earliest_date = screeningList.getFirst().getDate_time();
 			Date today = new Date();
+
 
 			LocalDate todayLocal = today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
@@ -1197,8 +1202,11 @@ public class SimpleServer extends AbstractServer {
 					earliest_date = s.getDate_time();
 				}
 			}
-
-
+			earliestLocal = earliest_date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			if (!earliestLocal.isEqual(todayLocal))
+			{
+				return;
+			}
 			if(earliestLocal.isBefore(todayLocal)){
 				movie.setNotified(true);
 				update_movie(movie);
@@ -1446,7 +1454,7 @@ public class SimpleServer extends AbstractServer {
 			return true;
 		}
 	}
-	private void create_reports(Session session) {
+	public void create_reports(Session session) {
 		// Check if the initialized reports already exist
 		if (!checkAndCreateReports(session)) {
 			System.out.println("Reports already exist. No need to create new ones.");
@@ -1513,8 +1521,8 @@ public class SimpleServer extends AbstractServer {
 		}
 
 		// Extract and aggregate user purchases
-		CriteriaBuilder builder2 = session.getCriteriaBuilder();
-		CriteriaQuery<UserPurchases> query2 = builder2.createQuery(UserPurchases.class);
+		//CriteriaBuilder builder2 = session.getCriteriaBuilder();
+		CriteriaQuery<UserPurchases> query2 = builder1.createQuery(UserPurchases.class);
 		query2.from(UserPurchases.class);
 		List<UserPurchases> data_purchases = session.createQuery(query2).getResultList();
 		for (UserPurchases userPurchases : data_purchases) {

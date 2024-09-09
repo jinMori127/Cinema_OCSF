@@ -171,6 +171,12 @@ public class SimpleChatServer
         server = new SimpleServer(3000);
         System.out.println("server is listening");
         server.listen();
+        Session session = server.sessionFactory.openSession();
+        session.beginTransaction();
+        server.create_reports(session);
+        session.getTransaction().commit();
+        session.close();
+
         daily_task();
     }
 }

@@ -55,17 +55,20 @@ public class MasterPageCotroller {
     public void change_content(ContentChangeEvent event)
     {
         Platform.runLater(()->{
+            System.out.println(event.getPage() + "1");
             setContent(event.getPage()+".fxml");
+            System.out.println(event.getPage() + "2");
             create_activity_list();
+            System.out.println(event.getPage() + "3");
 
         });
 
-        Platform.runLater(()->{
+        /*Platform.runLater(()->{
             javafx.geometry.Rectangle2D screenBounds = Screen.getPrimary().getBounds();
             double screenWidth = screenBounds.getWidth();
             double screenHeight = screenBounds.getHeight();
             content_area.layoutXProperty().setValue(screenWidth/2);
-        });
+        });*/
     }
 
     @Subscribe
@@ -168,7 +171,7 @@ public class MasterPageCotroller {
             //EventBus.getDefault().post(new BeginContentChangeEnent("TheaterMap"));
         }
         else if(menuItemText.equals("id")){
-            EventBus.getDefault().post(new BeginContentChangeEnent("UserLoginWithID"));
+            EventBus.getDefault().post(new BeginContentChangeEnent("UserLogInWithID"));
         }
         else if (menuItemText.equals("worker"))
         {
