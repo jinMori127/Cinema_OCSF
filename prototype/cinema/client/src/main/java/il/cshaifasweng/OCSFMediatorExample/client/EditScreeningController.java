@@ -36,6 +36,8 @@ import java.text.SimpleDateFormat;
 import java.net.URL;
 import java.sql.Time;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static il.cshaifasweng.OCSFMediatorExample.client.MovieEditingDetailsController.go_to_screening_movie;
 import static il.cshaifasweng.OCSFMediatorExample.client.SimpleClient.Current_Message;
@@ -188,6 +190,41 @@ public class EditScreeningController {
             ErrorMessage.setText("date format: dd/MM/yyyy, time format: HH:mm");
             return;
         }
+        String date_reg  ="^(?:(?:31(\\/|-|\\.)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)(\\/|-|\\.)(?:0?[13-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$|^(?:29(\\/|-|\\.)0?2\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$";
+        Pattern pattern = Pattern.compile(date_reg);
+        // Match the input string (date) against the pattern
+        Matcher matcher = pattern.matcher(dateC);
+        // Return true if the date matches the pattern, otherwise false
+        if (!matcher.matches())
+        {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("this is not a valid date");
+            return;
+        }
+
+        String time_reg = "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$";
+         pattern = Pattern.compile(time_reg);
+        // Match the input string (date) against the pattern
+         matcher = pattern.matcher(timeC);
+        // Return true if the date matches the pattern, otherwise false
+        if (!matcher.matches())
+        {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("this is not a valid time");
+            return;
+        }
+
+        Date now = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+        cal.add(Calendar.HOUR_OF_DAY, 5);
+        Date after_5 = cal.getTime();
+        if(real_date.before(after_5))
+        {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("screening must be at least 5 hours from now");
+            return;
+        }
         current_screening.setDate_time(real_date);
         Message message = new Message(10,"#UpdateScreening");
         message.setObject(current_screening);
@@ -257,10 +294,46 @@ public class EditScreeningController {
 
         }
 
+        String date_reg  ="^(?:(?:31(\\/|-|\\.)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)(\\/|-|\\.)(?:0?[13-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$|^(?:29(\\/|-|\\.)0?2\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$";
+        Pattern pattern = Pattern.compile(date_reg);
+        // Match the input string (date) against the pattern
+        Matcher matcher = pattern.matcher(date.getText());
+        // Return true if the date matches the pattern, otherwise false
+        if (!matcher.matches())
+        {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("this is not a valid date");
+            return;
+        }
+
+        String time_reg = "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$";
+        pattern = Pattern.compile(time_reg);
+        // Match the input string (date) against the pattern
+        matcher = pattern.matcher(screening_time.getText().trim());
+        // Return true if the date matches the pattern, otherwise false
+        if (!matcher.matches())
+        {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("this is not a valid time");
+            return;
+        }
+
         try {
             datec = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(date.getText().trim()+" "+screening_time.getText().trim());
         } catch (ParseException e) {
             throw new RuntimeException(e);
+        }
+
+        Date now = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+        cal.add(Calendar.HOUR_OF_DAY, 5);
+        Date after_5 = cal.getTime();
+        if(datec.before(after_5))
+        {
+            ErrorMessage.setVisible(true);
+            ErrorMessage.setText("you have entered a screening must be at least 5 hours from now");
+            return;
         }
 
         int room = Integer.parseInt(room_number.getText());

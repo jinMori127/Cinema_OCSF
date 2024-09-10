@@ -90,7 +90,7 @@ public class TheaterMapController {
                 screening = (Screening) event.getMessage().getObject();
                 create_the_page();
                 try {
-                    Thread.sleep(1);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
