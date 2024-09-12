@@ -142,9 +142,6 @@ public class MovieEditingDetailsController {
             ErrorMessage.setVisible(true);
             ErrorMessage.setText("Please enter a rating");
             return;
-        } else if (movie_link.getText().trim().isEmpty()) {
-            ErrorMessage.setVisible(true);
-            ErrorMessage.setText("Please enter a rating");
         }
         Movie movie = new Movie();
         if(File_uploaded == null)
