@@ -2086,7 +2086,8 @@ public class SimpleServer extends AbstractServer {
 				update_all_prices(new_price);
 				message.setMessage("#UpdateMovieList");
 				message.setObject(getAllMovies());
-				client.sendToClient(message);
+				message.setObject2(get_Edited_Details());
+				sendToAllClients(message);
 
 			}
 
