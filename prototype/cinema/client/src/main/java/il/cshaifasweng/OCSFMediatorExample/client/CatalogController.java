@@ -346,7 +346,18 @@ public class CatalogController {
             });
         }
         else if (event.getId()==BaseEventBox.get_event_id("SHOW_CM_CHANGES")){
-            //To be added
+            if(current_search != null && dictionary_search != null) {
+                Message m = new Message(10, "#SearchMovieFillter");
+                m.setObject(current_search);
+                m.setObject2(dictionary_search);
+                try {
+                    SimpleClient.getClient().sendToServer(m);
+                } catch (IOException e) {
+                    ErrorMessage.setText(e.getMessage());
+                    ErrorMessage.setVisible(true);
+                    return;
+                }
+            }
         }
         else if(event.getId() == BaseEventBox.get_event_id("GOT_SEARCH_MOVIE_FILTER")) {
             Platform.runLater(() -> {
@@ -361,6 +372,20 @@ public class CatalogController {
             }
             else {
                 Message m = new Message(10,"#SearchMovieFillter");
+                m.setObject(current_search);
+                m.setObject2(dictionary_search);
+                try {
+                    SimpleClient.getClient().sendToServer(m);
+                } catch (IOException e) {
+                    ErrorMessage.setText(e.getMessage());
+                    ErrorMessage.setVisible(true);
+                    return;
+                }
+            }
+        }
+        else if(event.getId() == BaseEventBox.get_event_id("UPDATE_SCREENING_FOR_MOVIE")) {
+            if(current_search != null && dictionary_search != null) {
+                Message m = new Message(10, "#SearchMovieFillter");
                 m.setObject(current_search);
                 m.setObject2(dictionary_search);
                 try {

@@ -1946,11 +1946,23 @@ public class SimpleServer extends AbstractServer {
 			////////////// Delete Movie ///////////////////////////
 			else if (message.getMessage().equals("#DeleteMovie")) {
 				Movie movie = (Movie) message.getObject();
-				remove_movie(movie);
-				message.setObject(getAllMovies());
-				message.setObject2(get_Edited_Details());
-				message.setMessage("#UpdateMovieList");
-				sendToAllClients(message);
+				Session session = sessionFactory.openSession();
+				session.beginTransaction();
+				movie = session.get(Movie.class,movie.getAuto_number_movie());
+				session.getTransaction().commit();
+				session.close();
+				if (movie.getScreenings().isEmpty()) {
+					remove_movie(movie);
+					message.setObject(getAllMovies());
+					message.setObject2(get_Edited_Details());
+					message.setMessage("#UpdateMovieList");
+					sendToAllClients(message);
+				}
+				else{
+					message.setData("This Movie has Screenings");
+					message.setMessage("#ServerError");
+					client.sendToClient(message);
+				}
 			}
 
 			////////////// Go To Screening //////////////////////
@@ -2044,6 +2056,18 @@ public class SimpleServer extends AbstractServer {
 			else if (message.getMessage().equals("#RemoveScreening")) {
 				Movie movie = ((Screening) message.getObject()).getMovie();
 				Screening screening = (Screening) message.getObject();
+				Session session = sessionFactory.openSession();
+				session.beginTransaction();
+				screening = session.get(Screening.class,screening.getAuto_number_screening());
+				session.getTransaction().commit();;
+				session.close();
+				if(screening.getTheater_map().contains("1") || screening.getTheater_map().contains("2"))
+				{
+					message.setMessage("#ServerError");
+					message.setData("there is a user in this screening");
+					client.sendToClient(message);
+					return;
+				}
 				remove_screening(screening);
 				message.setObject(get_screening_for_movie(movie));
 				message.setObject2(movie);

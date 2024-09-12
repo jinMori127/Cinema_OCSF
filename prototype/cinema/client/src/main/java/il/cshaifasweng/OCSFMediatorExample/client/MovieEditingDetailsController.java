@@ -335,10 +335,6 @@ public class MovieEditingDetailsController {
             ErrorMessage.setVisible(true);
             ErrorMessage.setText("Please enter a rating");
             return;
-        } else if (movie_link.getText().trim().isEmpty()) {
-            ErrorMessage.setVisible(true);
-            ErrorMessage.setText("Please enter a movie link");
-            return;
         }
         Movie movie = SelectedMovie;
         if(File_uploaded == null)
@@ -612,6 +608,7 @@ public class MovieEditingDetailsController {
             Button Button_Select = new Button();
             Button_Select.setText("Select");
             Button_Select.setOnAction(event->{
+                ErrorMessage.setVisible(false);
                 byte[] file1 = movie.getImage_location();
                 File_uploaded = file1;
                 if(file1!=null) {
@@ -692,6 +689,15 @@ public class MovieEditingDetailsController {
         if(event.getId() == 5) {
             Platform.runLater(() -> {
                 create_catalog(event.getMessage());
+            });
+        }
+        else if(event.getId() == BaseEventBox.get_event_id("SERVER_ERROR_MESSAGE"))
+        {
+            Platform.runLater(()->
+            {
+                ErrorMessage.setVisible(true);
+                ErrorMessage.setText(event.getMessage().getData());
+                return;
             });
         }
     }
