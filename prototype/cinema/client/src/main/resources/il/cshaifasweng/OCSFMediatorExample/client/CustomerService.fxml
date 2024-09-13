@@ -34,5 +34,6 @@
       <ComboBox fx:id="branch" layoutX="114.0" layoutY="182.0" onAction="#choose_branch" prefWidth="150.0" promptText="choose branch " />
       <TextField fx:id="returned_price" layoutX="428.0" layoutY="164.0" promptText="refund" />
       <Text layoutX="377.0" layoutY="181.0" strokeType="OUTSIDE" strokeWidth="0.0" text="optional" />
+      <Text fx:id="error_message" fill="#d81313" layoutX="416.0" layoutY="212.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="172.13671875" />
     </children>
 </AnchorPane>
