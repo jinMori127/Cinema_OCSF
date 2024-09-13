@@ -820,7 +820,7 @@ public class SimpleServer extends AbstractServer {
 				+ "<p><strong>Order ID:</strong> " + orderId + "<br/>"
 				+ "<strong>Order Date:</strong> " + formattedOrderDate + "<br/>"
 				+ "<strong>Source:</strong> Luna Aura</p>"
-				+ "<p><strong>Amount:</strong> $" + paymentAmount + "</p>"
+				+ "<p><strong>Amount:</strong> ₪" + paymentAmount + "</p>"
 				+ "<p><strong>Branch:</strong> " + branch + "</p>"
 				+ "<p><strong>Movie:</strong> " + movieName + "</p>"
 				+ "<p><strong>Room Number:</strong> " + roomNumber + "</p>"

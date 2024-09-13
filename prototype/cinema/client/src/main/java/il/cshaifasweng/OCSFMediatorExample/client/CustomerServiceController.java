@@ -336,7 +336,7 @@ public class CustomerServiceController {
 
         String currentText = complains_detailes.getText();
         String additionalDetails = "\nPurchase information: \nPurchase Type: " + purchase_type +
-                "\nPrice: $" + price +
+                "\nPrice: ₪" + price +
                 "\nDate of Purchase: " + formattedDate +
                 "\nMovie Name: " + movie_name;
 
