@@ -881,7 +881,7 @@ public class SimpleServer extends AbstractServer {
 				+ "</thead>"
 				+ "<tbody>"
 				+ "<tr>"
-				+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Punch Card for Classes</td>"
+				+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>Crtesea</td>"
 				+ "<td style='padding: 10px; border-bottom: 1px solid #ddd;'>₪" + paymentAmount + "</td>"
 				+ "</tr>"
 				+ "</tbody>"
