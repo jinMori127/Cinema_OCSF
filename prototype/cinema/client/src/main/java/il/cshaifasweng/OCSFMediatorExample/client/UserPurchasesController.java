@@ -253,7 +253,7 @@ public class UserPurchasesController {
 
 
                 else if (curr_date_3.before(date_screening) && (link_text == null||link_text.isEmpty())) {
-                    if (purchase_type.equals("Multi Ticket")){
+                    if (purchase_type.equals("Ticket")){
                         Message message = new Message(102, "#return_tickets");
                         message.setObject(auto_num);
                         message.setObject2(numOfSeats);
@@ -275,10 +275,19 @@ public class UserPurchasesController {
                 }
 
                 else if (curr_date_1.before(date_screening)) {
-                    ErrorMessage.setVisible(true);
-                    ErrorMessage.setText("Value returned 50%,Your Total Will be:"+(price/2));
-                    refund = price / 2;
-                    percent_return = 50;
+                    if (!purchase_type.equals("Ticket")) {
+
+                        ErrorMessage.setVisible(true);
+                        ErrorMessage.setText("Value returned 50%,Your Total Will be:" + (price / 2));
+                        refund = price / 2;
+                        percent_return = 50;
+                    }
+                    else {
+                        ErrorMessage.setVisible(true);
+                        ErrorMessage.setText("You used Multi Tiket to buy link ,  returned 0%,Your Total Will be:"+0);
+                        refund = 0;
+
+                    }
                 }
 
                 else {
