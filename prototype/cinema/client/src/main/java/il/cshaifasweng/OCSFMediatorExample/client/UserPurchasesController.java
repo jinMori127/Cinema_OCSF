@@ -244,7 +244,7 @@ public class UserPurchasesController {
 
                 TableColumn<UserPurchases, ?> seven_col = table_view.getColumns().get(7);
                 cellData = seven_col.getCellData(selectedRow);
-                String purchase_type =(String) cellData;
+                String payment_type =(String) cellData;
                 if (date_screening.before(curr_date)) {
                      ErrorMessage.setVisible(true);
                      percent_return=0;
@@ -253,7 +253,7 @@ public class UserPurchasesController {
 
 
                 else if (curr_date_3.before(date_screening) && (link_text == null||link_text.isEmpty())) {
-                    if (purchase_type.equals("Ticket")){
+                    if (payment_type.equals("Multi Ticket")){
                         Message message = new Message(102, "#return_tickets");
                         message.setObject(auto_num);
                         message.setObject2(numOfSeats);
@@ -275,7 +275,7 @@ public class UserPurchasesController {
                 }
 
                 else if (curr_date_1.before(date_screening)) {
-                    if (!purchase_type.equals("Ticket")) {
+                    if (!payment_type.equals("Multi Ticket")) {
 
                         ErrorMessage.setVisible(true);
                         ErrorMessage.setText("Value returned 50%,Your Total Will be:" + (price / 2));

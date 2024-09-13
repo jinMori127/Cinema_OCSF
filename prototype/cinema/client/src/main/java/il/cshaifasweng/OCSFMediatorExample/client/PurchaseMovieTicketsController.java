@@ -403,7 +403,7 @@ public class PurchaseMovieTicketsController {
                 IdUser idUser = (IdUser) eventBox.getMessage().getObject();
                 double price = screening.getMovie().getPrice() * places_took.size();
                 
-                UserPurchases userPurchases = new UserPurchases(seats_str.toString(), "Credit Card", price, idUser, screening);
+                UserPurchases userPurchases = new UserPurchases(seats_str.toString(), "Credit", price, idUser, screening);
                 userPurchases.setSeats(seats_str);
 
                 m.setMessage("#Save_user_purchases");
