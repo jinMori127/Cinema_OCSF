@@ -1957,6 +1957,9 @@ public class SimpleServer extends AbstractServer {
 					message.setObject2(get_Edited_Details());
 					message.setMessage("#UpdateMovieList");
 					sendToAllClients(message);
+					message.setData("The movie was removed successfully");
+					message.setMessage("#ServerError");
+					client.sendToClient(message);
 				}
 				else{
 					message.setData("This Movie has Screenings");
@@ -2008,6 +2011,10 @@ public class SimpleServer extends AbstractServer {
 				message.setObject(getAllMovies());
 				message.setMessage("#UpdateMovieList");
 				sendToAllClients(message);
+
+				message.setMessage("#ServerError");
+				message.setData("The movie was edited successfully");
+				client.sendToClient(message);
 			}
 
 			else if (message.getMessage().equals("#SearchMovies")) {

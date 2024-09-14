@@ -242,6 +242,7 @@ public class MovieEditingDetailsController {
     private byte[] File_uploaded;
     @FXML
     void choose_image(ActionEvent event) {
+        ErrorMessage.setVisible(false);
         FileChooser fileChooser = new FileChooser();
         List<String> lstFile = new ArrayList<String>();
         lstFile.add("*.png");
@@ -284,7 +285,6 @@ public class MovieEditingDetailsController {
 
     @FXML
     void edit_movie(ActionEvent event) {
-        ErrorMessage.setVisible(false);
         if(Movie_id.getText().trim().isEmpty())
         {
             ErrorMessage.setVisible(true);
@@ -478,11 +478,14 @@ public class MovieEditingDetailsController {
                 Movie the_movie = (Movie) event.getMessage().getObject();
                 Movie_id.setText(Integer.toString(the_movie.getAuto_number_movie()));
                 SelectedMovie = the_movie;
+                ErrorMessage.setVisible(true);
+                ErrorMessage.setText("The movie was added successfully");
             });
         }
         else if (event.getId()==BaseEventBox.get_event_id("SHOW_CM_CHANGES")){
             search_movie_name_function();
         }
+
     }
 
     @FXML
@@ -658,7 +661,6 @@ public class MovieEditingDetailsController {
             hbox_movies.getChildren().add(vboxButtons);
             Vbox_movies.getChildren().add(hbox_movies);
         }
-        ErrorMessage.setVisible(false);
     }
 
     public static Movie go_to_screening_movie;
