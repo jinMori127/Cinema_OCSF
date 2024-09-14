@@ -106,7 +106,15 @@ public class UserComplainsController {
         if (purchase_number_text.isEmpty()) {
             purchase_number_text = "-1";
         }
-        int purchase_number = Integer.parseInt(purchase_number_text);
+        int purchase_number;
+        try {
+            purchase_number = Integer.parseInt(purchase_number_text);
+        }
+        catch (NumberFormatException e) {
+            error_text.setVisible(true);
+            error_text.setText("Please enter a valid number");
+            return;
+        }
 
         if(complaint_text.isEmpty()) {
             error_text.setVisible(true);

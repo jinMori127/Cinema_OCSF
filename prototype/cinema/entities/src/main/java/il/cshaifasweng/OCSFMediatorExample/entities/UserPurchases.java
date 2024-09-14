@@ -66,7 +66,7 @@ public class UserPurchases implements Serializable{
         this.movie_name = movie_name;
         this.date_of_purchase = new Date();
         this.seats = "";
-        this.end_date_of_link_activation=end_date_of_link_activation;
+        this.end_date_of_link_activation = end_date_of_link_activation;
     }
 
     // get/set methods

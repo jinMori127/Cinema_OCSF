@@ -14,11 +14,11 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.fxml.Initializable;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import il.cshaifasweng.OCSFMediatorExample.entities.Message;
 import il.cshaifasweng.OCSFMediatorExample.entities.Complains;
+import javafx.scene.text.Text;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -70,6 +70,9 @@ public class CustomerServiceController {
 
     @FXML
     private TextField returned_price;
+
+    @FXML
+    private Text error_message;
 
     private boolean phase;
 
@@ -131,6 +134,7 @@ public class CustomerServiceController {
         respond.setEditable(false);
         submit_respond.setDisable(true);
         respond_col.setVisible(false);
+        error_message.setVisible(false);
         phase = true;
 
         branch.getItems().clear();
@@ -170,6 +174,12 @@ public class CustomerServiceController {
             auto_number = (int) cellData;
         }
         List<Object> respond_then_phase = new ArrayList<>();
+        if(respond.getText().isEmpty())
+        {
+            error_message.setVisible(true);
+            error_message.setText("Please enter the respond message");
+            return;
+        }
         respond_then_phase.add(respond.getText());
         respond_then_phase.add(phase);
         insert_message.setObject(respond_then_phase);
@@ -179,7 +189,15 @@ public class CustomerServiceController {
         {
             return_price_text = "0";
         }
-        int convert_price = Integer.parseInt(return_price_text);
+        int convert_price;
+        try {
+            convert_price = Integer.parseInt(return_price_text);
+        }
+        catch (NumberFormatException e) {
+            error_message.setVisible(true);
+            error_message.setText("Please enter a valid number");
+            return;
+        }
         insert_message.setObject3(convert_price);
         try {
             SimpleClient.getClient().sendToServer(insert_message);
@@ -214,6 +232,7 @@ public class CustomerServiceController {
         returned_price.setText("");
         respond.setEditable(false);
         submit_respond.setDisable(true);
+        error_message.setVisible(false);
         phase = true;
         respond_col.setVisible(false);
         Message insert_message = new Message(23, "#show_complains");
@@ -364,6 +383,8 @@ public class CustomerServiceController {
         complains_detailes.setText("");
         respond.setText("");
         returned_price.setText("");
+        error_message.setText("");
+        error_message.setVisible(false);
         respond.setEditable(false);
         submit_respond.setDisable(true);
     }
