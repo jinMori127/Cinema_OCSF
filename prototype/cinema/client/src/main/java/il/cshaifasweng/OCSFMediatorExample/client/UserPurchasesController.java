@@ -169,10 +169,10 @@ public class UserPurchasesController {
                 ErrorMessage.setVisible(true);
                 if(link_text == null || link_text.isEmpty()) {
                     ErrorMessage.setText("Note:\nif still more than 3 hours you will get 100%\nif still between 1-3 hours you will get 50%\n" +
-                            "in Other cases you will get 0 %");
+                            "if you used MultiTicket and still  more than 1 hour you will get your tikcet"+"\nin Other cases you will get 0 %");
                 }
                 else {
-                    ErrorMessage.setText("Note:\nYou can return the home link till hour before it's activation and get 50%\n" +
+                    ErrorMessage.setText("Note:\nYou can return the home link till hour before it's activation and get 50%(Take into account if  you used MultiTicket You will get 0)\n" +
                             "in Other cases you will get 0 %");
                 }
             } else {
@@ -258,7 +258,7 @@ public class UserPurchasesController {
                         message.setObject(auto_num);
                         message.setObject2(numOfSeats);
                         ErrorMessage.setVisible(true);
-                        ErrorMessage.setText("Value returned is"+numOfSeats+ "tickets" );
+                        ErrorMessage.setText("Value returned is "+numOfSeats+ " tickets" );
                         try {
                             SimpleClient.getClient().sendToServer(message);
                         } catch (IOException e) {
@@ -282,11 +282,16 @@ public class UserPurchasesController {
                         refund = price / 2;
                         percent_return = 50;
                     }
-                    else {
+                    else if (link_text != null && !link_text.trim().isEmpty()) {
                         ErrorMessage.setVisible(true);
-                        ErrorMessage.setText("You used Multi Tiket to buy link ,  returned 0%,Your Total Will be:"+0);
+                        ErrorMessage.setText("Value returned 0%,Your Total Will be:"+0);
                         refund = 0;
 
+                    }
+                    else {
+                        ErrorMessage.setVisible(true);
+                        ErrorMessage.setText("Value returned 0%,Your Total Will be:"+0);
+                        refund = 0;
                     }
                 }
 
