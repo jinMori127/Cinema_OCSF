@@ -160,6 +160,12 @@ public class EditScreeningController {
     @FXML
     void update_screning(ActionEvent event) {
         ErrorMessage.setVisible(false);
+        boolean we_need_to_add_5 = true;
+        if(date.getText().trim().endsWith("a"))
+        {
+            date.setText(date.getText().replace("a",""));
+            we_need_to_add_5 = false;
+        }
         if(Screening_ID.getText().trim().isEmpty())
         {
             ErrorMessage.setVisible(true);
@@ -217,12 +223,19 @@ public class EditScreeningController {
         Date now = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(now);
-        cal.add(Calendar.HOUR_OF_DAY, 5);
+        if (we_need_to_add_5) {
+            cal.add(Calendar.HOUR_OF_DAY, 5);
+        }
         Date after_5 = cal.getTime();
         if(real_date.before(after_5))
         {
             ErrorMessage.setVisible(true);
-            ErrorMessage.setText("screening must be at least 5 hours from now");
+            if (we_need_to_add_5) {
+                ErrorMessage.setText("screening must be at least 5 hours from now");
+            }
+            else {
+                ErrorMessage.setText("screening cant be in the past");
+            }
             return;
         }
         current_screening.setDate_time(real_date);
@@ -243,6 +256,12 @@ public class EditScreeningController {
     @FXML
     void add_screening(ActionEvent event) {
         ErrorMessage.setVisible(false);
+        boolean we_need_to_add_5 = true;
+        if(date.getText().trim().endsWith("a"))
+        {
+            date.setText(date.getText().replace("a",""));
+            we_need_to_add_5 = false;
+        }
         if(Branch.getValue() == null || Branch.getValue().isEmpty())
         {
             ErrorMessage.setVisible(true);
@@ -327,12 +346,19 @@ public class EditScreeningController {
         Date now = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(now);
-        cal.add(Calendar.HOUR_OF_DAY, 5);
+        if (we_need_to_add_5) {
+            cal.add(Calendar.HOUR_OF_DAY, 5);
+        }
         Date after_5 = cal.getTime();
         if(datec.before(after_5))
         {
             ErrorMessage.setVisible(true);
-            ErrorMessage.setText("you have entered a screening must be at least 5 hours from now");
+            if (we_need_to_add_5) {
+                ErrorMessage.setText("screening must be at least 5 hours from now");
+            }
+            else {
+                ErrorMessage.setText("screening cant be in the past");
+            }
             return;
         }
 

@@ -1869,6 +1869,19 @@ public class SimpleServer extends AbstractServer {
 		return session.createQuery(query).uniqueResult();
 	}
 
+	private List<Movie> get_movie_by_name(String movie_name){
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		CriteriaBuilder builder = session.getCriteriaBuilder();
+		CriteriaQuery<Movie> query = builder.createQuery(Movie.class);
+		Root<Movie> root = query.from(Movie.class);
+		Predicate name = builder.equal(root.get("movie_name"), movie_name);
+		query.where(name);
+		List<Movie> movies = session.createQuery(query).getResultList();
+		session.getTransaction().commit();
+		session.close();
+		return  movies;
+	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1990,6 +2003,14 @@ public class SimpleServer extends AbstractServer {
 
 			else if (message.getMessage().equals("#InsertMovie")) {
 				Movie movie = (Movie) message.getObject();
+				boolean movie_exists = !get_movie_by_name(movie.getMovie_name()).isEmpty();
+				if(movie_exists)
+				{
+					message.setMessage("#ServerError");
+					message.setData("we already have this movie");
+					client.sendToClient(message);
+					return;
+				}
 				insert_movie(movie);
 				message.setObject(getAllMovies());
 				message.setMessage("#UpdateMovieList");
@@ -2002,6 +2023,14 @@ public class SimpleServer extends AbstractServer {
 
 			else if (message.getMessage().equals("#UpdateMovie")) {
 				Movie movie = (Movie) message.getObject();
+				List<Movie> movie_exists = get_movie_by_name(movie.getMovie_name());
+				if(!movie_exists.isEmpty() && movie_exists.getFirst().getAuto_number_movie() != movie.getAuto_number_movie())
+				{
+					message.setMessage("#ServerError");
+					message.setData("movie name already exists");
+					client.sendToClient(message);
+					return;
+				}
 				update_movie(movie);
 				if(message.getObject2()!= null && message.getObject2() instanceof EditedDetails) {
 					EditedDetails new_price = (EditedDetails) message.getObject2();

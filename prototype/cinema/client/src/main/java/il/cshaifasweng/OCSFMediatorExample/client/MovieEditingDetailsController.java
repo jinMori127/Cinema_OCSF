@@ -440,18 +440,6 @@ public class MovieEditingDetailsController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        Movie_id.setText("");
-        movie_name.setText("");
-        lead_actor.setText("");
-        catgory.setValue("");
-        year.setText("");
-        duration.setText("");
-        selected_image.setImage(null);
-        director.setText("");
-        price.setText("");
-        description.setText("");
-        File_uploaded = null;
-        SelectedMovie = null;
     }
     private static Movie SelectedMovie;
     @Subscribe
@@ -696,6 +684,23 @@ public class MovieEditingDetailsController {
             {
                 ErrorMessage.setVisible(true);
                 ErrorMessage.setText(event.getMessage().getData());
+                if(event.getMessage().getData().equals("The movie was edited successfully"))
+                {
+                    Movie_id.setText("");
+                    movie_name.setText("");
+                    lead_actor.setText("");
+                    catgory.setValue("");
+                    year.setText("");
+                    duration.setText("");
+                    selected_image.setImage(null);
+                    director.setText("");
+                    price.setText("");
+                    description.setText("");
+                    movie_link.setText("");
+                    rating.setText("");
+                    File_uploaded = null;
+                    SelectedMovie = null;
+                }
                 return;
             });
         }
