@@ -90,6 +90,9 @@ public class MovieDetailsController {
     @FXML
     void initialize() {
         ErrorMessage.setVisible(false);
+
+        if (current_movie.getMovie_link().isEmpty()) purchase_butt.setVisible(false);
+
         EventBus.getDefault().register(this);
 
         assert branchesBox != null : "fx:id=\"branchesBox\" was not injected: check your FXML file 'MovieDetails.fxml'.";
