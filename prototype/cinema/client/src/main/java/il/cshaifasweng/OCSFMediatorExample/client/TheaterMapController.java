@@ -34,8 +34,7 @@ public class TheaterMapController {
     @FXML
     private Button buy_button;
 
-    @FXML
-    private Text seats_txt;
+
 
     @FXML
     private Text ErrorMessage;
@@ -50,7 +49,7 @@ public class TheaterMapController {
     public void initialize() {
         EventBus.getDefault().register(this);
         ErrorMessage.setVisible(false);
-        seats_txt.setText("# of chosen seats: " + counter);
+
         Message m = new Message(1000, "#get_screening_from_id");
         m.setObject(screening_id);
         try {
@@ -194,7 +193,7 @@ public class TheaterMapController {
                             {
                                 places_took.remove(list);
                                 counter --;
-                                seats_txt.setText("# of chosen seats: " + counter);
+
                                 break;
                             }
                         }
@@ -207,7 +206,7 @@ public class TheaterMapController {
                         l1.add(finalCol);
                         places_took.add(l1);
                         counter ++;
-                        seats_txt.setText("# of chosen seats: " + counter);
+
                     }
                     screening.setTheater_map(create_string_of_map(map));
                     Message m = new Message(10000, "#Update_theater_map");

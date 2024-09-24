@@ -91,7 +91,6 @@ public class MovieDetailsController {
     void initialize() {
         ErrorMessage.setVisible(false);
 
-        if (current_movie.getMovie_link().isEmpty()) purchase_butt.setVisible(false);
 
         EventBus.getDefault().register(this);
 
@@ -118,6 +117,8 @@ public class MovieDetailsController {
     private void Lay_out_Movie_details()
     {
         if (current_movie != null) {
+            if (current_movie.getMovie_link().isEmpty()) purchase_butt.setVisible(false);
+            else purchase_butt.setVisible(true);
             Director.setText("Directed by: ");
             leading_actor.setText("Leading actor: ");
             rating.setText("Rating: ");

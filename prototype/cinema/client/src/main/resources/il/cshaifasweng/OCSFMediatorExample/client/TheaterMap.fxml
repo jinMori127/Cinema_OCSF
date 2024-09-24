@@ -7,7 +7,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.TheaterMapController">
+<ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.TheaterMapController">
   <content>
     <AnchorPane fx:id="anchore_pane" prefHeight="220.0" prefWidth="353.0">
          <children>
@@ -19,7 +19,6 @@
                </font>
             </Text>
             <Button fx:id="back_button" layoutX="9.0" layoutY="194.0" mnemonicParsing="false" onAction="#go_back" text="back" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
-            <Text fx:id="seats_txt" layoutX="219.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
          </children></AnchorPane>
   </content>
 </ScrollPane>
