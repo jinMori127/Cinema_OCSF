@@ -19,6 +19,7 @@
                </font>
             </Text>
             <Button fx:id="back_button" layoutX="9.0" layoutY="194.0" mnemonicParsing="false" onAction="#go_back" text="back" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+            <Text fx:id="seats_txt" layoutX="61.0" layoutY="48.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
          </children></AnchorPane>
   </content>
 </ScrollPane>
