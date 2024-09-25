@@ -33,20 +33,20 @@
             <Text layoutX="25.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="leading actor:" />
             <Text layoutX="25.0" layoutY="129.0" strokeType="OUTSIDE" strokeWidth="0.0" text="catgory:" />
             <Text layoutX="202.0" layoutY="69.0" strokeType="OUTSIDE" strokeWidth="0.0" text="duration:" />
-            <Text layoutX="34.0" layoutY="158.0" strokeType="OUTSIDE" strokeWidth="0.0" text="year:" />
+            <Text layoutX="25.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="year:" />
             <Text layoutX="206.0" layoutY="100.0" strokeType="OUTSIDE" strokeWidth="0.0" text="image :" />
             <Text layoutX="204.0" layoutY="129.0" strokeType="OUTSIDE" strokeWidth="0.0" text="director:" />
             <Text layoutX="550.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0" text="description: " />
             <Button fx:id="edit_movie" layoutX="669.0" layoutY="90.0" mnemonicParsing="false" onAction="#edit_movie" text="edit" />
             <Button fx:id="add_movie" layoutX="669.0" layoutY="132.0" mnemonicParsing="false" onAction="#add_movie" text="add" />
-            <Text layoutX="213.0" layoutY="158.0" strokeType="OUTSIDE" strokeWidth="0.0" text="price" />
+            <Text layoutX="245.0" layoutY="161.0" strokeType="OUTSIDE" strokeWidth="0.0" text="price" />
             <TextField fx:id="movie_name" layoutX="59.0" layoutY="51.0" prefHeight="26.0" prefWidth="130.0" />
             <TextField fx:id="lead_actor" layoutX="105.0" layoutY="84.0" prefHeight="26.0" prefWidth="90.0" />
-            <TextField fx:id="year" layoutX="61.0" layoutY="141.0" />
+            <TextField fx:id="year" layoutX="60.0" layoutY="151.0" />
             <TextField fx:id="duration" layoutX="254.0" layoutY="52.0" prefHeight="26.0" prefWidth="65.0" />
             <Button fx:id="image" layoutX="254.0" layoutY="83.0" mnemonicParsing="false" onAction="#choose_image" text="choose image" />
             <TextField fx:id="director" layoutX="258.0" layoutY="111.0" prefHeight="26.0" prefWidth="82.0" />
-            <TextField fx:id="price" layoutX="254.0" layoutY="140.0" prefHeight="26.0" prefWidth="65.0" />
+            <TextField fx:id="price" layoutX="287.0" layoutY="144.0" prefHeight="26.0" prefWidth="65.0" />
             <TextArea fx:id="description" layoutX="497.0" layoutY="57.0" prefHeight="117.0" prefWidth="171.0" />
             <ComboBox fx:id="catgory" layoutX="75.0" layoutY="112.0" prefHeight="26.0" prefWidth="119.0" />
             <Text layoutX="20.0" layoutY="34.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Movie_id:" />

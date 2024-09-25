@@ -10,7 +10,7 @@
    <children>
       <TextField fx:id="user_id" alignment="CENTER" layoutX="173.0" layoutY="200.0" prefHeight="25.0" prefWidth="252.0" promptText="ID NUMBER" />
       <Button layoutX="276.0" layoutY="253.0" mnemonicParsing="false" onAction="#log_in_button" text="LogIn" />
-      <Text layoutX="146.0" layoutY="141.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Please insert your ID to connect to COOLNOA's system successfully " textAlignment="CENTER" wrappingWidth="306.66668701171875">
+      <Text layoutX="146.0" layoutY="141.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Please insert your ID to connect to Luna Aura's system successfully " textAlignment="CENTER" wrappingWidth="306.66668701171875">
          <font>
             <Font name="Agency FB" size="16.0" />
          </font>
