@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.text.Text;
+import javafx.scene.paint.Color;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -127,6 +128,9 @@ public class UserComplainsController {
             return;
         }
         else {
+            error_text.setText("Complaint received! A response will be sent within 24 hours.");
+            error_text.setFill(Color.GREEN);
+            error_text.setVisible(true);
             Complains new_complaint = new Complains();
             new_complaint.setId_user(UserLogInWithIDController.idUser);
             new_complaint.setComplain_text(complaint_text);
