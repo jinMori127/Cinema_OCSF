@@ -60,18 +60,23 @@ The system supports multiple user roles, including:
 
 ---
 
-## Manager Operations
-
-### 1. Movie and Package Updates
-- Content managers can update the list of movies and viewing packages, including adding/removing movies, updating showtimes, and adjusting prices (with network manager approval).
-
-### 2. Operational Tracking
+## Branch Manager Operations
+### 1. Operational Tracking
 - Monthly reports on ticket sales by theater, pass sales, and home viewing package sales.
 - Complaint status reports available to both theater and network managers.
-- The system is designed to be flexible for generating new reports with minimal development effort.
 
 ---
+## Manager Operations
 
+### 1. Price Approval
+- Review and approve or deny pricing changes proposed by the content manager.
+
+### 2. Operational Tracking
+- Generate monthly reports on ticket sales categorized by theater, as well as pass sales and home viewing package sales.
+- Access complaint status reports, which are available to both theater and network managers for effective oversight.
+
+
+---
 ## Customer Service Operations
 
 ### 1. Handling Complaints
