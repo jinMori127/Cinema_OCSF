@@ -5,7 +5,7 @@ This project was developed as part of the Software Engineering course. It involv
 
 ## Features
 The system supports multiple user roles, including:
-- **Manager**
+- **Network Manager**
 - **Branch Manager**
 - **Customer Service Worker**
 - **Content Manager**
@@ -66,7 +66,7 @@ The system supports multiple user roles, including:
 - Complaint status reports available to both theater and network managers.
 
 ---
-## Manager Operations
+## Network Manager Operations
 
 ### 1. Price Approval
 - Review and approve or deny pricing changes proposed by the content manager.
@@ -77,6 +77,17 @@ The system supports multiple user roles, including:
 
 
 ---
+## Content Manager
+
+### 1. Edit Movie Details
+- Update and modify the details of movies, including titles, descriptions, and cast information.
+
+### 2. Price Modification
+- Adjust the prices of movies, which requires approval from the network manager before implementation.
+
+
+---
+
 ## Customer Service Operations
 
 ### 1. Handling Complaints
