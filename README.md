@@ -1,7 +1,7 @@
 # Cinema Site Project
 
 ## Overview
-This project was developed as part of the Software Engineering course. It involves creating a management system for a movie theater chain called "LunaAura". The system enables users to browse movies, purchase tickets, buy streaming links for home viewing, and improve customer service.
+This project was developed as part of the Software Engineering course. It involves creating a management system for a movie theater chain called **"LunaAura."** The system enables users to browse movies, purchase tickets, buy streaming links for home viewing, and improve customer service.
 
 ## Features
 The system supports multiple user roles, including:
@@ -9,14 +9,15 @@ The system supports multiple user roles, including:
 - **Branch Manager**
 - **Customer Service Worker**
 - **Content Manager**
-- **User**
+- **Customers**
+- **Guests**
 
 ---
 
-## User Operations:
+## Guest & User Operations
 
 ### 1. Movie Browsing
-- View a list of movies currently showing in the theaters.
+- View a list of movies currently showing in theaters.
 - View upcoming movies.
 - Access details such as the movie’s name, producer, main actors, summary, and an image.
 
@@ -44,20 +45,29 @@ The system supports multiple user roles, including:
 - Possible financial compensation for valid complaints.
 
 ---
+### Employees log in with a username and password to access the full system.
 
-## Manager Operations:
+---
 
-### 7. Movie and Package Updates
+## Manager Operations
+
+### 1. Movie and Package Updates
 - Content managers can update the list of movies and viewing packages, including adding/removing movies, updating showtimes, and adjusting prices (with network manager approval).
 
-### 8. Operational Tracking
+### 2. Operational Tracking
 - Monthly reports on ticket sales by theater, pass sales, and home viewing package sales.
 - Complaint status reports available to both theater and network managers.
 - The system is designed to be flexible for generating new reports with minimal development effort.
 
-### 9. User Information
-- Employees log in with a username and password to access the full system.
-- Customers are identified by their ID numbers.
+
+## Customer Service Operations
+
+### 1. Handling Complaints
+- Customer service representatives are responsible for addressing complaints from customers.
+
+### 2. Compensation Decisions
+- Customer service representatives have the authority to decide on financial compensation for customers based on the validity of the complaint. 
+- Compensation includes refunds.
 
 ---
 
