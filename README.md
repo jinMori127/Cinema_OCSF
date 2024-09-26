@@ -37,6 +37,7 @@ The system supports multiple user roles, including:
 ###  When a guest makes a purchase, they are converted to a customer.
 
 
+---
 
 ## Customer Operations
 
@@ -55,8 +56,14 @@ The system supports multiple user roles, including:
 
 ---
 
-### Employee Access
+
+
+
+
+
+### Employee Access:
 - Employees log in with a username and password to access the full system.
+
 
 ---
 
@@ -66,6 +73,7 @@ The system supports multiple user roles, including:
 - Complaint status reports available to both theater and network managers.
 
 ---
+
 ## Network Manager Operations
 
 ### 1. Price Approval
