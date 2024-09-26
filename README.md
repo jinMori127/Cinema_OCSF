@@ -14,7 +14,7 @@ The system supports multiple user roles, including:
 
 ---
 
-## Guest & User Operations
+## Guest & Customer Operations
 
 ### 1. Movie Browsing
 - View a list of movies currently showing in theaters.
@@ -34,18 +34,29 @@ The system supports multiple user roles, including:
 - Purchase a pass for 20 movie tickets at a discounted rate.
 - Use the pass at any theater in the chain, subject to seat availability.
 
-### 5. Purchase Cancellation
-- Cancel movie tickets up to three hours before the showtime for a full refund.
-- Cancel movie tickets between three hours and one hour before showtime for a 50% refund.
-- Cancel home viewing packages up to one hour before the link becomes active for a 50% refund.
+###  When a guest makes a purchase, they are converted to a customer.
 
-### 6. Customer Service
+
+
+## Customer Operations
+
+### 1. Customer Identification
+- Customers can be identified by their ID.
+
+### 2. Customer Service
 - Submit complaints via the system.
 - Receive a response within 24 hours via email.
 - Possible financial compensation for valid complaints.
 
+### 3. Purchase Cancellation
+- Cancel movie tickets up to three hours before the showtime for a full refund.
+- Cancel movie tickets between three hours and one hour before showtime for a 50% refund.
+- Cancel home viewing packages up to one hour before the link becomes active for a 50% refund.
+
 ---
-### Employees log in with a username and password to access the full system.
+
+### Employee Access
+- Employees log in with a username and password to access the full system.
 
 ---
 
@@ -59,6 +70,7 @@ The system supports multiple user roles, including:
 - Complaint status reports available to both theater and network managers.
 - The system is designed to be flexible for generating new reports with minimal development effort.
 
+---
 
 ## Customer Service Operations
 
