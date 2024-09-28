@@ -98,6 +98,9 @@ Purchase using MultiTicket:
 ### Employee Access:
 - Employees log in with a username and password to access the full system.
 
+![WORKERLOGIN](https://github.com/user-attachments/assets/5fa71399-19a0-46b6-a467-c9761f1b7ee2)
+
+
 
 ---
 
