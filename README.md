@@ -21,6 +21,9 @@ The system supports multiple user roles, including:
 - View upcoming movies.
 - Access details such as the movie’s name, producer, main actors, summary, and an image.
 
+![Recording 2024-09-29 010005](https://github.com/user-attachments/assets/b31772db-f89b-49db-8e00-7eab4f787b57)
+
+
 ### 2. Ticket Purchase
 - Purchase tickets for movies shown in theaters.
 - Select specific seats from a map of the theater hall.
