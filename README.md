@@ -50,6 +50,17 @@ Email Recived:
 - Purchase a pass for 20 movie tickets at a discounted rate.
 - Use the pass at any theater in the chain, subject to seat availability.
 
+![MultiPurchase](https://github.com/user-attachments/assets/e59774c6-4197-47a5-8bcc-9ec515474e18)
+
+Purchase using MultiTicket:
+
+![purchaselinkmulti](https://github.com/user-attachments/assets/733b8090-6496-4ff0-802f-03ef68296e56)
+
+
+
+
+
+
 ###  When a guest makes a purchase, they are converted to a customer.
 
 
