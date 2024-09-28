@@ -48,8 +48,9 @@ The system supports multiple user roles, including:
 
 ### 2. Customer Service
 - Submit complaints via the system.
-- Receive a response within 24 hours via email.
 - Possible financial compensation for valid complaints.
+![Complain](https://github.com/user-attachments/assets/e3dd70ca-6686-4d98-b721-a41436f53594)
+
 
 ### 3. Purchase Cancellation
 - Cancel movie tickets up to three hours before the showtime for a full refund.
