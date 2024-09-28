@@ -127,8 +127,14 @@ Purchase using MultiTicket:
 ### 1. Edit Movie Details
 - Update and modify the details of movies, including titles, descriptions, and cast information.
 
+![EDITINGDETAILS](https://github.com/user-attachments/assets/2d361139-0025-49b0-bad3-95b817608caf)
+
+
 ### 2. Price Modification
 - Adjust the prices of movies, which requires approval from the network manager before implementation.
+
+![EditPrice](https://github.com/user-attachments/assets/9a645fa4-076b-46d1-b8ba-7b3eef1915b3)
+
 
 
 ---
