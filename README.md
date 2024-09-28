@@ -26,6 +26,14 @@ The system supports multiple user roles, including:
 - Select specific seats from a map of the theater hall.
 - Receive a digital ticket via email with movie details, theater location, and seating information.
 
+![purchaseticket](https://github.com/user-attachments/assets/be65ca1a-274a-4834-b47c-8bff3c82c594)
+
+Email Recived:
+
+![image](https://github.com/user-attachments/assets/024100d7-ac81-49f7-a75b-87a0083f8691)
+
+
+
 ### 3. Home Viewing Links
 - Purchase links for limited-time access to movies for home viewing.
 - Receive a streaming link via email with the movie’s name and link.
