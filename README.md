@@ -38,6 +38,13 @@ Email Recived:
 - Purchase links for limited-time access to movies for home viewing.
 - Receive a streaming link via email with the movie’s name and link.
 
+![homwlinkpurchase](https://github.com/user-attachments/assets/6cee8add-7ddc-4eae-848f-809cc1fb5afc)
+
+Email Recived:
+![image](https://github.com/user-attachments/assets/b03aae95-b6ff-4b28-8aa2-b54d8cecb9b2)
+
+
+
 ### 4. Ticket Pass
 - Purchase a pass for 20 movie tickets at a discounted rate.
 - Use the pass at any theater in the chain, subject to seat availability.
