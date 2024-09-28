@@ -43,7 +43,7 @@ The system supports multiple user roles, including:
 
 ### 1. Customer Identification
 - Customers can be identified by their ID.
-  ![LOGINUSER](https://github.com/user-attachments/assets/3b1a70af-c578-4f7e-a256-14b967aab28a)
+![LOGINUSER (2)](https://github.com/user-attachments/assets/5c888371-e5ad-490f-bdde-5cd8d214b0a2)
 
 
 ### 2. Customer Service
