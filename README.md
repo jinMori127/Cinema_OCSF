@@ -85,6 +85,9 @@ Purchase using MultiTicket:
 - Cancel movie tickets between three hours and one hour before showtime for a 50% refund.
 - Cancel home viewing packages up to one hour before the link becomes active for a 50% refund.
 
+![cancel purchase](https://github.com/user-attachments/assets/7764fe9d-43c1-4f4a-938e-9492c8093817)
+
+
 ---
 
 
