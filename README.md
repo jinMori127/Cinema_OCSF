@@ -163,14 +163,42 @@ The system is to be developed in Java, with a distributed architecture. The firs
 ## Team Collaboration
 The project is to be developed collaboratively by all group members.
 
+
+### Setup Instructions
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   ```
+
+2. **Navigate to the project directory:**
+   ```bash
+   cd <project-directory>
+   ```
+
+3. **Start the server:**
+   ```bash
+   java -jar <server-file>.jar
+   ```
+   - **Note:** Insert your SQL password and host for the HTTP server configuration.
+
+4. **Run the client:**
+
+5. **Choose your host and IP:**
+   - If running locally, keep it as the default:
+     ```bash
+     localhost:3000
+     ```
+   - If using ngrok, set the host and IP the same as your ngrok instance.
+     For example:
+     ```
+     Host: 0.tcp.eu.ngrok.io
+     Port: 10160
+     ```
+6. **You're now ready to go!**
 ---
 
-## Getting Started
-1. Clone the repository: `git clone <repository-url>`
-2. Navigate to the project directory: `cd <project-directory>`
-3. Set up the environment and dependencies (e.g., using Maven or Gradle).
-4. Start the development server: `java -jar <server-file>.jar`
-
+This corrected version addresses grammar issues, organizes the steps more clearly, and refines instructions for readability.
 ---
 
 ## Contributing
