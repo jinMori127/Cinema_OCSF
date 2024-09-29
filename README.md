@@ -198,7 +198,6 @@ The project is to be developed collaboratively by all group members.
 6. **You're now ready to go!**
 ---
 
-This corrected version addresses grammar issues, organizes the steps more clearly, and refines instructions for readability.
 ---
 
 ## Contributing
