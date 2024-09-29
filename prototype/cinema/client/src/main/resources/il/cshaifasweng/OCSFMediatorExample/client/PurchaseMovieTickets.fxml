@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.PurchaseMovieTicketsController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.PurchaseMovieTicketsController">
    <children>
       <Button layoutX="360.0" layoutY="341.0" mnemonicParsing="false" onAction="#pay_amount" text="pay" />
       <Text fx:id="ErrorMessage" fill="RED" layoutX="27.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ErrorMessage" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -24,5 +24,10 @@
       <TextField fx:id="phone_number" layoutX="246.0" layoutY="236.0" promptText="Phone Number:" />
       <Button fx:id="use_multiTicket_butt" layoutX="243.0" layoutY="341.0" mnemonicParsing="false" onAction="#multiTicket_pay" text="use multi ticket" />
       <Button layoutX="183.0" layoutY="341.0" mnemonicParsing="false" onAction="#go_back" text="back" />
+      <Text fx:id="price_text_filed" layoutX="14.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="164.63671875">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Text>
    </children>
 </AnchorPane>

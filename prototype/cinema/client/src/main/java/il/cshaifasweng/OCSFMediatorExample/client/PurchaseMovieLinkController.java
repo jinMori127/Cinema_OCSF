@@ -63,7 +63,8 @@ public class PurchaseMovieLinkController {
     @FXML
     private Text error_message;
 
-
+    @FXML
+    private Text price_text_filed;
 
     @FXML
     private DatePicker date_pic;
@@ -74,11 +75,12 @@ public class PurchaseMovieLinkController {
 
 
     @FXML
-    private Button purchase_multi;
-
-    @FXML
     public void initialize() {
         EventBus.getDefault().register(this);
+        price_text_filed.setVisible(true);
+        price_text_filed.setText("Payment Amount: " + MovieDetailsController.current_movie.getPrice());
+
+
         if(UserLogInWithIDController.idUser != null) {
             IdUser old_id_user = UserLogInWithIDController.idUser;
             String full_name = old_id_user.getName();
@@ -115,9 +117,6 @@ public class PurchaseMovieLinkController {
         });
 
         date_pic.setValue(today);
-
-
-
     }
 
     @FXML

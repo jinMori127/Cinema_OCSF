@@ -7,9 +7,6 @@ import javafx.fxml.FXML;
 import javafx.scene.text.Text;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
@@ -19,8 +16,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 public class PurchaseMovieTicketsController {
 
@@ -52,7 +48,7 @@ public class PurchaseMovieTicketsController {
     private TextField phone_number;
 
     @FXML
-    private Button use_multiTicket_butt;
+    private Text price_text_filed;
 
     List<MultiEntryTicket> multiTickets;
 
@@ -244,6 +240,14 @@ public class PurchaseMovieTicketsController {
     @FXML
     public void initialize() {
         ErrorMessage.setVisible(false);
+
+        // calculate the price
+        ArrayList<ArrayList<Integer>> places_took = TheaterMapController.places_took;
+        Screening screening = TheaterMapController.screening;
+        double price = screening.getMovie().getPrice() * places_took.size();
+
+        price_text_filed.setVisible(true);
+        price_text_filed.setText("payment amount:" + price);
         EventBus.getDefault().register(this);
         if (UserLogInWithIDController.idUser != null) {
             IdUser user= UserLogInWithIDController.idUser;

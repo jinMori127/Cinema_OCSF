@@ -8,9 +8,10 @@
 <?import javafx.scene.paint.LinearGradient?>
 <?import javafx.scene.paint.RadialGradient?>
 <?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="575.0" prefWidth="774.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.PurchaseMovieLinkController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="575.0" prefWidth="774.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="il.cshaifasweng.OCSFMediatorExample.client.PurchaseMovieLinkController">
    <children>
       <TextField fx:id="user_id" layoutX="229.0" layoutY="14.0" promptText="id" />
       <TextField fx:id="user_first_name" layoutX="229.0" layoutY="50.0" promptText="First Name" />
@@ -97,5 +98,10 @@
       <Text fx:id="MULTI" fill="RED" layoutX="615.0" layoutY="483.0" strokeType="OUTSIDE" strokeWidth="0.0" />
       <Text layoutX="398.0" layoutY="134.0" strokeType="OUTSIDE" strokeWidth="0.0" text="The End Time is" />
       <DatePicker fx:id="date_pic" layoutX="229.0" layoutY="247.0" />
+      <Text fx:id="price_text_filed" layoutX="11.0" layoutY="68.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="139.13671875">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Text>
    </children>
 </AnchorPane>
