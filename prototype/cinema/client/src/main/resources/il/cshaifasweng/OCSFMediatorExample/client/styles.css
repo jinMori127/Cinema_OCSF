@@ -1,24 +1,185 @@
-.cool-menu {
-    -fx-background-color: #2E8B57;
-    -fx-text-fill: white;
-    -fx-font-size: 16px;
-    -fx-font-family: "Arial";
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0.5, 0, 0);
+
+.vbox {
+    -fx-alignment: center; /* Center the AnchorPane within the VBox */
 }
 
-.cool-menu-item {
-    -fx-background-color: transparent;
+.menu {
+    -fx-background-color: #56203D;
     -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-padding: 8px 15px;
+    -fx-background-radius: 20px;
+}
+.menu-bar{
+    -fx-background-color: #816b7c;
+}
+.menu .label {
+    -fx-text-fill: white;
+}
+.menu .label:hover{
+    -fx-text-fill: black;
+}
+
+.menu:hover {
+    -fx-background-color:#AD7A99 ;
+}
+
+.menu-item {
+    -fx-background-color:#AD7A99;
+    -fx-font-size: 13px; /* Font size */
+    -fx-padding: 5px 15px; /* Padding inside the menu items */
+    -fx-background-radius: 5px;
+}
+.menu-item .label{
+    -fx-text-fill: white;
+}
+
+/* Hover effect for menu items */
+.menu-item:hover {
+    -fx-background-color: #816b7c; /* Background color on hover */
+    -fx-text-fill: #56203D;
+}
+.menu-item .label:hover{
+    -fx-text-fill: #56203D;
+}
+
+
+/* Customize all buttons */
+.button {
+    -fx-background-color: #AD7A99; /* Background color */
+    -fx-text-fill: #ffffff; /* Text color */
+    -fx-font-size: 14px; /* Font size */
+    -fx-font-family: "Arial"; /* Font family */
+    -fx-padding: 5px 10px;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand; /* Cursor changes to hand when hovering */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 3, 0, 0, 1); /* Shadow effect */
+}
+
+/* Hover effect */
+.button:hover {
+    -fx-background-color: #7e496c; /* Darker background color on hover */
+}
+
+/* Pressed effect */
+.button:pressed {
+    -fx-background-color: #7e496c; /* Even darker background when pressed */
+}
+
+/* Focused effect */
+
+.text-field {
+    -fx-alignment: center;
+    -fx-background-color: #ecf0f1; /* Background color of the text field */
+    -fx-text-fill: #2c67a5; /* Text color inside the text field */
+    -fx-font-size: 14px; /* Font size of the text */
+    -fx-font-family: "Times New Roman"; /* Font family of the text */
+    -fx-padding: 5px; /* Padding inside the text field */
+    -fx-background-radius: 5px; /* Rounded corners for the background */
+    -fx-prompt-text-fill: #95a5a6; /* Color of the prompt text */
+}
+
+.text-area {
+    -fx-background-color: #ecf0f1; /* Background color of the text field */
+    -fx-text-fill: #2c67a5; /* Text color inside the text field */
+    -fx-font-size: 14px; /* Font size of the text */
+    -fx-font-family: "Times New Roman"; /* Font family of the text */
+    -fx-padding: 5px; /* Padding inside the text field */
+    -fx-background-radius: 5px; /* Rounded corners for the background */
+    -fx-prompt-text-fill: #95a5a6; /* Color of the prompt text */
+}
+
+
+
+.cool-text-field {
+    -fx-background-color: #F0FFF0;
+    -fx-fill: #1f5d81; /* Use -fx-fill for Text nodes */
+    -fx-border-radius: 5px;
+    -fx-padding: 5px;
+    -fx-font-size: 30px;
+}
+
+
+.cool-text-field:focused {
+    -fx-border-color: #3CB371;
+    -fx-background-color: #FFFFFF;
+}
+
+.cool-label {
+    -fx-text-fill: #2E8B57;
     -fx-font-size: 14px;
     -fx-font-family: "Arial";
 }
 
-.cool-menu-item:hover {
-    -fx-background-color: #3CB371;
-    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.3), 10, 0.5, 0, 0);
+.cool-heading {
+    -fx-text-fill: #2E8B57;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Arial";
 }
 
-.cool-menu-item:pressed {
-    -fx-background-color: #2E8B57;
-    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.5), 5, 0.5, 0, 0);
+.root-pane {
+    -fx-background-color: #F5F5F5;
+    -fx-padding: 20px;
+    -fx-spacing: 10px; /* Adjust as necessary */
+}
+
+
+
+
+
+
+/* Style the entire TableView */
+.table-view {
+    -fx-background-color: #f3f4f6; /* Background color of the table */
+    -fx-border-color: #d1d5db; /* Border color of the table */
+    -fx-table-cell-border-color: #e5e7eb; /* Color of cell borders */
+    -fx-padding: 10px; /* Padding inside the table */
+    -fx-selection-bar: #1f5d81; /* Background color of selected row */
+    -fx-selection-bar-non-focused: #95a5a6; /* Background color of selected row when not focused */
+}
+
+.column-header {
+    -fx-background-color: #1f5d81; /* Background color of column headers */
+    -fx-border-color: #d1d5db; /* Border color of column headers */
+    -fx-text-fill: black; /* Text color of column headers */
+    -fx-font-size: 14px; /* Font size of column headers */
+    -fx-font-weight: bold; /* Bold text for column headers */
+}
+
+
+.combo-box {
+    -fx-background-color: #5e76a5; /* Background color of ComboBox */
+    -fx-background-radius: 5px; /* Background rounded corners */
+    -fx-padding: 5px; /* Padding inside ComboBox */
+    -fx-font-size: 14px; /* Font size of ComboBox text */
+    -fx-font-family: "Arial"; /* Font family of ComboBox text */
+}
+
+.combo-box .text-field {
+    -fx-background-color: transparent; /* Make text field background transparent */
+    -fx-padding: 5px; /* Padding inside text field */
+    -fx-text-fill: white; /* Text color of the ComboBox */
+}
+
+.combo-box-popup{
+    -fx-background-radius: 5px;
+}
+.combo-box-popup .list-view {
+    -fx-background-color: #ffffff; /* Background color of popup list */
+    -fx-border-color: #3498db; /* Border color of popup list */
+    -fx-background-radius: 5px;
+}
+
+/* Style individual list cells */
+.combo-box-popup .list-view .list-cell {
+    -fx-background-color: #ffffff; /* Background color of each item */
+    -fx-text-fill: #2c3e50; /* Text color of each item */
+    -fx-padding: 5px; /* Padding inside each item */
+    -fx-background-radius: 5px;
+}
+
+/* Hover effect for list cells */
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #6c95a1; /* Background color on hover */
 }

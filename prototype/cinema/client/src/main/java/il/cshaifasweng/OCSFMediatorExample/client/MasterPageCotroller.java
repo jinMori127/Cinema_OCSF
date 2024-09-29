@@ -139,6 +139,7 @@ public class MasterPageCotroller {
         // catalog_menu.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> setContent("Movie_editing_details.fxml"));
         create_activity_list();
         setContent("HomePage.fxml");
+        Menu menu = new Menu("File");
 
     }
 
