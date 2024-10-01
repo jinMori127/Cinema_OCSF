@@ -22,8 +22,9 @@ public class Screening implements Serializable {
     private Date date_time;
 
     private int room_number;
-    @Column(columnDefinition = "VARCHAR(5000)")
+    @Column(columnDefinition = "TEXT")
     private String theater_map;
+
     private String branch;
 
 

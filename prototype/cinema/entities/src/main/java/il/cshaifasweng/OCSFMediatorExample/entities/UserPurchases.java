@@ -11,6 +11,8 @@ public class UserPurchases implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int auto_number_purchase;
+
+    @Column(columnDefinition = "TEXT")
     private String seats;
     private String payment_type;
     private double payment_amount;

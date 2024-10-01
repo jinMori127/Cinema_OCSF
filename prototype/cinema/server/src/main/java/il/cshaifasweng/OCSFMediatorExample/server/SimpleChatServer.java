@@ -7,6 +7,7 @@ import il.cshaifasweng.OCSFMediatorExample.entities.Screening;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
@@ -28,32 +29,37 @@ public class SimpleChatServer
 	private static SimpleServer server;
     public static String password;
     public static String host;
-    private static List<Screening> delete_screenings_daily()
-    {
+    private static List<Screening> delete_screenings_daily() {
+        // Open a new session
         Session session = server.sessionFactory.openSession();
 
         // Begin a transaction
         Transaction transaction = null;
-        List<Screening> screeningsToDelete = null;
+        List<Screening> screeningsToDelete = new ArrayList<>();  // Initialize the list to avoid potential NPE
+
         try {
+            // Get the date for one week ago
             LocalDateTime oneWeekAgo = LocalDateTime.now().minusWeeks(1);
             Date dateOneWeekAgo = Date.from(oneWeekAgo.atZone(ZoneId.systemDefault()).toInstant());
+
+            // Start the transaction
             transaction = session.beginTransaction();
+
+            // HQL query to select screenings older than one week
             String selectHql = "FROM Screening WHERE date_time < :oneWeekAgo";
             Query<Screening> selectQuery = session.createQuery(selectHql, Screening.class);
             selectQuery.setParameter("oneWeekAgo", dateOneWeekAgo);
+
+            // Execute the query to retrieve the screenings to delete
             screeningsToDelete = selectQuery.list();
 
-
-
-
-
             // HQL query to delete screenings older than one week
-            String hql = "DELETE FROM Screening WHERE date_time < :oneWeekAgo";
-            int rowsDeleted = session.createQuery(hql)
+            String deleteHql = "DELETE FROM Screening WHERE date_time < :oneWeekAgo";
+            int rowsDeleted = session.createQuery(deleteHql)
                     .setParameter("oneWeekAgo", dateOneWeekAgo)
                     .executeUpdate();
-            // Commit the transaction
+
+            // Commit the transaction after deleting the rows
             transaction.commit();
             System.out.println("Deleted " + rowsDeleted + " past screenings.");
 
@@ -61,13 +67,18 @@ public class SimpleChatServer
             if (transaction != null) {
                 transaction.rollback();  // Rollback in case of an error
             }
-            e.printStackTrace();
+            e.printStackTrace();  // Log the exception
+
         } finally {
-            session.close();
-            return screeningsToDelete;// Close the session
-            //sessionFactory.close();  // Close the session factory
+            // Ensure session is closed in the finally block
+            if (session != null) {
+                session.close();  // Close the session to avoid resource leaks
+            }
         }
+
+        return screeningsToDelete;  // Return the screenings outside the finally block
     }
+
     private static void  log_out_from_everything()
     {
         Session session = server.sessionFactory.openSession();
