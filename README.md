@@ -168,7 +168,7 @@ The project is to be developed collaboratively by all group members.
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/jinMori127/Cinema_OCSF.git
    ```
 
 2. **Navigate to the project directory:**
@@ -207,5 +207,5 @@ The project is to be developed collaboratively by all group members.
 ---
 
 ## Contact
-**CALL 911**  
-[Link to TikTok](https://vt.tiktok.com/ZS2YPYCPr/)
+**email**: samii.serhan@gmail.com  
+**linkedin**: [Sami-serhan](https://www.linkedin.com/in/sami-serhan-101906311/)
